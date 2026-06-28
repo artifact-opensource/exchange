@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTIFACT VIRTUAL | R&D SYSTEMS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030303;
+            --accent: #ffffff;
+            --mercury-silver: #e0e0e0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: var(--bg);
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .snap-container {
+            scroll-snap-type: x mandatory;
+            display: flex;
+            overflow-x: scroll;
+            width: 100vw;
+            height: 100vh;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .snap-section {
+            scroll-snap-align: center;
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: var(--bg);
+        }
+        
+        /* Global scrollbar hide */
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        html, body, * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+
+        /* Post-modern typography treatments */
+        .text-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        .mix-difference {
+            mix-blend-mode: difference;
+        }
+        /* Grain effect */
+        .grain::after {
+            content: "";
+            position: fixed;
+            top: -150%;
+            left: -150%;
+            width: 300%;
+            height: 300%;
+            background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/5c/Image_with_unfiltered_noise.png");
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+            animation: grain 8s steps(10) infinite;
+        }
+        @keyframes grain {
+            0%, 100% { transform:translate(0, 0) }
+            10% { transform:translate(-5%, -10%) }
+            20% { transform:translate(-15%, 5%) }
+            30% { transform:translate(7%, -25%) }
+            40% { transform:translate(-5%, 25%) }
+            50% { transform:translate(-15%, 10%) }
+            60% { transform:translate(15%, 0%) }
+            70% { transform:translate(0%, 15%) }
+            80% { transform:translate(3%, 35%) }
+            90% { transform:translate(-10%, 10%) }
+        }
+
+        /* Mercury Specifics */
+        .mercury-canvas {
+            filter: url(#viscosity);
+            opacity: 0.4;
+        }
+        .displace-text {
+            filter: url(#text-distort);
+        }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="grain">
+    <!-- SVG Filters for Mercurial effects -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="viscosity">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" seed="2">
+                    <animate attributeName="baseFrequency" dur="30s" values="0.01;0.015;0.01" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="80" xChannelSelector="R" yChannelSelector="G" />
+                <feGaussianBlur stdDeviation="5" />
+            </filter>
+            
+            <filter id="text-distort">
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" result="warp" />
+                <feDisplacementMap in="SourceGraphic" in2="warp" scale="0" result="distort">
+                    <animate id="distort-anim" attributeName="scale" dur="0.2s" values="0;15;0" begin="indefinite" />
+                </feDisplacementMap>
+            </filter>
+        </defs>
+    </svg>
+
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

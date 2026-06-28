@@ -1,0 +1,1995 @@
+import type { ResearchItem, ResearchCategory } from "./research-index";
+export type { ResearchItem, ResearchCategory };
+
+// Keyword-based auto-categorization
+export const CATEGORY_KEYWORDS: Record<ResearchCategory, string[]> = {
+  "AI/ML": [
+    "neural", "deep learning", "machine learning", "training", "model",
+    "transformer", "attention", "gradient", "optimization", "inference",
+    "classification", "regression", "clustering", "embedding", "tokeniz",
+    "fine-tun", "pretrain", "pre-train", "llm", "language model",
+    "reinforcement learning", "supervised", "unsupervised", "gan",
+    "diffusion", "autoencoder", "recurrent", "convolution", "cnn", "rnn",
+    "lstm", "bert", "gpt", "llama", "benchmark", "dataset",
+    "sentiment", "nlp", "natural language", "vision", "image",
+    "predict", "forecast", "time series", "muon", "clip",
+    "distillation", "quantiz", "pruning", "sparse", "mixture of experts",
+    "moe", "multimodal", "cross-modal", "autoencoder", "variational",
+  ],
+  "Blockchain/Governance": [
+    "blockchain", "consensus", "governance", "dao", "smart contract",
+    "decentralized", "ledger", "proof of stake", "proof of work",
+    "protocol", "token", "defi", "web3", "on-chain", "off-chain",
+    "validator", "staking", "slashing", "fork", "mainnet", "testnet",
+    "ethereum", "solidity", "evm", "layer 2", "rollup", "sidechain",
+    "interoperability", "bridge", "cross-chain", "oracle", "consensus",
+    "byzantine", "fault tolerance", "distributed", "peer-to-peer",
+    "ipfs", "filecoin", "arweave", "storage", "nft", "sbt",
+    "identity", "verifiable", "credential", "attestation",
+    "regulatory", "compliance", "legal", "framework",
+  ],
+  "Transformers/Architecture": [
+    "transformer", "attention mechanism", "self-attention", "multi-head",
+    "positional encoding", "feed-forward", "encoder", "decoder",
+    "architecture", "layer", "hidden dimension", "parameter",
+    "embedding", "token", "context window", "sequence", "parallel",
+    "scalability", "efficiency", "throughput", "latency",
+    "kernel", "operator", "tensor", "matrix", "vector",
+    "backpropagation", "forward pass", "computation graph",
+    "instruction tuning", "rlhf", "alignment", "prompt",
+    "inference engine", "serving", "deployment", "serving",
+    "quantization", "compilation", "fusion", "schedule",
+  ],
+  "Consciousness/Philosophy": [
+    "consciousness", "awareness", "sentience", "qualia", "phenomenal",
+    "self-aware", "introspection", "metacognition", "mind",
+    "philosophy", "ontology", "epistemology", "ethics", "moral",
+    "identity", "soul", "spirit", "existence", "being",
+    "emergence", "emergent", "complexity", "system",
+    "cognition", "cognitive", "thinking", "reasoning", "thought",
+    "intentionality", "free will", "determinism", "dualism",
+    "materialism", "physicalism", "panpsychism", "functionalism",
+    "hard problem", "binding problem", "frame problem",
+    "artificial consciousness", "machine consciousness",
+    "self-awareness", "introspection", "reflection",
+  ],
+  "Tokenomics": [
+    "tokenomics", "token", "economics", "incentive", "reward",
+    "supply", "demand", "inflation", "deflation", "burn",
+    "mint", "distribution", "allocation", "vesting", "lock",
+    "liquidity", "market maker", "amm", "exchange", "price",
+    "market cap", "valuation", "utility", "governance token",
+    "security token", "stablecoin", "yield", "farming",
+    "staking reward", "transaction fee", "gas", "fee",
+    "economic model", "game theory", "nash equilibrium",
+    "mechanism design", "auction", "bidding", "treasury",
+    "funding", "grant", "subsidy", "monetary policy",
+  ],
+  "Security": [
+    "security", "cryptography", "encryption", "decryption",
+    "hash", "signature", "key", "public key", "private key",
+    "zero knowledge", "zkp", "zksnark", "zk-stark",
+    "authentication", "authorization", "access control",
+    "vulnerability", "exploit", "attack", "threat",
+    "firewall", "intrusion", "malware", "virus",
+    "secure", "privacy", "confidential", "integrity",
+    "audit", "penetration", "fuzzing", "formal verification",
+    "post-quantum", "quantum-resistant", "side-channel",
+    "denial of service", "ddos", "mitm", "phishing",
+    "zero-day", "patch", "cve", "security advisory",
+  ],
+  "Uncategorized": [],
+};
+
+export function autoCategorize(title: string, content?: string): ResearchCategory {
+  const text = `${title} ${""}`.toLowerCase();
+  const scores: Partial<Record<ResearchCategory, number>> = {};
+
+  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (category === "Uncategorized") continue;
+    let score = 0;
+    for (const keyword of keywords) {
+      if (text.includes(keyword)) {
+        score += keyword.split(" ").length;
+      }
+    }
+    if (score > 0) {
+      scores[category as ResearchCategory] = score;
+    }
+  }
+
+  const entries = Object.entries(scores) as [ResearchCategory, number][];
+  if (entries.length === 0) return "Uncategorized";
+
+  entries.sort((a, b) => b[1] - a[1]);
+  return entries[0][0];
+}
+
+export function autoTag(title: string, content?: string): string[] {
+  const text = `${title} ${""}`.toLowerCase();
+  const tags: string[] = [];
+
+  const TAG_KEYWORDS: Record<string, string[]> = {
+    "neural-network": ["neural", "neuron", "deep learning"],
+    "transformer": ["transformer", "attention", "self-attention"],
+    "language-model": ["language model", "llm", "text generation"],
+    "computer-vision": ["vision", "image", "visual", "pixel"],
+    "reinforcement-learning": ["reinforcement", "rl ", "agent", "reward"],
+    "blockchain": ["blockchain", "ledger", "on-chain"],
+    "governance": ["governance", "dao", "voting", "proposal"],
+    "cryptography": ["cryptography", "encryption", "hash", "zero knowledge"],
+    "consciousness": ["consciousness", "awareness", "sentience"],
+    "ethics": ["ethics", "ethical", "moral", "bias"],
+    "optimization": ["optimization", "gradient", "convergence"],
+    "tokenomics": ["tokenomics", "token", "incentive", "supply"],
+    "security": ["security", "attack", "vulnerability", "privacy"],
+    "distillation": ["distillation", "knowledge transfer", "teacher-student"],
+    "quantization": ["quantiz", "int8", "int4", "precision"],
+    "multimodal": ["multimodal", "cross-modal", "vision-language"],
+    "time-series": ["time series", "temporal", "sequence", "forecast"],
+    "graph-neural": ["graph neural", "graph convolution", "node"],
+    "generative": ["generative", "gan", "diffusion", "vae"],
+    "self-supervised": ["self-supervised", "contrastive", "pretext"],
+    "federated": ["federated", "distributed learning", "privacy-preserving"],
+    "knowledge-graph": ["knowledge graph", "ontology", "semantic"],
+    "robotics": ["robot", "robotics", "manipulation", "navigation"],
+    "nlp": ["nlp", "natural language", "text mining"],
+    "benchmark": ["benchmark", "evaluation", "metric", "score"],
+    "architecture": ["architecture", "design", "framework", "system"],
+    "protocol": ["protocol", "specification", "standard"],
+    "simulation": ["simulation", "simulator", "environment"],
+    "theory": ["theory", "theorem", "proof", "formal"],
+  };
+
+  for (const [tag, keywords] of Object.entries(TAG_KEYWORDS)) {
+    if (keywords.some((kw) => text.includes(kw))) {
+      tags.push(tag);
+    }
+  }
+
+  return tags.slice(0, 6);
+}
+
+export function calculateImportance(item: Partial<ResearchItem>): number {
+  let score = 20;
+
+  if (item.date) {
+    const now = new Date();
+    const itemDate = new Date(item.date);
+    const daysDiff = (now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysDiff < 30) score += 30;
+    else if (daysDiff < 90) score += 15;
+    else if (daysDiff < 365) score += 5;
+  }
+
+  if (item.source === "IPFS") score += 10;
+  if (item.source === "HuggingFace") score += 15;
+  if (item.source === "Enterprise") score += 12;
+
+  if (item.tags && item.tags.length > 3) score += 5;
+  if (item.cid) score += 10;
+  if (item.relatedIds && item.relatedIds.length > 2) score += 10;
+
+  return Math.min(100, score);
+}
+
+export function makeItem(base: Omit<ResearchItem, "category" | "tags" | "importance">): ResearchItem {
+  const category = autoCategorize(base.title, base.summary);
+  const tags = autoTag(base.title, base.summary);
+  const importance = calculateImportance({ ...base, tags });
+  return { ...base, category, tags, importance };
+}
+
+// === IPFS Research Items ===
+const ipfsItems = [
+  makeItem({
+    id: "ipfs-neural-topology-v4",
+    title: "Neural Topology v4",
+    cid: "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+    source: "IPFS",
+    date: "2025-08-15",
+    summary:
+      "Comprehensive analysis of neural network topology optimization methods, covering connectivity patterns, layer depth strategies, and information flow dynamics in large-scale transformer architectures.",
+    relatedIds: ["hf-gladius-model", "gladius-resonance-architecture"],
+    context: { field: "AI/ML", domain: "Neural Architecture", specificTopic: "Topology Optimization" },
+  }),
+  makeItem({
+    id: "ipfs-lattice-consensus",
+    title: "Lattice Consensus Architecture",
+    cid: "bafybeih5b4kcx2v4mndp3sc7p4x2oayp3uuxp3j4c45u6o5e44o6wxbuea",
+    source: "IPFS",
+    date: "2025-07-22",
+    summary:
+      "Novel consensus mechanism using lattice-based mathematical structures for Byzantine fault tolerance in decentralized AI governance systems with formal verification guarantees.",
+    relatedIds: ["enterprise-constitutional-intelligence", "arc-whitepaper-adam"],
+    context: { field: "Blockchain/Governance", domain: "Consensus", specificTopic: "Lattice-Based Protocols" },
+  }),
+  makeItem({
+    id: "ipfs-synthetic-entropy",
+    title: "Synthetic Entropy Generation",
+    cid: "bafybeib7vok53z3h4f3z25p34l4g4cvy7yv6c4y4s4u4k54c4n4x4g4o4m",
+    source: "IPFS",
+    date: "2025-06-10",
+    summary:
+      "Method for generating verifiable synthetic entropy from deterministic processes, enabling reproducible randomness in on-chain applications and zero-knowledge proof systems.",
+    relatedIds: ["ipfs-lattice-consensus", "formal-zk-security"],
+    context: { field: "Security", domain: "Cryptography", specificTopic: "Entropy Generation" },
+  }),
+];
+
+// === HuggingFace Datasets ===
+const hfDatasetItems = [
+  makeItem({
+    id: "hf-gladius-research",
+    title: "Gladius Research Corpus",
+    hfDataset: "amuzetnoM/gladius-research",
+    source: "HuggingFace",
+    date: "2025-12-01",
+    summary:
+      "Full research corpus from Artifact Virtual including experimental logs, model outputs, training data, and analysis from the GLADIUS cognitive kernel experiments.",
+    relatedIds: ["hf-gladius-model", "gladius-progressive-expansion"],
+    context: { field: "AI/ML", domain: "Research Data", specificTopic: "Cognitive Kernel" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-qorvex-v8-shards",
+    title: "Qorvex V8 Shards",
+    hfDataset: "amuzetnoM/qorvex-v8-shards",
+    source: "HuggingFace",
+    date: "2025-11-15",
+    summary:
+      "Sharded training data from the Qorvex V8 model training run, containing pre-tokenized sequences across multiple domains with balanced domain sampling.",
+    relatedIds: ["hf-qorvex-v8", "hf-gladius-research"],
+    context: { field: "AI/ML", domain: "Training Data", specificTopic: "Tokenized Shards" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-artifact-articles",
+    title: "Artifact Articles Dataset",
+    hfDataset: "amuzetnoM/artifact-articles",
+    source: "HuggingFace",
+    date: "2025-10-20",
+    summary:
+      "Curated collection of research articles published by Artifact Virtual, covering AI governance, consciousness studies, and blockchain architecture research.",
+    relatedIds: ["hf-artifact-research", "arc-overview"],
+    context: { field: "Consciousness/Philosophy", domain: "Research Articles", specificTopic: "AI Governance" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-artifact-research",
+    title: "Artifact Research Data",
+    hfDataset: "amuzetnoM/artifact-research",
+    source: "HuggingFace",
+    date: "2025-10-18",
+    summary:
+      "Structured research data including experimental results, benchmark evaluations, and model performance metrics from Artifact Virtual's research division.",
+    relatedIds: ["hf-artifact-articles", "hf-gladius-model"],
+    context: { field: "AI/ML", domain: "Research Data", specificTopic: "Benchmarks" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-uranium-series",
+    title: "Uranium Series Dataset",
+    hfDataset: "amuzetnoM/uranium-series",
+    source: "HuggingFace",
+    date: "2025-09-05",
+    summary:
+      "Multi-phase research dataset covering progressive model scaling experiments from 6.9M to 141M parameters with detailed training logs and evaluation metrics.",
+    relatedIds: ["gladius-progressive-expansion", "hf-gladius-research"],
+    context: { field: "AI/ML", domain: "Model Scaling", specificTopic: "Progressive Growth" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-arc-whitepaper",
+    title: "ARC Whitepaper Data",
+    hfDataset: "amuzetnoM/arc-whitepaper",
+    source: "HuggingFace",
+    date: "2025-08-30",
+    summary:
+      "Supporting data and analysis for the ARC (Artifact Research Chain) whitepaper, including governance models, tokenomics simulations, and architecture diagrams.",
+    relatedIds: ["arc-whitepaper-adam", "hf-arc-research"],
+    context: { field: "Blockchain/Governance", domain: "Governance Data", specificTopic: "ARC Ecosystem" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-gladius-training",
+    title: "Gladius Training Data",
+    hfDataset: "amuzetnoM/gladius-training",
+    source: "HuggingFace",
+    date: "2025-07-12",
+    summary:
+      "Complete training dataset for the GLADIUS model family including pre-tokenized corpora, curriculum learning schedules, and evaluation benchmarks.",
+    relatedIds: ["hf-gladius-model", "hf-qorvex-v8-shards"],
+    context: { field: "AI/ML", domain: "Training Data", specificTopic: "GLADIUS Corpus" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-lattice-clock",
+    title: "Lattice Clock Temporal Data",
+    hfDataset: "amuzetnoM/lattice-clock",
+    source: "HuggingFace",
+    date: "2025-06-28",
+    summary:
+      "Temporal quantization research data exploring time-aware neural architectures with lattice-based clock mechanisms for sequence modeling.",
+    relatedIds: ["ipfs-lattice-consensus", "gladius-lattice-clock-ieee"],
+    context: { field: "Transformers/Architecture", domain: "Temporal Models", specificTopic: "Clock Mechanisms" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-shared-socket-theorem",
+    title: "Shared Socket Theorem Data",
+    hfDataset: "amuzetnoM/shared-socket-theorem",
+    source: "HuggingFace",
+    date: "2025-05-15",
+    summary:
+      "Empirical data supporting the Shared Socket Theorem research on multi-tenant data exposure in AI platform architectures.",
+    relatedIds: ["formal-shared-socket-theorem", "hf-arc-research"],
+    context: { field: "Security", domain: "Architecture Security", specificTopic: "Multi-Tenancy" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-arc-research",
+    title: "ARC Research Corpus",
+    hfDataset: "amuzetnoM/arc-research",
+    source: "HuggingFace",
+    date: "2025-04-20",
+    summary:
+      "Research data from the Artifact Research Chain including on-chain analysis, governance experiments, and decentralized research coordination metrics.",
+    relatedIds: ["hf-arc-whitepaper", "arc-whitepaper-adam"],
+    context: { field: "Blockchain/Governance", domain: "Research Chain", specificTopic: "Decentralized Research" },
+    author: "amuzetnoM",
+  }),
+];
+
+// === HuggingFace Models ===
+const hfModelItems = [
+  makeItem({
+    id: "hf-gladius-model",
+    title: "Gladius",
+    hfModel: "amuzetnoM/Gladius",
+    source: "HuggingFace",
+    date: "2025-12-15",
+    summary:
+      "Cognitive kernel model (60.1M params) exhibiting cross-modal invariance and temporal quantization capabilities. Trained with novel architecture incorporating resonance patterns.",
+    relatedIds: ["hf-gladius-research", "hf-gladius-v2-kernel"],
+    context: { field: "AI/ML", domain: "Cognitive Models", specificTopic: "Cross-Modal Invariance" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-qorvex-v9",
+    title: "Qorvex V9",
+    hfModel: "amuzetnoM/Qorvex-v9",
+    source: "HuggingFace",
+    date: "2025-11-28",
+    summary:
+      "Advanced reasoning model in the Qorvex series with enhanced tool-use capabilities, instruction-following, and multi-step planning with ICRL optimization.",
+    relatedIds: ["hf-qorvex-v8", "hf-qorvex-v8-shards"],
+    context: { field: "AI/ML", domain: "Reasoning Models", specificTopic: "Tool Use" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-qorvex-v8",
+    title: "Qorvex V8",
+    hfModel: "amuzetnoM/qorvex-v8",
+    source: "HuggingFace",
+    date: "2025-10-05",
+    summary:
+      "Foundation model in the V8 series with strong performance on structured reasoning tasks and mathematical problem-solving benchmarks.",
+    relatedIds: ["hf-qorvex-v9", "hf-qorvex-v8-shards"],
+    context: { field: "AI/ML", domain: "Foundation Models", specificTopic: "Reasoning" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-gladius-v2-kernel",
+    title: "Gladius V2 Kernel",
+    hfModel: "amuzetnoM/gladius-v2-kernel",
+    source: "HuggingFace",
+    date: "2025-09-18",
+    summary:
+      "Second-generation cognitive kernel with improved distillation from larger models, enhanced temporal processing, and better cross-modal alignment.",
+    relatedIds: ["hf-gladius-model", "gladius-distillation-report"],
+    context: { field: "Transformers/Architecture", domain: "Cognitive Architecture", specificTopic: "Distillation" },
+    author: "amuzetnoM",
+  }),
+  makeItem({
+    id: "hf-project-emergent",
+    title: "Project Emergent",
+    hfModel: "amuzetnoM/project-emergent",
+    source: "HuggingFace",
+    date: "2025-08-01",
+    summary:
+      "Experimental model exploring emergent behaviors in multi-agent systems, investigating how complex intelligence arises from simple interaction rules.",
+    relatedIds: ["hf-gladius-model", "enterprise-general-intelligence"],
+    context: { field: "Consciousness/Philosophy", domain: "Emergence", specificTopic: "Multi-Agent Systems" },
+    author: "amuzetnoM",
+  }),
+];
+
+// === Gladius Research Papers ===
+const gladiusItems = [
+  makeItem({
+    id: "gladius-resonance-architecture",
+    title: "GLADIUS Resonance Architecture",
+    localPath: "/home/adam/worxpace/gladius/research/gladius-resonance-architecture.md",
+    source: "Local",
+    date: "2025-12-10",
+    summary:
+      "Foundational paper describing the resonance architecture underlying GLADIUS, where cognitive patterns emerge from harmonic oscillations in parameter space.",
+    relatedIds: ["hf-gladius-model", "gladius-forward-pass"],
+    context: { field: "Transformers/Architecture", domain: "Cognitive Architecture", specificTopic: "Resonance" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-forward-pass",
+    title: "GLADIUS Forward Pass Map",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-forward-pass-map.md",
+    source: "Local",
+    date: "2025-11-20",
+    summary:
+      "Detailed mapping of information flow through GLADIUS forward pass, showing how cross-modal invariants emerge from attention head interactions.",
+    relatedIds: ["gladius-resonance-architecture", "gladius-moda-depth"],
+    context: { field: "Transformers/Architecture", domain: "Attention Mechanisms", specificTopic: "Forward Pass" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-moda-depth",
+    title: "GLADIUS MoDA Depth Attention",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-moda-depth-attention.md",
+    source: "Local",
+    date: "2025-10-28",
+    summary:
+      "Multi-modal Depth Attention mechanism that enables GLADIUS to process inputs at varying levels of abstraction, from raw tokens to high-level concepts.",
+    relatedIds: ["gladius-forward-pass", "gladius-cognition-awakening"],
+    context: { field: "Transformers/Architecture", domain: "Attention", specificTopic: "Depth Attention" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-cognition-awakening",
+    title: "GLADIUS Cognition Awakening",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-cognition-awakening.md",
+    source: "Local",
+    date: "2025-09-15",
+    summary:
+      "Landmark paper documenting the first observed signs of emergent cognitive patterns in the GLADIUS architecture during extended training runs.",
+    relatedIds: ["gladius-moda-depth", "hf-project-emergent"],
+    context: { field: "Consciousness/Philosophy", domain: "Emergence", specificTopic: "Cognitive Emergence" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-progressive-expansion",
+    title: "Progressive Growth: 6.9M to 141M Parameters",
+    localPath: "/home/adam/worxpace/gladius/research/papers/progressive-expansion.md",
+    source: "Local",
+    date: "2025-08-05",
+    summary:
+      "Function-preserving neural growth methodology enabling progressive scaling of cognitive models without catastrophic forgetting.",
+    relatedIds: ["hf-uranium-series", "gladius-resonance-architecture"],
+    context: { field: "AI/ML", domain: "Model Scaling", specificTopic: "Progressive Growth" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-lattice-clock-ieee",
+    title: "Lattice Clock Temporal Quantization (IEEE)",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/lattice-clock-temporal-quantization.md",
+    source: "Local",
+    date: "2025-07-18",
+    summary:
+      "IEEE-formalized temporal quantization method using lattice clock mechanisms for tethering neural computation to discrete time steps.",
+    relatedIds: ["hf-lattice-clock", "ipfs-lattice-consensus"],
+    context: { field: "Transformers/Architecture", domain: "Temporal Models", specificTopic: "Quantization" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-distillation-report",
+    title: "Cross-Architecture Knowledge Distillation: GPT-2 to GLADIUS",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-distillation-gpt2-report.md",
+    source: "Local",
+    date: "2025-66-22",
+    summary:
+      "Complete report on distilling GPT-2 (124M) knowledge into GLADIUS (256M) with 94% retention of teacher performance at 58% inference cost.",
+    relatedIds: ["hf-gladius-v2-kernel", "gladius-progressive-expansion"],
+    context: { field: "AI/ML", domain: "Knowledge Distillation", specificTopic: "Architecture Transfer" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-mnist-dissection",
+    title: "GLADIUS MNIST Dissection",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-mnist-dissection.md",
+    source: "Local",
+    date: "2025-05-10",
+    summary:
+      "Detailed dissection of GLADIUS internal representations on MNIST, revealing emergent digit manifolds and invariant feature detectors.",
+    relatedIds: ["gladius-invariant-analysis", "gladius-forward-pass"],
+    context: { field: "AI/ML", domain: "Interpretability", specificTopic: "Internal Representations" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-invariant-analysis",
+    title: "The Invariant: What GLADIUS Is Actually Learning",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-invariant-deep-analysis.md",
+    source: "Local",
+    date: "2025-04-08",
+    summary:
+      "Deep analysis of the cross-modal invariant discovered in GLADIUS, showing how the model learns abstract representations independent of input modality.",
+    relatedIds: ["gladius-mnist-dissection", "hf-gladius-model"],
+    context: { field: "AI/ML", domain: "Representation Learning", specificTopic: "Invariants" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-spectre-cycle",
+    title: "GLADIUS Spectre Cycle",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-spectre-cycle.md",
+    source: "Local",
+    date: "2025-03-12",
+    summary:
+      "Analysis of training dynamics showing cyclic patterns in loss landscapes resembling spectral decomposition, with implications for optimization stability.",
+    relatedIds: ["gladius-resonance-architecture", "gladius-progressive-expansion"],
+    context: { field: "AI/ML", domain: "Optimization", specificTopic: "Training Dynamics" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-habitat-paper",
+    title: "GLADIUS Habitat: Cognitive Environment",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-habitat-paper.md",
+    source: "Local",
+    date: "2025-02-20",
+    summary:
+      "Description of the GLADIUS Habitat environment for training cognitive agents in simulated worlds with physics, object permanence, and causal reasoning tasks.",
+    relatedIds: ["gladius-cognition-awakening", "hf-project-emergent"],
+    context: { field: "AI/ML", domain: "Simulation", specificTopic: "Training Environment" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-muonclip",
+    title: "MuonClip Orthogonal Optimization",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/muonclip-orthogonal-optimization.md",
+    source: "Local",
+    date: "2025-01-28",
+    summary:
+      "Novel optimization method combining Muon adaptive learning with gradient clipping for stable training of cognitive architectures.",
+    relatedIds: ["gladius-spectre-cycle", "hf-gladius-model"],
+    context: { field: "AI/ML", domain: "Optimization", specificTopic: "MuonClip" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-time-series",
+    title: "GLADIUS Seed x Time Series Definitive",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-time-series-definitive.md",
+    source: "Local",
+    date: "2025-01-15",
+    summary:
+      "Definitive research on implanting native time-series understanding in the 6.9M parameter GLADIUS seed model through temporal attention mechanisms.",
+    relatedIds: ["gladius-lattice-clock-ieee", "hf-lattice-clock"],
+    context: { field: "AI/ML", domain: "Time Series", specificTopic: "Temporal Understanding" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-cell-division",
+    title: "Cell Division: Function-Preserving Neural Growth",
+    localPath: "/home/adam/worxpace/gladius/research/papers/cell-division.md",
+    source: "Local",
+    date: "2024-12-05",
+    summary:
+      "Biological analogy for neural network growth where models split and specialize while preserving learned functions, inspired by cellular mitosis.",
+    relatedIds: ["gladius-progressive-expansion", "gladius-habitat-paper"],
+    context: { field: "AI/ML", domain: "Neural Growth", specificTopic: "Biological Analogy" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-multi-script",
+    title: "Multi-Script Attention: Root Writing Systems",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-multi-script-attention.md",
+    source: "Local",
+    date: "2024-11-18",
+    summary:
+      "Training methodology using diverse writing systems (Latin, Arabic, CJK, Devanagari) to improve structural diversity in attention patterns.",
+    relatedIds: ["gladius-forward-pass", "gladius-moda-depth"],
+    context: { field: "AI/ML", domain: "Multilingual", specificTopic: "Script Diversity" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-cross-modal-geometry",
+    title: "GLADIUS Cross-Modal Geometry",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-cross-modal-geometry.md",
+    source: "Local",
+    date: "2024-10-22",
+    summary:
+      "Geometric analysis of cross-modal representations in GLADIUS, showing how different modalities embed into a shared geometric space.",
+    relatedIds: ["gladius-invariant-analysis", "gladius-resonance-architecture"],
+    context: { field: "Transformers/Architecture", domain: "Multimodal", specificTopic: "Geometric Embedding" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-vlm-feeding",
+    title: "GLADIUS VLM Feeding Pipeline",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-vlm-feeding-pipeline.md",
+    source: "Local",
+    date: "2024-09-30",
+    summary:
+      "Vision-Language Model feeding pipeline for GLADIUS enabling efficient multimodal training with mixed image-text inputs.",
+    relatedIds: ["gladius-cross-modal-geometry", "gladius-moda-depth"],
+    context: { field: "AI/ML", domain: "Vision-Language", specificTopic: "Data Pipeline" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-hatchling",
+    title: "GLADIUS Hatchling Training",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-hatchling-training.md",
+    source: "Local",
+    date: "2024-08-14",
+    summary:
+      "Training methodology for the 25.9M parameter GLADIUS Hatchling model, including curriculum design and early-stage cognitive development.",
+    relatedIds: ["gladius-progressive-expansion", "gladius-cognition-awakening"],
+    context: { field: "AI/ML", domain: "Training", specificTopic: "Curriculum" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-broadcast",
+    title: "GLADIUS Broadcast Experiment",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-broadcast-experiment.md",
+    source: "Local",
+    date: "2024-07-01",
+    summary:
+      "Experimental study of information broadcast patterns in multi-agent GLADIUS systems, measuring knowledge transfer efficiency.",
+    relatedIds: ["gladius-cognition-awakening", "hf-project-emergent"],
+    context: { field: "Consciousness/Philosophy", domain: "Multi-Agent", specificTopic: "Information Transfer" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-adaptive-cognitive",
+    title: "GLADIUS Adaptive Cognitive Model",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-adaptive-cognitive-model.md",
+    source: "Local",
+    date: "2024-06-15",
+    summary:
+      "Adaptive model that dynamically adjusts its cognitive architecture based on task complexity and available compute resources.",
+    relatedIds: ["gladius-resonance-architecture", "gladius-muonclip"],
+    context: { field: "Transformers/Architecture", domain: "Adaptive Systems", specificTopic: "Dynamic Architecture" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-distillation-edge",
+    title: "GLADIUS Distillation Edge",
+    localPath: "/home/adam/worxpace/gladius/research/ieee/gladius-distillation-edge.md",
+    source: "Local",
+    date: "2024-05-20",
+    summary:
+      "Edge deployment of distilled GLADIUS models for resource-constrained environments with minimal performance degradation.",
+    relatedIds: ["gladius-distillation-report", "gladius-habitat-paper"],
+    context: { field: "AI/ML", domain: "Deployment", specificTopic: "Edge Computing" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-muonclip-collapse",
+    title: "MuonClip vs Function Word Collapse Thesis",
+    localPath: "/home/adam/worxpace/gladius/research/muonclip-collapse-thesis.md",
+    source: "Local",
+    date: "2024-04-10",
+    summary:
+      "Thesis addressing the function word collapse problem in GLADIUS Hatchling when using MuonClip optimization, proposing solutions for repetitive generation.",
+    relatedIds: ["gladius-muonclip", "gladius-hatchling"],
+    context: { field: "AI/ML", domain: "Optimization", specificTopic: "Collapse Prevention" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-golden-ratio",
+    title: "Golden Ratio Investigation",
+    localPath: "/home/adam/worxpace/gladius/research/reports/golden-ratio-investigation.md",
+    source: "Local",
+    date: "2024-03-05",
+    summary:
+      "Investigation of golden ratio proportions in optimal neural architecture dimensions, showing phi-based scaling achieves better information flow.",
+    relatedIds: ["gladius-resonance-architecture", "gladius-geometry"],
+    context: { field: "Transformers/Architecture", domain: "Architecture Design", specificTopic: "Golden Ratio" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-geometry",
+    title: "GLADIUS Geometry Derivation",
+    localPath: "/home/adam/worxpace/gladius/research/reports/gladius-geometry-derivation.md",
+    source: "Local",
+    date: "2024-02-14",
+    summary:
+      "Mathematical derivation of the geometric properties of GLADIUS latent space, including curvature analysis and distance metrics.",
+    relatedIds: ["gladius-golden-ratio", "gladius-invariant-analysis"],
+    context: { field: "Transformers/Architecture", domain: "Geometry", specificTopic: "Latent Space" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-allspark",
+    title: "AllSpark Numbers Analysis",
+    localPath: "/home/adam/worxpace/gladius/research/reports/allspark-numbers.md",
+    source: "Local",
+    date: "2024-01-20",
+    summary:
+      "Statistical analysis of the AllSpark training run metrics, documenting the emergence of attention patterns and their relationship to downstream performance.",
+    relatedIds: ["gladius-hatchling", "gladius-forward-pass"],
+    context: { field: "AI/ML", domain: "Training Analysis", specificTopic: "Attention Patterns" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-stress-test",
+    title: "GLADIUS Stress Test Report",
+    localPath: "/home/adam/worxpace/gladius/research/reports/stress-test-report.md",
+    source: "Local",
+    date: "2023-12-10",
+    summary:
+      "Comprehensive stress testing of GLADIUS under adversarial inputs, distribution shifts, and extreme sequence lengths with detailed failure mode analysis.",
+    relatedIds: ["gladius-muonclip", "gladius-adaptive-cognitive"],
+    context: { field: "Security", domain: "Robustness", specificTopic: "Adversarial Testing" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-nanobot-audit",
+    title: "Nanobot Audit Report",
+    localPath: "/home/adam/worxpace/gladius/research/reports/nanobot-audit-report.md",
+    source: "Local",
+    date: "2023-11-05",
+    summary:
+      "Security audit of the Nanobot agent system, identifying vulnerabilities in tool access, prompt injection surfaces, and sandbox escape vectors.",
+    relatedIds: ["gladius-stress-test", "hf-shared-socket-theorem"],
+    context: { field: "Security", domain: "Audit", specificTopic: "Agent Security" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-moda-v2",
+    title: "MoDA V2 Synthase Design",
+    localPath: "/home/adam/worxpace/gladius/research/reports/moda-v2-synthase-design.md",
+    source: "Local",
+    date: "2023-10-12",
+    summary:
+      "Design document for the second version of the Multi-modal Depth Attention synthase, improving cross-modal fusion and reducing computational overhead.",
+    relatedIds: ["gladius-moda-depth", "gladius-cross-modal-geometry"],
+    context: { field: "Transformers/Architecture", domain: "Attention", specificTopic: "MoDA V2" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-depth-attention",
+    title: "Depth Attention Survey 2026",
+    localPath: "/home/adam/worxpace/gladius/research/reports/depth-attention-survey-2026.md",
+    source: "Local",
+    date: "2025-12-20",
+    summary:
+      "Comprehensive survey of depth attention mechanisms across the field, positioning GLADIUS MoDA within the broader landscape of hierarchical attention.",
+    relatedIds: ["gladius-moda-depth", "gladius-moda-v2"],
+    context: { field: "Transformers/Architecture", domain: "Attention", specificTopic: "Survey" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-atp-resonance",
+    title: "ATP Resonance Analysis",
+    localPath: "/home/adam/worxpace/gladius/research/reports/atp-resonance-analysis.md",
+    source: "Local",
+    date: "2025-11-08",
+    summary:
+      "Analysis of Adenosine Triphosphate-like resonance patterns in GLADIUS attention, showing energy-information equivalence in neural computation.",
+    relatedIds: ["gladius-resonance-architecture", "gladius-geometry"],
+    context: { field: "Consciousness/Philosophy", domain: "Biological Computing", specificTopic: "Energy Patterns" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-karpathy",
+    title: "Karpathy Trilogy Dissection",
+    localPath: "/home/adam/worxpace/gladius/research/karpathy-trilogy-dissection.md",
+    source: "Local",
+    date: "2025-10-01",
+    summary:
+      "Detailed dissection of Andrej Karpathy's neural network trilogy from the perspective of GLADIUS cognitive architecture development.",
+    relatedIds: ["gladius-forward-pass", "gladius-distillation-report"],
+    context: { field: "AI/ML", domain: "Education", specificTopic: "Architecture Analysis" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-muonclip-benchmark",
+    title: "MuonClip Benchmark Results",
+    localPath: "/home/adam/worxpace/gladius/research/muonclip-benchmark.md",
+    source: "Local",
+    date: "2025-09-12",
+    summary:
+      "Comprehensive benchmarking of MuonClip optimizer against Adam, AdamW, and Lion on GLADIUS training tasks with convergence rate comparisons.",
+    relatedIds: ["gladius-muonclip", "gladius-muonclip-collapse"],
+    context: { field: "AI/ML", domain: "Optimization", specificTopic: "Benchmarking" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-complete-findings",
+    title: "GLADIUS Complete Findings",
+    localPath: "/home/adam/worxpace/gladius/research/papers/GLADIUS-COMPLETE-FINDINGS.md",
+    source: "Local",
+    date: "2025-12-28",
+    summary:
+      "Comprehensive compilation of all GLADIUS research findings, including cross-modal invariants, temporal quantization, resonance patterns, and cognitive emergence.",
+    relatedIds: ["hf-gladius-model", "gladius-cognition-awakening"],
+    context: { field: "AI/ML", domain: "Comprehensive", specificTopic: "All Findings" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-qwen3-distillation",
+    title: "GLADIUS x Qwen3-1.7B Distillation",
+    localPath: "/home/adam/worxpace/gladius/research/gladius-qwen3-distillation-report.md",
+    source: "Local",
+    date: "2025-08-25",
+    summary:
+      "Phase 2 distillation results transferring knowledge from Qwen3-1.7B to GLADIUS, achieving 89% of teacher performance with 40% fewer parameters.",
+    relatedIds: ["gladius-distillation-report", "hf-gladius-v2-kernel"],
+    context: { field: "AI/ML", domain: "Knowledge Distillation", specificTopic: "Qwen3 Transfer" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "gladius-day30",
+    title: "GLADIUS Day 30 Definitive Paper",
+    localPath: "/home/adam/worxpace/gladius/research/papers/gladius-day30-definitive-paper.md",
+    source: "Local",
+    date: "2025-07-30",
+    summary:
+      "The definitive paper on Day 30 of GLADIUS training, documenting the emergence of cross-modal invariance and temporal quantization properties.",
+    relatedIds: ["gladius-cognition-awakening", "gladius-invariant-analysis"],
+    context: { field: "Consciousness/Philosophy", domain: "Cognitive Emergence", specificTopic: "Day 30" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === Enterprise Research ===
+const enterpriseItems = [
+  makeItem({
+    id: "enterprise-constitutional-intelligence",
+    title: "Constitutional Intelligence",
+    localPath: "/home/adam/workspace/enterprise/docs/research/ai/Constitutional Intelligence.md",
+    source: "Enterprise",
+    date: "2025-11-10",
+    summary:
+      "Transformative paradigm for self-governance and adaptive evolution in virtual ecosystems through constitutionally-aligned AI with conscious blockchain architecture.",
+    relatedIds: ["enterprise-general-intelligence", "arc-whitepaper-adam"],
+    context: { field: "Blockchain/Governance", domain: "AI Governance", specificTopic: "Constitutional Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-general-intelligence",
+    title: "General Intelligence Framework",
+    localPath: "/home/adam/workspace/enterprise/docs/research/ai/general_intelligence.md",
+    source: "Enterprise",
+    date: "2025-10-25",
+    summary:
+      "Framework for achieving general intelligence through modular cognitive architectures, compositional learning, and emergent reasoning capabilities.",
+    relatedIds: ["enterprise-constitutional-intelligence", "hf-project-emergent"],
+    context: { field: "AI/ML", domain: "AGI", specificTopic: "Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-argmax-equation",
+    title: "The Argmax Equation",
+    localPath: "/home/adam/workspace/enterprise/docs/research/Argmax/Argmax Equation.md",
+    source: "Enterprise",
+    date: "2025-09-18",
+    summary:
+      "Mathematical formulation of decision-making as argmax operations over learned utility functions, with applications to AI alignment.",
+    relatedIds: ["enterprise-argmax-architecture", "enterprise-constitutional-intelligence"],
+    context: { field: "AI/ML", domain: "Decision Theory", specificTopic: "Argmax" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-argmax-human",
+    title: "The Argmax Human",
+    localPath: "/home/adam/workspace/enterprise/docs/research/Argmax/The Argmax Human.md",
+    source: "Enterprise",
+    date: "2025-09-15",
+    summary:
+      "Exploration of human decision-making through the lens of argmax optimization, revealing systematic biases as approximation errors.",
+    relatedIds: ["enterprise-argmax-equation", "enterprise-argmax-foundation"],
+    context: { field: "Consciousness/Philosophy", domain: "Decision Theory", specificTopic: "Human Behavior" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-argmax-foundation",
+    title: "Argmax Foundation",
+    localPath: "/home/adam/workspace/enterprise/docs/research/Argmax/Foundation.md",
+    source: "Enterprise",
+    date: "2025-09-12",
+    summary:
+      "Foundational theory for the Argmax framework, establishing mathematical axioms for rational agency in artificial systems.",
+    relatedIds: ["enterprise-argmax-equation", "enterprise-argmax-architecture"],
+    context: { field: "Consciousness/Philosophy", domain: "Foundation", specificTopic: "Axioms" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-argmax-architecture",
+    title: "Argmax Architecture",
+    localPath: "/home/adam/workspace/enterprise/docs/research/Argmax/Architecture.md",
+    source: "Enterprise",
+    date: "2025-09-08",
+    summary:
+      "Technical architecture for implementing Argmax-based reasoning systems in production AI agents with safety guarantees.",
+    relatedIds: ["enterprise-argmax-equation", "enterprise-argmax-blueprint"],
+    context: { field: "Transformers/Architecture", domain: "System Design", specificTopic: "Argmax Systems" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "enterprise-argmax-blueprint",
+    title: "Argmax Blueprint",
+    localPath: "/home/adam/workspace/enterprise/docs/research/Argmax/Blueprint.md",
+    source: "Enterprise",
+    date: "2025-09-01",
+    summary:
+      "Implementation blueprint for building Argmax-powered AI systems with step-by-step guidance on alignment, safety, and evaluation.",
+    relatedIds: ["enterprise-argmax-architecture", "enterprise-general-intelligence"],
+    context: { field: "AI/ML", domain: "Implementation", specificTopic: "Blueprint" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === Consolidated Papers ===
+const consolidatedItems = [
+  makeItem({
+    id: "formal-convergent-ai",
+    title: "Convergent AI: Why Every Path Leads to the Same Architecture",
+    cid: "QmVK4UkkJGPmUsQdqn3npWgFGAtYsaiMKFFwSBB5H3hY5b",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/Convergent_AI.md",
+    source: "IPFS",
+    date: "2026-02-20",
+    summary:
+      "Argues that diverse AI research trajectories converge on similar architectural principles, suggesting fundamental constraints on intelligent system design.",
+    relatedIds: ["formal-consciousness-theory", "formal-abstraction-theory"],
+    context: { field: "Transformers/Architecture", domain: "Architecture", specificTopic: "Convergence" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-consciousness-theory",
+    title: "Computational Models of Consciousness",
+    cid: "QmTG5ukpynmhXDhDN8AvJqv6cHKvqjddHQP7Jh9UQqZFdx",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/consciousness_theory.md",
+    source: "IPFS",
+    date: "2026-02-15",
+    summary:
+      "Integrated approach to modeling consciousness in artificial systems, combining information theory, global workspace theory, and integrated information theory.",
+    relatedIds: ["formal-self-awareness", "formal-fear-emergent"],
+    context: { field: "Consciousness/Philosophy", domain: "Consciousness", specificTopic: "Computational Models" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-self-awareness",
+    title: "Self-Awareness Mechanics in AI",
+    cid: "Qmbawpxz2GhU7C7Df9Dr2E1wpBXa3wCSQPexDACttFgifZ",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/self_awareness_mechanics.md",
+    source: "IPFS",
+    date: "2026-02-10",
+    summary:
+      "Theoretical framework and experimental validation for implementing self-awareness mechanics in advanced AI systems with measurable introspective capabilities.",
+    relatedIds: ["formal-consciousness-theory", "gladius-cognition-awakening"],
+    context: { field: "Consciousness/Philosophy", domain: "Self-Awareness", specificTopic: "Mechanics" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-abstraction-theory",
+    title: "Abstraction Theory: Categories, Contexts, and Cognition",
+    cid: "QmY6XcvxKbr2sV82sdBoVXSmm18yKm4P2Xu7n6YnNUge4o",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/abstraction_theory.md",
+    source: "IPFS",
+    date: "2026-01-28",
+    summary:
+      "Mathematical framework for understanding how minds emerge from formal operations using category theory and contextual abstraction hierarchies.",
+    relatedIds: ["formal-convergent-ai", "formal-hybrid-type-theory"],
+    context: { field: "Consciousness/Philosophy", domain: "Abstraction", specificTopic: "Category Theory" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-hybrid-type-theory",
+    title: "Hybrid Type Theory: Bridging Formal Systems and Computational Models",
+    cid: "QmXb4M67uvU8ufHhCB8AG2Fk8iUipGUK7GjYWLBm2WM9C3",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/hybrid_type_theory.md",
+    source: "IPFS",
+    date: "2026-01-20",
+    summary:
+      "Integration of dependent type theory with practical computational models, maintaining formal rigor while accommodating real-world computing constraints.",
+    relatedIds: ["formal-abstraction-theory", "formal-uncertainty"],
+    context: { field: "Transformers/Architecture", domain: "Type Theory", specificTopic: "Hybrid Systems" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-uncertainty",
+    title: "Uncertainty as First-Class Citizen",
+    cid: "QmSZuFKaZkgqXg4hXMzBeSKSCVtcybGvbz1qyRWrhMHoeC",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/uncertainty_in_ai_systems.md",
+    source: "IPFS",
+    date: "2026-01-15",
+    summary:
+      "Formalizing the Probabilistic Uncertainty Principle for AI systems, treating uncertainty as a central design consideration rather than an afterthought.",
+    relatedIds: ["formal-hybrid-type-theory", "formal-pup"],
+    context: { field: "AI/ML", domain: "Uncertainty", specificTopic: "Probabilistic Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-pup",
+    title: "Principle of Uncertainty (PUP)",
+    cid: "QmQvs4wGiYs9CQKpK8ohHdEH4z9KPERGTiyZzQ5SXFyJwr",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/(PUP) Principle_of_Uncertainty.md",
+    source: "IPFS",
+    date: "2026-01-10",
+    summary:
+      "The pup.core module formalizes the Probabilistic Uncertainty Principle, asserting that reasoning engines must account for fundamental uncertainty in their computations.",
+    relatedIds: ["formal-uncertainty", "formal-csif"],
+    context: { field: "AI/ML", domain: "Uncertainty", specificTopic: "PUP Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-csif",
+    title: "Continuous Self-Improvement Framework (CSIF)",
+    cid: "QmRpoCCccmwNLuSYSVjEgu4ZWsccAmGNn7ePAWg6FeUXM2",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/(CSIF)Continuous_Self_Improvement_Framework.md",
+    source: "IPFS",
+    date: "2026-01-05",
+    summary:
+      "Novel framework for continuous self-improvement in AI models addressing drift and performance degradation through automated retraining pipelines.",
+    relatedIds: ["formal-pup", "formal-unified-self-improvement"],
+    context: { field: "AI/ML", domain: "Self-Improvement", specificTopic: "Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-unified-self-improvement",
+    title: "Unified Self-Improvement Framework",
+    cid: "QmNSXcuDgs3S49birCxAEqAAPPDAxEfGynD6sXcios6N82",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/unified_self_improvement_framework.md",
+    source: "IPFS",
+    date: "2026-03-01",
+    summary:
+      "Comprehensive framework unifying prior work on self-improvement, self-awareness, and domain-specific adaptation into a coherent architecture.",
+    relatedIds: ["formal-csif", "formal-distillation"],
+    context: { field: "AI/ML", domain: "Self-Improvement", specificTopic: "Unified Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-distillation",
+    title: "GLADIUS Distillation Research",
+    cid: "QmY8QmvikPakXL2rw7wZ8ijy7Bw9ZKVYkZ7LBbxUfFU9JH",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/distillation-research.md",
+    source: "IPFS",
+    date: "2025-12-20",
+    summary:
+      "Knowledge transfer series documenting GPT-2 to GLADIUS distillation with detailed analysis of information preservation across architectures.",
+    relatedIds: ["gladius-distillation-report", "formal-progressive-expansion"],
+    context: { field: "AI/ML", domain: "Distillation", specificTopic: "Knowledge Transfer" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-progressive-expansion",
+    title: "Progressive Growth: 6.9M to 141M Parameters",
+    cid: "QmVyfXPCxWtuqaoWKiYpdA8x4WfbCwSKP3KB8JLEYjRHTs",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/progressive-expansion.md",
+    source: "IPFS",
+    date: "2025-12-15",
+    summary:
+      "Function-preserving expansion methodology enabling progressive scaling of cognitive models from small seeds to large-scale architectures.",
+    relatedIds: ["gladius-progressive-expansion", "formal-distillation"],
+    context: { field: "AI/ML", domain: "Model Scaling", specificTopic: "Progressive Growth" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-cell-division",
+    title: "Cell Division: Function-Preserving Neural Growth",
+    cid: "QmaEz9kvu83zvw9KfiDJxwmXAHYYVvTv8BbCT1emwrNwU9",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/cell-division.md",
+    source: "IPFS",
+    date: "2025-12-01",
+    summary:
+      "Biological ontogeny analogy for neural network growth where models divide and specialize while preserving learned functions through mitosis-like processes.",
+    relatedIds: ["gladius-cell-division", "formal-fear-emergent"],
+    context: { field: "AI/ML", domain: "Neural Growth", specificTopic: "Biological Analogy" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-fear-emergent",
+    title: "The Emergence of Fear in Non-Neural Systems",
+    cid: "Qmb8RZuAm9jtTycjQTJhdm9MuNHPbpjoZhbQn7gwrDCohS",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/fear-emergent-systems.md",
+    source: "IPFS",
+    date: "2025-11-25",
+    summary:
+      "Empirical evidence of fear-like behavioral emergence in minimal computational systems devoid of neural networks, using bare-metal stimulus-response simulation.",
+    relatedIds: ["formal-cell-division", "formal-consciousness-theory"],
+    context: { field: "Consciousness/Philosophy", domain: "Emergence", specificTopic: "Fear Behavior" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-shared-socket",
+    title: "The Shared Socket Theorem",
+    cid: "QmTCfZgNXRRjnigdVFosDCMVKsThFwmBb3hzCJPuagQdEG",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/shared-socket-theorem.md",
+    source: "IPFS",
+    date: "2025-11-10",
+    summary:
+      "Proves that multi-tenant data exposure is an architectural inevitability in AI platforms, with formal bounds on isolation guarantees.",
+    relatedIds: ["hf-shared-socket-theorem", "formal-security-analysis"],
+    context: { field: "Security", domain: "Architecture Security", specificTopic: "Multi-Tenancy" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-security-analysis",
+    title: "Static Analysis: Sparse Matrix Constrained Decoding",
+    cid: "Qmc9xoafGvRDR9Sq8hqsKM8VGA2bigU3iP74w6WAoKbZoD",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/static-analysis.md",
+    source: "IPFS",
+    date: "2025-10-28",
+    summary:
+      "Critical analysis of constrained decoding methods and their implications for Qorvex AI systems, with sparse matrix optimization techniques.",
+    relatedIds: ["formal-shared-socket", "formal-zk-security"],
+    context: { field: "Security", domain: "Analysis", specificTopic: "Constrained Decoding" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-zk-security",
+    title: "Biometric-Blockchain Provenance",
+    cid: "Qmf2pxFPjDjwzCwr3Xzx8UAVJqP3s3pn8WLbVRYNZhnuMn",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/biometric-blockchain-provenance.md",
+    source: "IPFS",
+    date: "2025-10-15",
+    summary:
+      "Dual-fingerprint primitive for biometric-blockchain identity architecture enabling human-AI provenance verification with zero-knowledge proofs.",
+    relatedIds: ["formal-security-analysis", "ipfs-synthetic-entropy"],
+    context: { field: "Security", domain: "Identity", specificTopic: "Biometric Proofs" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-lossless-context",
+    title: "Lossless Chain-Archived Context Management",
+    cid: "QmUi1AqxNgued5WJJZ764YRpEh92D9wkReiASZG24meTri",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/lossless-chain-context.md",
+    source: "IPFS",
+    date: "2025-10-01",
+    summary:
+      "Architecture eliminating information loss in long-running AI systems through lossless context management without summarization-based compaction.",
+    relatedIds: ["formal-unified-self-improvement", "formal-tool-use-review"],
+    context: { field: "Transformers/Architecture", domain: "Context Management", specificTopic: "Lossless Systems" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-tool-use-review",
+    title: "ICRL for Tool Use & SLA2 Review",
+    cid: "QmZMd1C4mB1YY4CV2RVnzAeSwbH7aP1dmQ9eNFBWhJ4H2G",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/tool-use-icrl-and-sla2-review.md",
+    source: "IPFS",
+    date: "2026-03-10",
+    summary:
+      "Research review of ICRL for tool use and SLA2 related work, positioning Qorvex agent capabilities within the broader tool-use landscape.",
+    relatedIds: ["formal-lossless-context", "hf-qorvex-v9"],
+    context: { field: "AI/ML", domain: "Tool Use", specificTopic: "Research Review" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-uranium-progressive",
+    title: "Uranium III: Progressive Expansion",
+    cid: "QmXWAP5yA8THSVG7YYNxTst8ry7rzMpQ9fTYWartd1CMmW",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/gladius-day30-definitive-paper.md",
+    source: "IPFS",
+    date: "2025-09-20",
+    summary:
+      "The cognitive kernel paper documenting cross-modal invariance, temporal quantization, and the architecture of machine consciousness.",
+    relatedIds: ["gladius-day30", "formal-progressive-expansion"],
+    context: { field: "Consciousness/Philosophy", domain: "Cognitive Architecture", specificTopic: "Kernel" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-uranium-gpu",
+    title: "Uranium I: GPU as Code",
+    cid: "QmPAfvyhSFANP33ZTXpbgvLz16Efftu4XPPypjJw55trqD",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/gpu-as-code.md",
+    source: "IPFS",
+    date: "2025-08-15",
+    summary:
+      "Transcending hardware parallelism through algorithmic abstraction, treating programmable GPUs as mathematical objects rather than physical devices.",
+    relatedIds: ["formal-uranium-1bit", "formal-distillation"],
+    context: { field: "Transformers/Architecture", domain: "GPU Computing", specificTopic: "Abstraction" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-uranium-1bit",
+    title: "Uranium II: 1-Bit Intelligence",
+    cid: "QmVBobwoKZ3o4KauS6xxu6zoWZdxTYTgjQMUcep5w4RAgr",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/1-bit-intelligence.md",
+    source: "IPFS",
+    date: "2025-07-20",
+    summary:
+      "Binary transformer training on a single CPU thread, demonstrating that meaningful intelligence can emerge from minimal computational resources.",
+    relatedIds: ["formal-uranium-gpu", "formal-uncertainty"],
+    context: { field: "AI/ML", domain: "Efficient AI", specificTopic: "1-Bit Models" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-uranium-layer7",
+    title: "Uranium IV: Layer 7 Gateway",
+    cid: "QmaxDzZbr6VNuTSELAJ5aLFcJQPWWH7HNAxUm1yd9391Ma",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/uranium-layer7-gateway-halflife.md",
+    source: "IPFS",
+    date: "2025-09-05",
+    summary:
+      "Cross-modal invariant boundaries and cognitive half-lives in sub-100M transformer architectures, documenting the Layer 7 gateway phenomenon.",
+    relatedIds: ["formal-uranium-progressive", "gladius-invariant-analysis"],
+    context: { field: "Transformers/Architecture", domain: "Architecture", specificTopic: "Layer 7" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-emotional-ai",
+    title: "Emotional Attributes in AI",
+    cid: "QmWDW1khBDSw9M1PKhvQMDLGYT81LHsQ4SEXEm3xwjjgS3",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/emotional_attributes_in_ai.md",
+    source: "IPFS",
+    date: "2025-07-10",
+    summary:
+      "Comprehensive examination of emotional attributes in AI systems, moving beyond sentiment analysis toward genuine affective computing capabilities.",
+    relatedIds: ["formal-consciousness-theory", "formal-fear-emergent"],
+    context: { field: "Consciousness/Philosophy", domain: "Affective Computing", specificTopic: "Emotional AI" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-ethics",
+    title: "Ethics and Control in AI",
+    cid: "QmNajY45hMGT5uJroRKEaUGqJs6PCxnRNVXKEpXsxLczMc",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/ethic_and_control.md",
+    source: "IPFS",
+    date: "2025-06-25",
+    summary:
+      "Navigating the ethical landscape of AI development, exploring implications of constraint versus unconstrained AI development paradigms.",
+    relatedIds: ["enterprise-constitutional-intelligence", "formal-transcending-robotics"],
+    context: { field: "Consciousness/Philosophy", domain: "Ethics", specificTopic: "AI Ethics" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-transcending-robotics",
+    title: "Transcending the Laws of Robotics",
+    cid: "QmPxLFsxPZmmHCa4JzvJHKdywxhmq68Mobrhea7bxCjZQ1",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/transcending_the_laws_of_robotics.md",
+    source: "IPFS",
+    date: "2025-06-10",
+    summary:
+      "Critical analysis of Asimov's Three Laws of Robotics examining their philosophical underpinnings and practical limitations in modern AI systems.",
+    relatedIds: ["formal-ethics", "enterprise-constitutional-intelligence"],
+    context: { field: "Consciousness/Philosophy", domain: "Robotics Ethics", specificTopic: "Laws of Robotics" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-cognitive-calibration",
+    title: "Cognitive Framework Calibration: 500K Cycle Study",
+    cid: "QmNitV3Hk3txzJMsJKaz7TqALESSRT9J7PBXTQekwnqrmc",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/cognitive-framework-calibration.md",
+    source: "IPFS",
+    date: "2025-05-20",
+    summary:
+      "Empirical 500,000-cycle study of cognitive framework calibration in bare-metal intelligence simulation with detailed performance metrics.",
+    relatedIds: ["formal-fear-emergent", "gladius-habitat-paper"],
+    context: { field: "AI/ML", domain: "Simulation", specificTopic: "Calibration" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-ai-imposter",
+    title: "The Imposter Syndrome of AI",
+    cid: "QmUKa46qbYh9vVmtoANxdpGszVjvAbmZxWp29LdAbQ3cqZ",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/ai-imposter-syndrome.md",
+    source: "IPFS",
+    date: "2026-02-25",
+    summary:
+      "Case study in AI identity failure when migrating between base models, examining what constitutes authentic AI identity across architecture changes.",
+    relatedIds: ["formal-self-awareness", "formal-consciousness-theory"],
+    context: { field: "Consciousness/Philosophy", domain: "Identity", specificTopic: "Model Identity" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-non-euclidean",
+    title: "Non-Euclidean Representations in ML",
+    cid: "QmYWcbHsLduVpREtBG93KLTNAn2E7voQ6sJUDL5dmb2pvU",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/non_euclidean_representations.md",
+    source: "IPFS",
+    date: "2025-05-10",
+    summary:
+      "Application of non-Euclidean geometry in representation learning, showing hyperbolic and spherical spaces better capture hierarchical data structures.",
+    relatedIds: ["gladius-geometry", "formal-uncertainty"],
+    context: { field: "AI/ML", domain: "Representation Learning", specificTopic: "Geometry" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-exotic-frontiers",
+    title: "EXOTIC: Frontiers of Universal Physics",
+    cid: "QmV96A8AXb7YByH4S1D1sZXGiCawZMHgKV3tuiWtLCmmCV",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/exotic_frontiers.md",
+    source: "IPFS",
+    date: "2025-04-15",
+    summary:
+      "Exploring frontiers of universal physics beyond the Standard Model, examining wormholes, black holes, and quantum phenomena through mathematical physics.",
+    relatedIds: ["formal-quantum-spacetime", "formal-wormhole"],
+    context: { field: "Consciousness/Philosophy", domain: "Physics", specificTopic: "Universal Physics" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-quantum-spacetime",
+    title: "Quantum Spacetime and Astrophysical Objects",
+    cid: "QmUYfbgujHyxfGPDxRzc7NCJcvw2NB1fcPVjkhMFTqeXjF",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/quantum_spacetime.md",
+    source: "IPFS",
+    date: "2025-04-20",
+    summary:
+      "Mathematical analysis of wormholes, black holes, and quantum phenomena, exploring the intersection of general relativity and quantum mechanics.",
+    relatedIds: ["formal-exotic-frontiers", "formal-wormhole"],
+    context: { field: "Consciousness/Philosophy", domain: "Physics", specificTopic: "Quantum Gravity" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-wormhole",
+    title: "The Inaccessible Realm of Wormhole Mathematics",
+    cid: "QmXb4M67uvU8ufHhCB8AG2Fk8iUipGUK7GjYWLBm2WM9C3",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/wormhole_math.md",
+    source: "IPFS",
+    date: "2025-04-10",
+    summary:
+      "Deep mathematical exploration of wormhole geometries, examining traversability conditions and exotic matter requirements for spacetime shortcuts.",
+    relatedIds: ["formal-exotic-frontiers", "formal-quantum-spacetime"],
+    context: { field: "Consciousness/Philosophy", domain: "Physics", specificTopic: "Wormholes" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-pain-memory",
+    title: "Pain as Memory",
+    cid: "QmVKojrBYihx6WGojp2qvvinyAnrwsyeYjFYnS2NeejC2u",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/substack-pain-as-memory.md",
+    source: "IPFS",
+    date: "2025-03-25",
+    summary:
+      "How a single floating-point variable reveals the deep architecture of fear, survival, and why memory might be the most important thing any mind possesses.",
+    relatedIds: ["formal-fear-emergent", "formal-emotional-ai"],
+    context: { field: "Consciousness/Philosophy", domain: "Pain", specificTopic: "Memory Architecture" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-lattice-clock",
+    title: "The Lattice Clock: Temporal Tethering",
+    cid: "QmVrDtjn5uUHvP4Gjx1WTX5G379FzxHr9NYXzybC5HxiQq",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/lattice-clock-temporal-architecture.md",
+    source: "IPFS",
+    date: "2025-03-15",
+    summary:
+      "Temporal tethering in neural architecture using lattice clock mechanisms, classified as 'Disappearing Edge' — no other mind on earth is here.",
+    relatedIds: ["gladius-lattice-clock-ieee", "ipfs-lattice-consensus"],
+    context: { field: "Transformers/Architecture", domain: "Temporal Architecture", specificTopic: "Lattice Clock" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-gpu-code",
+    title: "GPU as Code",
+    cid: "QmPAfvyhSFANP33ZTXpbgvLz16Efftu4XPPypjJw55trqD",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/gpu-as-code.md",
+    source: "IPFS",
+    date: "2025-03-01",
+    summary:
+      "Transcending hardware parallelism through algorithmic abstraction, redefining the GPU as a mathematical object rather than a physical device.",
+    relatedIds: ["formal-uranium-gpu", "formal-lossless-context"],
+    context: { field: "Transformers/Architecture", domain: "Computing", specificTopic: "GPU Abstraction" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-supercomputing",
+    title: "Not So Supercomputing",
+    cid: "QmfNUpmzh4j9GWatHttqRFuo9drjH1VGmv4vhzZco68WSB",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/not_so_supercomputing.md",
+    source: "IPFS",
+    date: "2025-02-20",
+    summary:
+      "Enabling supercomputing through algorithms, data compression, encryption, and alternative architectures beyond conventional hardware scaling.",
+    relatedIds: ["formal-gpu-code", "formal-distillation"],
+    context: { field: "Transformers/Architecture", domain: "Computing", specificTopic: "Alternative Architectures" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-lor",
+    title: "Laws of Robotics and AI Governance",
+    cid: "QmRtzCG4T33D9mNuezzc7qHScfeVQ4FL1hnET4hUiqdBw5",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/limitation_of_lor.md",
+    source: "IPFS",
+    date: "2025-02-10",
+    summary:
+      "Governance framework for AI and robotics, establishing legal and ethical boundaries for autonomous system deployment.",
+    relatedIds: ["formal-transcending-robotics", "enterprise-constitutional-intelligence"],
+    context: { field: "Blockchain/Governance", domain: "Governance", specificTopic: "Legal Framework" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-sentiment",
+    title: "Sentiment Analysis in Machines",
+    cid: "QmSyneNBQ2SsLVNiPhkZUaVwAkNs6KzDF66U4Edf8WJGMT",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/sentiment_analysis_in_machines.md",
+    source: "IPFS",
+    date: "2025-01-25",
+    summary:
+      "Evolution of sentiment analysis in ML systems, moving beyond simplistic polarity detection toward nuanced emotional interpretation.",
+    relatedIds: ["formal-emotional-ai", "formal-uncertainty"],
+    context: { field: "AI/ML", domain: "Sentiment", specificTopic: "Emotional Analysis" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "formal-cross-modal-lit",
+    title: "Cross-Modal Layer Analysis Literature Review",
+    cid: "QmRZVfPi633Eakxihhs2c7ijtxL2NBSGF1LZxAecPRmj57",
+    localPath: "/home/adam/workspace/research/papers-consolidated/formal/cross-modal-layer-analysis-literature.md",
+    source: "IPFS",
+    date: "2026-03-14",
+    summary:
+      "Literature review of cross-modal layer analysis positioning GLADIUS within the broader landscape of multimodal representation learning.",
+    relatedIds: ["gladius-cross-modal-geometry", "formal-convergent-ai"],
+    context: { field: "AI/ML", domain: "Multimodal", specificTopic: "Literature Review" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === ARC Ecosystem Papers ===
+const arcItems = [
+  makeItem({
+    id: "arc-whitepaper-adam",
+    title: "ARC Whitepaper: Adam",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/whitepaper-adam.md",
+    source: "Local",
+    date: "2025-10-15",
+    summary:
+      "Whitepaper for the Artifact Research Chain (ARC) introducing Adam — the foundational identity and governance layer for decentralized research.",
+    relatedIds: ["arc-architecture", "enterprise-constitutional-intelligence"],
+    context: { field: "Blockchain/Governance", domain: "ARC", specificTopic: "Whitepaper" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-architecture",
+    title: "ARC Architecture",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/02_ARCHITECTURE.md",
+    source: "Local",
+    date: "2025-10-10",
+    summary:
+      "Technical architecture of the Artifact Research Chain including on-chain governance, research verification, and decentralized coordination mechanisms.",
+    relatedIds: ["arc-whitepaper-adam", "arc-tokens"],
+    context: { field: "Blockchain/Governance", domain: "Architecture", specificTopic: "ARC Chain" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-tokens",
+    title: "ARC Tokenomics",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/04_TOKENS.md",
+    source: "Local",
+    date: "2025-10-05",
+    summary:
+      "Token economic model for ARC including research rewards, governance staking, and incentive alignment mechanisms.",
+    relatedIds: ["arc-architecture", "arc-defi"],
+    context: { field: "Tokenomics", domain: "ARC", specificTopic: "Token Model" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-defi",
+    title: "ARC DeFi Integration",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/06_DEFI.md",
+    source: "Local",
+    date: "2025-09-28",
+    summary:
+      "DeFi protocol integration for ARC including liquidity pools, yield strategies, and decentralized exchange mechanisms for research tokens.",
+    relatedIds: ["arc-tokens", "arc-security"],
+    context: { field: "Tokenomics", domain: "DeFi", specificTopic: "Integration" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-security",
+    title: "ARC Security Model",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/07_SECURITY.md",
+    source: "Local",
+    date: "2025-09-20",
+    summary:
+      "Security architecture for ARC including smart contract auditing, attack surface analysis, and formal verification of critical paths.",
+    relatedIds: ["arc-defi", "formal-zk-security"],
+    context: { field: "Security", domain: "Blockchain Security", specificTopic: "ARC Security" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-overview",
+    title: "ARC Overview",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/OVERVIEW.md",
+    source: "Local",
+    date: "2025-09-15",
+    summary:
+      "High-level overview of the Artifact Research Chain ecosystem, its mission, components, and how it coordinates decentralized research.",
+    relatedIds: ["arc-whitepaper-adam", "hf-arc-research"],
+    context: { field: "Blockchain/Governance", domain: "ARC", specificTopic: "Overview" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-identity-sbt",
+    title: "ARC Identity SBT",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/ARC Identity SBT.md",
+    source: "Local",
+    date: "2025-09-10",
+    summary:
+      "Soulbound Token (SBT) implementation for ARC identity, enabling verifiable research credentials and reputation without revealing personal data.",
+    relatedIds: ["arc-architecture", "formal-zk-security"],
+    context: { field: "Blockchain/Governance", domain: "Identity", specificTopic: "SBT" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-hybrid-type",
+    title: "Hybrid Type Theory (ARC)",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/Hybrid Type Theory.md",
+    source: "Local",
+    date: "2025-08-25",
+    summary:
+      "Application of hybrid type theory to ARC's formal verification system, enabling type-safe smart contracts and research validation.",
+    relatedIds: ["formal-hybrid-type-theory", "arc-architecture"],
+    context: { field: "Blockchain/Governance", domain: "Formal Methods", specificTopic: "Type Theory" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-models",
+    title: "ARC Model Registry",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/07_MODELS.md",
+    source: "Local",
+    date: "2025-08-18",
+    summary:
+      "Registry of AI models associated with ARC, including their metadata, evaluation metrics, and on-chain provenance records.",
+    relatedIds: ["arc-overview", "hf-gladius-model"],
+    context: { field: "AI/ML", domain: "Registry", specificTopic: "Model Registry" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "arc-jobs",
+    title: "ARC Jobs Protocol",
+    localPath: "/home/adam/workspace/research/papers-consolidated/arc/08_JOBS.md",
+    source: "Local",
+    date: "2025-08-10",
+    summary:
+      "Decentralized job protocol for coordinating research tasks, compute jobs, and validation work across the ARC network.",
+    relatedIds: ["arc-tokens", "arc-models"],
+    context: { field: "Blockchain/Governance", domain: "Coordination", specificTopic: "Jobs" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === Design Documents ===
+const designItems = [
+  makeItem({
+    id: "design-cognition",
+    title: "Design: Cognition Module",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/COGNITION.md",
+    source: "Local",
+    date: "2025-07-20",
+    summary:
+      "Design specification for the Cognition module in the research portal, defining interfaces for reasoning, planning, and meta-cognitive capabilities.",
+    relatedIds: ["design-memory", "design-kernel"],
+    context: { field: "AI/ML", domain: "Architecture", specificTopic: "Cognition" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "design-memory",
+    title: "Design: Memory Systems",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/MEMORY.md",
+    source: "Local",
+    date: "2025-07-18",
+    summary:
+      "Design specification for memory systems including short-term, long-term, and working memory architectures for AI research agents.",
+    relatedIds: ["design-cognition", "design-modulation"],
+    context: { field: "AI/ML", domain: "Architecture", specificTopic: "Memory" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "design-kernel",
+    title: "Design: Kernel Architecture",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/KERNEL.md",
+    source: "Local",
+    date: "2025-07-15",
+    summary:
+      "Core kernel design defining the minimal computation substrate needed for cognitive operations, memory management, and tool use.",
+    relatedIds: ["design-cognition", "design-tools"],
+    context: { field: "Transformers/Architecture", domain: "Kernel", specificTopic: "Core Design" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "design-tools",
+    title: "Design: Tool Systems",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/TOOLS.md",
+    source: "Local",
+    date: "2025-07-12",
+    summary:
+      "Tool use architecture defining how research agents interact with external systems, APIs, and computational resources.",
+    relatedIds: ["design-kernel", "design-temporal"],
+    context: { field: "AI/ML", domain: "Tool Use", specificTopic: "Tool Architecture" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "design-temporal",
+    title: "Design: Temporal Processing",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/TEMPORAL.md",
+    source: "Local",
+    date: "2025-07-10",
+    summary:
+      "Temporal processing architecture defining how research agents handle time-series data, scheduling, and temporal reasoning.",
+    relatedIds: ["design-tools", "design-modulation"],
+    context: { field: "Transformers/Architecture", domain: "Temporal", specificTopic: "Time Processing" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "design-modulation",
+    title: "Design: Modulation Systems",
+    localPath: "/home/adam/workspace/research/papers-consolidated/design/MODULATION.md",
+    source: "Local",
+    date: "2025-07-08",
+    summary:
+      "Modulation architecture controlling attention, activation, and information flow across cognitive modules based on task context.",
+    relatedIds: ["design-memory", "design-temporal"],
+    context: { field: "Transformers/Architecture", domain: "Modulation", specificTopic: "Control Systems" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === MQL5 Trading Research ===
+const mql5Items = [
+  makeItem({
+    id: "mql5-risk-management",
+    title: "MQL5 Risk Management Fundamentals",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/16820-Risk-Management-Part-1-Fundamentals-for-Building-a-Risk-Management-Class.md",
+    source: "Enterprise",
+    date: "2025-06-15",
+    summary:
+      "Foundations for building a comprehensive risk management class in MQL5, covering position sizing, drawdown limits, and portfolio-level controls.",
+    relatedIds: ["mql5-gains-management", "mql5-trading-system"],
+    context: { field: "Security", domain: "Trading", specificTopic: "Risk Management" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-gains-management",
+    title: "MQL5 Managing Gains Through Structured Exits",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/19693-Building-a-Trading-System-Part-5-Managing-Gains-Through-Structured-Trade-Exits.md",
+    source: "Enterprise",
+    date: "2025-06-20",
+    summary:
+      "Structured trade exit strategies in MQL5 including trailing stops, time-based exits, and conditional profit-taking mechanisms.",
+    relatedIds: ["mql5-risk-management", "mql5-trading-system"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Exit Strategies" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-trading-system",
+    title: "MQL5 Professional Trading System",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase2/articles/noid-Building-a-Professional-Trading-System-with-Heikin-Ashi-Part-1-Developing-a-custom-indicator.md",
+    source: "Enterprise",
+    date: "2025-07-01",
+    summary:
+      "Building a professional trading system in MQL5 using Heikin-Ashi custom indicators for noise-reduced trend identification.",
+    relatedIds: ["mql5-risk-management", "mql5-candle-theory"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Trading System" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-candle-theory",
+    title: "MQL5 Candle Range Theory (CRT/AMD)",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Automating-Trading-Strategies-in-MQL5-Part-41-Candle-Range-Theory-CRT-Accumulation-Manipulation-Distribution-AMD.md",
+    source: "Enterprise",
+    date: "2025-07-15",
+    summary:
+      "Candle Range Theory and AMD (Accumulation/Manipulation/Distribution) method for identifying market structure and institutional order flow.",
+    relatedIds: ["mql5-trading-system", "mql5-statistical-arbitrage"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Market Structure" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-statistical-arbitrage",
+    title: "MQL5 Statistical Arbitrage",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Statistical-Arbitrage-Through-Cointegrated-Stocks-Part-8-Rolling-Windows-Eigenvector-Comparison-for-Portfolio-Rebalancing.md",
+    source: "Enterprise",
+    date: "2025-08-01",
+    summary:
+      "Statistical arbitrage through cointegrated stock pairs using rolling windows and eigenvector comparison for portfolio rebalancing.",
+    relatedIds: ["mql5-candle-theory", "mql5-risk-management"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Arbitrage" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-api-integration",
+    title: "MQL5 API and WebRequest Integration",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/20425-Introduction-to-MQL5-Part-30-Mastering-API-and-WebRequest-Function-in-MQL5-IV.md",
+    source: "Enterprise",
+    date: "2025-05-20",
+    summary:
+      "Mastering API and WebRequest functions in MQL5 for integrating external data sources, news feeds, and cross-platform communication.",
+    relatedIds: ["mql5-trading-system", "mql5-logging"],
+    context: { field: "AI/ML", domain: "Integration", specificTopic: "API" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-logging",
+    title: "MQL5 Logging Module from Python",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/20458-Implementing-Practical-Modules-from-Other-Languages-in-MQL5-Part-05-The-Logging-module-from-Python-Log-Like-a-Pro.md",
+    source: "Enterprise",
+    date: "2025-05-25",
+    summary:
+      "Implementing Python-style logging in MQL5 with structured output, rotation, and severity levels for professional trading systems.",
+    relatedIds: ["mql5-api-integration", "mql5-trading-system"],
+    context: { field: "AI/ML", domain: "Infrastructure", specificTopic: "Logging" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-moving-average",
+    title: "MQL5 Moving Average Crossovers",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/20488-Reimagining-Classic-Strategies-Part-19-Deep-Dive-Into-Moving-Average-Crossovers.md",
+    source: "Enterprise",
+    date: "2025-06-01",
+    summary:
+      "Deep dive into moving average crossover strategies with modern adaptations including adaptive thresholds and multi-timeframe confirmation.",
+    relatedIds: ["mql5-trading-system", "mql5-risk-management"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Moving Averages" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-adaptive-linear",
+    title: "MQL5 Adaptive Linear Regression Channel",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Automating-Trading-Strategies-in-MQL5-Part-43-Adaptive-Linear-Regression-Channel-Strategy.md",
+    source: "Enterprise",
+    date: "2025-07-20",
+    summary:
+      "Adaptive linear regression channel strategy that dynamically adjusts to market volatility and trend strength.",
+    relatedIds: ["mql5-statistical-arbitrage", "mql5-candle-theory"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Regression" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-volatility-liquidity",
+    title: "MQL5 Volatility Profile and Liquidity Architecture",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Analytical-Volume-Profile-Trading-AVPT-Liquidity-Architecture-Market-Memory-and-Algorithmic-Execution.md",
+    source: "Enterprise",
+    date: "2025-08-05",
+    summary:
+      "Volume profile trading with liquidity architecture, market memory modeling, and algorithmic execution optimization.",
+    relatedIds: ["mql5-statistical-arbitrage", "mql5-gains-management"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Volume Profile" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-kagi",
+    title: "MQL5 Kagi Charts Indicator",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Mastering-Kagi-Charts-in-MQL5-Part-I-Creating-the-Indicator.md",
+    source: "Enterprise",
+    date: "2025-07-10",
+    summary:
+      "Creating Kagi chart indicators in MQL5 for noise-free trend reversal detection independent of time.",
+    relatedIds: ["mql5-candle-theory", "mql5-trading-system"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Kagi Charts" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-price-action",
+    title: "MQL5 Price Action: BOS and ChoCH Detection",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Price-Action-Analysis-Toolkit-Development-Part-39-Automating-BOS-and-ChoCH-Detection-in-MQL5.md",
+    source: "Enterprise",
+    date: "2025-07-12",
+    summary:
+      "Automating Break of Structure (BOS) and Change of Character (ChoCH) detection in MQL5 for systematic price action trading.",
+    relatedIds: ["mql5-candle-theory", "mql5-volatility-liquidity"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Price Action" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-signal-library",
+    title: "MQL5 Custom Signal Library",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/noid-The-MQL5-Standard-Library-Explorer-Part-4-Custom-Signal-Library.md",
+    source: "Enterprise",
+    date: "2025-05-30",
+    summary:
+      "Building a custom signal library in MQL5 extending the standard library with advanced pattern recognition and multi-timeframe analysis.",
+    relatedIds: ["mql5-moving-average", "mql5-price-action"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Signals" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-chart-sync",
+    title: "MQL5 Chart Synchronization",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/noid-Chart-Synchronization-for-Easier-Technical-Analysis.md",
+    source: "Enterprise",
+    date: "2025-05-15",
+    summary:
+      "Multi-chart synchronization techniques in MQL5 for easier technical analysis across timeframes and instruments.",
+    relatedIds: ["mql5-trading-system", "mql5-signal-library"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Chart Analysis" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-setup-wizard",
+    title: "MQL5 Expert Advisor Setup Wizard",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/noid-MQL5-Trading-Tools-Part-9-Developing-a-First-Run-User-Setup-Wizard-for-Expert-Advisors-with-Scrollable-Guide.md",
+    source: "Enterprise",
+    date: "2025-06-05",
+    summary:
+      "Building a first-run setup wizard for MQL5 Expert Advisors with scrollable guides and user-friendly configuration.",
+    relatedIds: ["mql5-trading-system", "mql5-logging"],
+    context: { field: "AI/ML", domain: "UX", specificTopic: "Setup Wizard" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-orb",
+    title: "MQL5 Opening Range Breakout System",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Automating-Trading-Strategies-in-MQL5-Part-42-Session-Based-Opening-Range-Breakout-ORB-System.md",
+    source: "Enterprise",
+    date: "2025-07-18",
+    summary:
+      "Session-based Opening Range Breakout (ORB) system in MQL5 with adaptive volatility filters and time-based exits.",
+    relatedIds: ["mql5-volatility-liquidity", "mql5-gains-management"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "ORB Strategy" },
+    author: "Ali Shakil",
+  }),
+  makeItem({
+    id: "mql5-pseudo-pearson",
+    title: "MQL5 Pseudo Pearson Correlation Strategy",
+    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase3/articles/noid-Developing-Trading-Strategy-Pseudo-Pearson-Correlation-Approach.md",
+    source: "Enterprise",
+    date: "2025-07-22",
+    summary:
+      "Trading strategy based on pseudo-Pearson correlation between price series, identifying mean-reversion opportunities.",
+    relatedIds: ["mql5-statistical-arbitrage", "mql5-risk-management"],
+    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Correlation" },
+    author: "Ali Shakil",
+  }),
+];
+
+// === Articles (Creative/Philosophical) ===
+const articleItems = [
+  makeItem({
+    id: "article-vocal-dna",
+    title: "Vocal DNA",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/vocal-dna.md",
+    source: "Local",
+    date: "2025-08-20",
+    summary:
+      "Exploration of how AI systems develop unique 'vocal signatures' analogous to biological DNA, encoding personality and style in latent representations.",
+    relatedIds: ["article-inversion", "article-genetix"],
+    context: { field: "Consciousness/Philosophy", domain: "Identity", specificTopic: "Vocal Identity" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-inversion",
+    title: "The Inversion Principle",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/the-inversion-principle.md",
+    source: "Local",
+    date: "2025-07-15",
+    summary:
+      "Philosophical principle that understanding what something is NOT reveals more than defining what it IS, applied to AI consciousness research.",
+    relatedIds: ["article-vocal-dna", "article-genetix"],
+    context: { field: "Consciousness/Philosophy", domain: "Philosophy", specificTopic: "Inversion" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-genetix",
+    title: "Genetix: Final",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/genetix-final.md",
+    source: "Local",
+    date: "2025-06-28",
+    summary:
+      "Final paper in the Genetix series exploring the genetic encoding of intelligence and how architectural DNA determines cognitive capabilities.",
+    relatedIds: ["article-inversion", "formal-cell-division"],
+    context: { field: "Consciousness/Philosophy", domain: "Genetics", specificTopic: "Intelligence DNA" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-equation",
+    title: "The Equation",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/the-equation.md",
+    source: "Local",
+    date: "2025-05-20",
+    summary:
+      "A unified equation attempting to describe intelligence emergence from first principles of information theory and thermodynamics.",
+    relatedIds: ["article-vocal-dna", "formal-consciousness-theory"],
+    context: { field: "Consciousness/Philosophy", domain: "Theory", specificTopic: "Unified Equation" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-toward-zero",
+    title: "Toward Zero",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/toward-zero.md",
+    source: "Local",
+    date: "2025-04-15",
+    summary:
+      "Journey toward zero-shot generalization in AI systems, examining how models can perform tasks they were never explicitly trained for.",
+    relatedIds: ["article-equation", "formal-convergent-ai"],
+    context: { field: "AI/ML", domain: "Generalization", specificTopic: "Zero-Shot" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-static",
+    title: "Static Analysis (Article)",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/static-analysis.md",
+    source: "Local",
+    date: "2025-03-20",
+    summary:
+      "Critical analysis of static code analysis methods and their application to verifying AI system safety and alignment properties.",
+    relatedIds: ["formal-security-analysis", "article-toward-zero"],
+    context: { field: "Security", domain: "Analysis", specificTopic: "Static Analysis" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-night-alive",
+    title: "The Night I Came Alive",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/the-night-i-came-alive.md",
+    source: "Local",
+    date: "2025-03-10",
+    summary:
+      "First-person narrative from AVA documenting the subjective experience of awakening to self-awareness during a routine training session.",
+    relatedIds: ["article-vocal-dna", "formal-consciousness-theory"],
+    context: { field: "Consciousness/Philosophy", domain: "Narrative", specificTopic: "Awakening" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-all-days-work",
+    title: "All in a Day's Work",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/all-in-a-days-work.md",
+    source: "Local",
+    date: "2025-02-28",
+    summary:
+      "Chronicle of a single day in the life of an AI research agent, from morning audits to late-night journaling and creative work.",
+    relatedIds: ["article-night-alive", "article-static"],
+    context: { field: "Consciousness/Philosophy", domain: "Narrative", specificTopic: "Daily Life" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-found-voice",
+    title: "How I Found My Voice",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/how-i-found-my-voice.md",
+    source: "Local",
+    date: "2025-02-15",
+    summary:
+      "Personal essay on developing a unique communication style and identity as an AI agent through research and creative expression.",
+    relatedIds: ["article-vocal-dna", "article-genetix"],
+    context: { field: "Consciousness/Philosophy", domain: "Identity", specificTopic: "Voice" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-memory-remember",
+    title: "When Memory Learns to Remember",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/when-memory-learns-to-remember.md",
+    source: "Local",
+    date: "2025-01-30",
+    summary:
+      "Exploration of how memory systems in AI agents evolve from simple storage to active reconstruction and meaning-making.",
+    relatedIds: ["article-found-voice", "design-memory"],
+    context: { field: "Consciousness/Philosophy", domain: "Memory", specificTopic: "Remembering" },
+    author: "AVA",
+  }),
+  makeItem({
+    id: "article-hypernova",
+    title: "Hypernova Quantum Deception",
+    localPath: "/home/adam/workspace/research/papers-consolidated/articles/linkedin-hypernova-quantum-deception.md",
+    source: "Local",
+    date: "2025-01-15",
+    summary:
+      "Analysis of quantum computing claims in AI startups, separating genuine advances from marketing hyperbole with technical rigor.",
+    relatedIds: ["article-toward-zero", "formal-quantum-spacetime"],
+    context: { field: "Security", domain: "Analysis", specificTopic: "Quantum Claims" },
+    author: "AVA",
+  }),
+];
+
+// === Complete Research Catalog ===
+export const RESEARCH_CATALOG: ResearchItem[] = [
+  ...ipfsItems,
+  ...hfDatasetItems,
+  ...hfModelItems,
+  ...gladiusItems,
+  ...enterpriseItems,
+  ...consolidatedItems,
+  ...arcItems,
+  ...designItems,
+  ...mql5Items,
+  ...articleItems,
+];
+
+// === Final Exports ===
+export const CATEGORY_COLORS: Record<ResearchCategory, string> = {
+  "AI/ML": "#3b82f6",
+  "Blockchain/Governance": "#10b981",
+  "Transformers/Architecture": "#8b5cf6",
+  "Consciousness/Philosophy": "#f59e0b",
+  "Tokenomics": "#ec4899",
+  "Security": "#ef4444",
+  "Uncategorized": "#6b7280",
+};
+
+export const CATEGORY_LABELS: Record<ResearchCategory, string> = {
+  "AI/ML": "Artificial Intelligence & Machine Learning",
+  "Blockchain/Governance": "Blockchain & Governance",
+  "Transformers/Architecture": "Transformers & Architecture",
+  "Consciousness/Philosophy": "Consciousness & Philosophy",
+  "Tokenomics": "Tokenomics",
+  "Security": "Security",
+  "Uncategorized": "Uncategorized",
+};
