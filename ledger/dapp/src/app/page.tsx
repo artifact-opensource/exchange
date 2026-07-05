@@ -1,3 +1,4 @@
+import { FlywheelMonitor } from "@/components/monitor/FlywheelMonitor"
 'use client'
 
 import { useAccount } from 'wagmi'

@@ -66,7 +66,10 @@ export const EXPLORER = {
 
 // ─── Token Metadata ───────────────────────────────────────────────
 export const TOKEN_META: Record<string, { name: string; symbol: string; icon: string; color: string }> = {
-  au: { name: 'Artifact Utility', symbol: 'Au', icon: 'au', color: '#FFD700' },
+  au: { name: "Artifact Utility", symbol: "Au", icon: "https://raw.githubusercontent.com/artifact-virtual/assets/main/tokens/au-gold.svg", color: "#FFD700" },
+  ag: { name: "Artifact Governance", symbol: "Ag", icon: "https://raw.githubusercontent.com/artifact-virtual/assets/main/tokens/ag-silver.svg", color: "#C0C0C0" },
+  eth: { name: "Ethereum", symbol: "ETH", icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg", color: "#627EEA" },
+};
   ag: { name: 'Artifact Governance', symbol: 'Ag', icon: 'ag', color: '#C0C0C0' },
   weth: { name: 'Wrapped Ethereum', symbol: 'WETH', icon: 'weth', color: '#627EEA' },
   usdc: { name: 'USD Coin', symbol: 'USDC', icon: 'usdc', color: '#2775CA' },
