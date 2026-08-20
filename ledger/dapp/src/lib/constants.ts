@@ -21,3 +21,5 @@ export const TOKEN_META: Record<string, { name: string; symbol: string; icon: st
   usdc: { name: "USD Coin", symbol: "USDC", icon: "usdc", color: "#2775CA" },
   aero: { name: "Aerodrome", symbol: "AERO", icon: "aero", color: "#0052FF" },
 };
+
+export const TOKENS = TOKEN_META;
