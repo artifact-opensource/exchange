@@ -13,7 +13,14 @@
  * constants below are canonical fallbacks only.
  */
 
-const RPC = process.env.BASE_RPC_URL || "https://mainnet.base.org";
+const RPCS = [
+  process.env.BASE_RPC_URL,
+  process.env.NEXT_PUBLIC_RPC_URL,
+  "https://mainnet.base.org",
+  "https://base-rpc.publicnode.com",
+  "https://base-pokt.nodies.app",
+  "https://1rpc.io/base",
+].filter(Boolean);
 
 const ADDRESSES = {
   au:
@@ -45,14 +52,24 @@ const SEL = {
 };
 
 async function ethCall(to, data) {
-  const r = await fetch(RPC, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }),
-  });
-  const j = await r.json();
-  if (j.error || !j.result || j.result === "0x") throw new Error(j.error?.message || "empty result");
-  return j.result;
+  let lastErr = null;
+  for (let i = 0; i < RPCS.length * 2; i++) {
+    const rpc = RPCS[i % RPCS.length];
+    try {
+      const r = await fetch(rpc, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: i + 1, method: "eth_call", params: [{ to, data }, "latest"] }),
+        signal: AbortSignal.timeout(6000),
+      });
+      const j = await r.json();
+      if (!j.error && j.result && j.result !== "0x") return j.result;
+      lastErr = new Error(j.error?.message || "empty result");
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("all RPCs failed");
 }
 
 const padAddr = (addr) => addr.toLowerCase().replace(/^0x/, "").padStart(64, "0");
