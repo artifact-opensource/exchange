@@ -18,3 +18,11 @@ html, body, * {
 .snap-container::-webkit-scrollbar {
     display: none !important;
 }
+
+/* Scroll-glitch fix: each dimension panel scrolls vertically AND is a
+   mandatory snap child of the horizontal container. Without containment,
+   an inner scroll hitting top/bottom chains into the parent and violently
+   snaps sideways mid-scroll. */
+.snap-container > * {
+    overscroll-behavior: contain;
+}
