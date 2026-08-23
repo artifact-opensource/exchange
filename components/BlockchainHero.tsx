@@ -14,8 +14,17 @@ const BlockchainHeroContent: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ─── Live market data via /api/market (oracle → cache → pool → dexscreener) ───
+  // ─── Live market data via /api/market (pool → dexscreener → oracle) ───
   const [market, setMarket] = useState<any>(null);
+
+  const sourceLabel = (s?: string) =>
+    !s ? '' :
+    s.startsWith('dexscreener') ? 'dexscreener' :
+    s === 'cl_pool_spot' ? 'pool spot' :
+    s === 'pool_spot' ? 'pool' :
+    s === 'oracle_bootstrap' ? 'oracle · nominal bootstrap' :
+    s === 'oracle_cache' ? 'oracle cache' :
+    s;
 
   useEffect(() => {
     let alive = true;
@@ -202,7 +211,7 @@ const BlockchainHeroContent: React.FC = () => {
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               {market?.au?.status === 'live' ? (
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400">
-                  ● Live · {market.au.source} · supply {formatTokens(auSupply, 'Au')}
+                  ● Live · {sourceLabel(market.au.source)} · supply {formatTokens(auSupply, 'Au')}
                 </span>
               ) : (
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
@@ -231,7 +240,7 @@ const BlockchainHeroContent: React.FC = () => {
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               {market?.ag?.status === 'live' ? (
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400">
-                  ● Live · {market.ag.source} · supply {formatTokens(agSupply, 'Ag')}
+                  ● Live · {sourceLabel(market.ag.source)} · supply {formatTokens(agSupply, 'Ag')}
                 </span>
               ) : (
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
