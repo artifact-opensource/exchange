@@ -1,6 +1,6 @@
-import { readJsonBody } from "../_lib";
+import { readJsonBody } from "../_lib.mjs";
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const key = process.env.OPENROUTER_API_KEY;
     if (!key) return res.status(500).json({ error: "OpenRouter API key not configured" });
@@ -22,10 +22,10 @@ export default async function handler(req: any, res: any) {
         tool_choice: body.tools ? "auto" : undefined,
       }),
     });
-    const data: any = await r.json();
+    const data = await r.json();
     if (!r.ok) return res.status(500).json({ error: "OpenRouter analysis failed" });
     return res.status(200).json(data.choices[0].message);
-  } catch (e: any) {
+  } catch (e) {
     return res.status(500).json({ error: "OpenRouter analysis failed", details: String(e?.message || e) });
   }
 }

@@ -1,6 +1,6 @@
-import { readJsonBody } from "../_lib";
+import { readJsonBody } from "../_lib.mjs";
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const key = process.env.GEMINI_API_KEY;
     if (!key) return res.status(500).json({ error: "Gemini API key not configured" });
@@ -13,12 +13,11 @@ export default async function handler(req: any, res: any) {
         body: JSON.stringify({ contents: prompt }),
       },
     );
-    const data: any = await r.json();
-    const text =
-      data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join("") ?? null;
+    const data = await r.json();
     if (!r.ok) return res.status(500).json({ error: "Gemini analysis failed" });
+    const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? null;
     return res.status(200).json({ text });
-  } catch (e: any) {
+  } catch (e) {
     return res.status(500).json({ error: "Gemini analysis failed", details: String(e?.message || e) });
   }
 }

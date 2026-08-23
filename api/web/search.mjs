@@ -1,13 +1,13 @@
-import { readJsonBody } from "../_lib";
+import { readJsonBody } from "../_lib.mjs";
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const { query } = await readJsonBody(req);
     const r = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
     const html = await r.text();
-    const results: any[] = [];
+    const results = [];
     const regex = /<a class="result__url" href="([^"]+)".*?>(.*?)<\/a>.*?<a class="result__snippet[^>]+>(.*?)<\/a>/gs;
-    let m: RegExpExecArray | null;
+    let m;
     while ((m = regex.exec(html)) !== null && results.length < 5) {
       results.push({
         url: m[1],
@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
       });
     }
     return res.status(200).json({ results });
-  } catch (e: any) {
+  } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
   }
 }
