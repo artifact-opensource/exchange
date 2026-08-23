@@ -11,7 +11,9 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: prompt }),
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: String(prompt ?? "") }] }],
+        }),
       },
     );
     const data = await r.json();
