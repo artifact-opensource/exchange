@@ -14,6 +14,21 @@ const BlockchainHeroContent: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ─── Live market data via /api/market (oracle → cache → pool → dexscreener) ───
+  const [market, setMarket] = useState<any>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const load = () =>
+      fetch('/api/market/route')
+        .then((r) => r.json())
+        .then((d) => { if (alive) setMarket(d); })
+        .catch(() => {});
+    load();
+    const id = setInterval(load, 45000);
+    return () => { alive = false; clearInterval(id); };
+  }, []);
+
   // ─── Real on-chain data (Base Mainnet) ─────────────────────────────
   const chainId = BASE_CHAIN_ID;
 
@@ -79,6 +94,9 @@ const BlockchainHeroContent: React.FC = () => {
     if (!isConnected || raw === undefined || raw === null) return `0.0000 ${symbol}`;
     return `${Number(formatUnits(raw, 18)).toLocaleString('en-US', { maximumFractionDigits: 4 })} ${symbol}`;
   };
+
+  const formatPriceUsd = (v: number) =>
+    '$' + v.toLocaleString('en-US', { minimumFractionDigits: v < 1 ? 8 : 2, maximumFractionDigits: v < 1 ? 10 : 2 });
 
   const shortenAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
@@ -179,13 +197,22 @@ const BlockchainHeroContent: React.FC = () => {
               onMouseEnter={triggerDistort}
               className="displace-text text-[clamp(2.6rem,9vw,5.5rem)] font-black leading-[0.85] tracking-tighter bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent cursor-default select-none"
             >
-              {formatTokens(auSupply, 'Au')}
+              {market?.au?.status === 'live' ? formatPriceUsd(market.au.priceUsd) : formatTokens(auSupply, 'Au')}
             </div>
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              {market?.au?.status === 'live' ? (
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400">
+                  ● Live · {market.au.source} · supply {formatTokens(auSupply, 'Au')}
+                </span>
+              ) : (
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
+                  NO_MARKET — awaiting liquidity · supply {formatTokens(auSupply, 'Au')}
+                </span>
+              )}
+              <div className="h-[1px] flex-1 bg-white/5"></div>
               <a href={basescanUrl('auToken')} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-white/30 hover:text-white/60 tracking-wider transition-colors">
                 {shortenAddress(BASESCAN.auToken)} ↗ BASESCAN
               </a>
-              <div className="h-[1px] flex-1 bg-white/5"></div>
             </div>
           </section>
 
@@ -199,13 +226,22 @@ const BlockchainHeroContent: React.FC = () => {
               onMouseEnter={triggerDistort}
               className="displace-text text-[clamp(2.6rem,9vw,5.5rem)] font-black leading-[0.85] tracking-tighter bg-gradient-to-b from-[#E8E8E8] to-[#6b6b6b] bg-clip-text text-transparent cursor-default select-none"
             >
-              {formatTokens(agSupply, 'Ag')}
+              {market?.ag?.status === 'live' ? formatPriceUsd(market.ag.priceUsd) : formatTokens(agSupply, 'Ag')}
             </div>
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              {market?.ag?.status === 'live' ? (
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400">
+                  ● Live · {market.ag.source} · supply {formatTokens(agSupply, 'Ag')}
+                </span>
+              ) : (
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
+                  PRE_MARKET — zero supply · no liquidity yet
+                </span>
+              )}
+              <div className="h-[1px] flex-1 bg-white/5"></div>
               <a href={basescanUrl('agToken')} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-white/30 hover:text-white/60 tracking-wider transition-colors">
                 {shortenAddress(BASESCAN.agToken)} ↗ BASESCAN
               </a>
-              <div className="h-[1px] flex-1 bg-white/5"></div>
             </div>
           </section>
 

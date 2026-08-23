@@ -42,7 +42,7 @@ export default function ResearchPortal() {
       setIsIndexing(true)
       try {
         await initDB()
-        await buildFullIndex()
+        await buildFullIndex(RESEARCH_CATALOG)
         setIndexReady(true)
         // Load all items for display
         const all = await searchIndex('')
@@ -57,7 +57,9 @@ export default function ResearchPortal() {
           aiTags: [],
           semanticScore: item.importance / 10,
           colorCode: CATEGORY_COLORS[item.category],
-          contextLayers: item.contextPath.split('/'),
+          contextLayers: item.context
+            ? [item.context.field, item.context.domain, item.context.specificTopic]
+            : [],
           searchableText: `${item.title} ${item.summary} ${item.tags.join(' ')}`.toLowerCase(),
         })))
       }
