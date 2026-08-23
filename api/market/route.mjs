@@ -51,25 +51,30 @@ const SEL = {
   decimals: "0x313ce567",
 };
 
+const CALL_TIMEOUT_MS = 4000;
+
+async function ethCallOnce(rpc, to, data) {
+  const r = await fetch(rpc, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }),
+    signal: AbortSignal.timeout(CALL_TIMEOUT_MS),
+  });
+  const j = await r.json();
+  if (!j.error && j.result && j.result !== "0x") return j.result;
+  throw new Error(j.error?.message || "empty result");
+}
+
+/** Race every configured RPC in parallel; first valid answer wins. */
 async function ethCall(to, data) {
-  let lastErr = null;
-  for (let i = 0; i < RPCS.length * 2; i++) {
-    const rpc = RPCS[i % RPCS.length];
+  for (let pass = 0; pass < 2; pass++) {
     try {
-      const r = await fetch(rpc, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: i + 1, method: "eth_call", params: [{ to, data }, "latest"] }),
-        signal: AbortSignal.timeout(6000),
-      });
-      const j = await r.json();
-      if (!j.error && j.result && j.result !== "0x") return j.result;
-      lastErr = new Error(j.error?.message || "empty result");
-    } catch (e) {
-      lastErr = e;
+      return await Promise.any(RPCS.map((rpc) => ethCallOnce(rpc, to, data)));
+    } catch {
+      /* transient — one retry pass */
     }
   }
-  throw lastErr || new Error("all RPCs failed");
+  throw new Error("all Base RPCs failed");
 }
 
 const padAddr = (addr) => addr.toLowerCase().replace(/^0x/, "").padStart(64, "0");
@@ -156,7 +161,7 @@ async function tryDexScreener(token) {
   return { priceUsd: parseFloat(pair.priceUsd), source: `dexscreener:${pair.dexId}`, detail: `liq $${(pair.liquidity?.usd || 0).toLocaleString()}` };
 }
 
-async function priceFor(key) {
+async function priceFor(key, deadline = Date.now() + 9000) {
   const token = ADDRESSES[key];
   const attempts = [
     ...(key === "au" ? [tryPools] : []),
@@ -166,6 +171,7 @@ async function priceFor(key) {
   ];
   let lastErr = null;
   for (const attempt of attempts) {
+    if (Date.now() > deadline) break; // stay under the function timeout
     try {
       const { priceUsd, ...rest } = await attempt();
       if (Number.isFinite(priceUsd) && priceUsd > 0 && priceUsd < 1e9) {
@@ -188,15 +194,25 @@ async function priceFor(key) {
   };
 }
 
+// 25s module-scope cache: UI polls every 45s, so most requests are instant
+// and we never hammer public RPCs more than ~2×/min per warm instance.
+let CACHE = { ts: 0, data: null };
+const CACHE_TTL_MS = 25_000;
+
 export default async function handler(req, res) {
   try {
+    if (CACHE.data && Date.now() - CACHE.ts < CACHE_TTL_MS) {
+      return res.status(200).json(CACHE.data);
+    }
     const url = new URL(req.url, `https://${req.headers.host || "localhost"}`);
     const t = (url.searchParams.get("token") || "").toLowerCase();
     if (t === "au" || t === "ag") {
       return res.status(200).json(await priceFor(t));
     }
     const [au, ag] = await Promise.all([priceFor("au"), priceFor("ag")]);
-    return res.status(200).json({ au, ag, checkedAt: new Date().toISOString() });
+    const payload = { au, ag, checkedAt: new Date().toISOString() };
+    CACHE = { ts: Date.now(), data: payload };
+    return res.status(200).json(payload);
   } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
   }
