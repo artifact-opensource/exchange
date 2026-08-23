@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     const key = process.env.GEMINI_API_KEY;
     if (!key) return res.status(500).json({ error: "Gemini API key not configured" });
     const { prompt } = await readJsonBody(req);
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-flash-latest";
     const r = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
       {
