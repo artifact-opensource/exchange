@@ -20,6 +20,12 @@ const RPCS = [
   "https://base-rpc.publicnode.com",
   "https://base-pokt.nodies.app",
   "https://1rpc.io/base",
+  "https://base-mainnet.public.blastapi.io",
+  "https://endpoints.omniatech.io/v1/base/mainnet/public",
+  "https://rpc.notadegen.com/base",
+  "https://base.meowrpc.com",
+  "https://base.drpc.org",
+  "https://developer-access-mainnet.base.org",
 ].filter(Boolean);
 
 const ADDRESSES = {
@@ -65,16 +71,17 @@ async function ethCallOnce(rpc, to, data) {
   throw new Error(j.error?.message || "empty result");
 }
 
-/** Race every configured RPC in parallel; first valid answer wins. */
+/** Race every configured RPC in parallel; first valid answer wins.
+ *  If all fail, throws an error carrying per-provider reasons (visible in
+ *  the API's no_market note — makes egress/allowlist issues debuggable). */
 async function ethCall(to, data) {
-  for (let pass = 0; pass < 2; pass++) {
-    try {
-      return await Promise.any(RPCS.map((rpc) => ethCallOnce(rpc, to, data)));
-    } catch {
-      /* transient — one retry pass */
-    }
-  }
-  throw new Error("all Base RPCs failed");
+  const results = await Promise.allSettled(RPCS.map((rpc) => ethCallOnce(rpc, to, data)));
+  const ok = results.find((r) => r.status === "fulfilled");
+  if (ok) return ok.value;
+  const summary = results
+    .map((r, i) => `${new URL(RPCS[i]).host}: ${String(r.reason?.message || r.reason).slice(0, 60)}`)
+    .join(" | ");
+  throw new Error(`all Base RPCs failed → ${summary}`);
 }
 
 const padAddr = (addr) => addr.toLowerCase().replace(/^0x/, "").padStart(64, "0");
