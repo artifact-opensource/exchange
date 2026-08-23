@@ -5,8 +5,9 @@ export default async function handler(req, res) {
     const key = process.env.GEMINI_API_KEY;
     if (!key) return res.status(500).json({ error: "Gemini API key not configured" });
     const { prompt } = await readJsonBody(req);
+    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
     const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -14,7 +15,12 @@ export default async function handler(req, res) {
       },
     );
     const data = await r.json();
-    if (!r.ok) return res.status(500).json({ error: "Gemini analysis failed" });
+    if (!r.ok)
+      return res.status(502).json({
+        error: "Gemini analysis failed",
+        status: r.status,
+        details: JSON.stringify(data).slice(0, 300),
+      });
     const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? null;
     return res.status(200).json({ text });
   } catch (e) {
