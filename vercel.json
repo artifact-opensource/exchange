@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/**": {
-      "includeFiles": ["index_ipfs.md"],
+      "includeFiles": "index_ipfs.md",
       "maxDuration": 30
     }
   },
