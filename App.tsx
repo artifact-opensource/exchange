@@ -36,9 +36,6 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  if (route.startsWith("#/investors")) {
-    return <Web3Provider><InvestorPortalApp /></Web3Provider>;
-  }
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [currentSection, setCurrentSection] = useState<SectionId>(SectionId.RD);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
@@ -177,6 +174,11 @@ export default function App() {
     }
   };
 
+  // Route split AFTER all hooks — hook order must be identical across renders
+  if (route.startsWith("#/investors")) {
+    return <Web3Provider><InvestorPortalApp /></Web3Provider>;
+  }
+
   return (
     <RefreshContext.Provider value={{ triggerRefresh }}>
     <main className="relative w-full h-[100dvh] bg-[#030303] selection:bg-white selection:text-black touch-pan-x overflow-hidden">
@@ -294,11 +296,30 @@ export default function App() {
               {/* AV/ST — Space Tech Division */}
               {config.id === SectionId.ST && <SpaceDivision />}
 
-              {/* Empty space for IM */}
+              {/* AV/IM — Investor Relations portal node */}
               {config.id === SectionId.IM && (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="font-mono text-[10px] text-white/20 tracking-[0.5em] uppercase border border-white/5 p-12">
-                    Space_Reserved // Institutional_Node
+                <div className="w-full h-full flex items-center justify-center px-4">
+                  <div className="max-w-xl w-full border border-white/10 bg-black/40 backdrop-blur-md p-8 md:p-12 flex flex-col gap-6">
+                    <div className="flex items-center gap-3">
+                      <img src="/brand/av-logo-white.png" alt="AV" draggable={false} className="h-5 w-auto select-none" />
+                      <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-emerald-400/70">Investor_Node // Live</span>
+                    </div>
+                    <h3 className="font-black text-2xl md:text-4xl tracking-tighter uppercase text-white">Investor Relations</h3>
+                    <p className="font-mono text-[10px] md:text-[11px] leading-relaxed text-white/50 uppercase tracking-wider">
+                      One account across every membership universe · percentile-banded financials · sovereign proposal voting · build-in-public kanbans
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[["OPERATOR", "FREE"], ["BACKER", "$200"], ["PILLAR", "$2K/YR"]].map(([t, p]) => (
+                        <div key={t} className="border border-white/10 bg-white/[0.02] p-3 flex flex-col gap-1">
+                          <span className="font-mono text-[9px] tracking-[0.25em] text-white/40">{t}</span>
+                          <span className="font-mono text-sm md:text-lg text-white font-bold">{p}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="#/investors" className="group flex items-center justify-between border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/15 transition-colors px-5 py-3">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-emerald-400">Enter Investor_Relations</span>
+                      <span className="font-mono text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
                   </div>
                 </div>
               )}

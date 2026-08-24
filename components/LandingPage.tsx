@@ -22,9 +22,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
           transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
           className="flex items-center gap-6"
         >
-          <div className="w-16 h-16 md:w-24 md:h-24 border border-white flex items-center justify-center font-bold text-white italic text-3xl md:text-5xl">
-            AV
-          </div>
+          <img
+            src="/brand/av-logo-white.png"
+            alt="Artifact Virtual"
+            draggable={false}
+            className="h-16 md:h-24 w-auto select-none"
+          />
           <div className="flex flex-col">
             <span className="font-black tracking-[0.5em] md:tracking-[0.8em] text-lg md:text-2xl uppercase text-white">
               ARTIFACT VIRTUAL
