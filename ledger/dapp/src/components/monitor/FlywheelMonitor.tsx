@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { useOraclePrices } from '@/hooks/use-oracle.ts'
+import { useOraclePrices } from '@/hooks/use-oracle'
 
 export const FlywheelMonitor = () => {
   const { prices, isLoading } = useOraclePrices()

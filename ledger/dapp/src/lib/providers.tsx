@@ -6,6 +6,7 @@ import { WagmiProvider } from 'wagmi'
 import { base } from 'wagmi/chains'
 import { wagmiConfig } from '@/lib/wagmi'
 import { useState, type ReactNode } from 'react'
+import { WalletHandoff } from '@/components/wallet-handoff'
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -20,6 +21,8 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
+        {/* must be inside QueryClientProvider: wagmi v2 hooks use react-query */}
+        <WalletHandoff />
         <OnchainKitProvider
           chain={base}
           config={{

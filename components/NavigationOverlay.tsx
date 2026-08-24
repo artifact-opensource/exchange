@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SectionId } from '../types';
-import MorphBurger from './MorphBurger';
 
 interface NavigationOverlayProps {
   currentSection: SectionId;
@@ -30,13 +29,8 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-black/60 backdrop-blur-xl border-l border-white/5 z-[200] flex flex-col justify-center px-12 md:px-20"
         >
-          {/* Mobile Close Button */}
-          <button 
-            onClick={onClose}
-            className="absolute top-8 right-8 p-2 text-white/40 hover:text-white transition-colors sm:hidden"
-          >
-            <MorphBurger open={true} onClick={onClose || (() => {})} />
-          </button>
+          {/* Close control = the header MorphBurger (raised above this overlay
+              while open) — no duplicate X here by design. */}
 
           <div className="flex flex-col items-end gap-8 md:gap-12">
             <div className="w-full flex flex-col items-end mb-4">

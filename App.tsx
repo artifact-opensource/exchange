@@ -35,6 +35,17 @@ export default function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  // Escape closes the navigation overlay
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isSidebarOpen]);
+
   if (route.startsWith("#/investors")) {
     return <Web3Provider><InvestorPortalApp /></Web3Provider>;
   }
@@ -178,7 +189,7 @@ export default function App() {
 
       {/* Precision Header */}
       <header
-        className={`fixed top-0 left-0 w-full p-6 md:p-12 z-[90] flex justify-between items-start pointer-events-none transition-opacity duration-500 ${isHeaderVisible ? "opacity-100" : "opacity-0"}`}
+        className={`fixed top-0 left-0 w-full p-6 md:p-12 flex justify-between items-start pointer-events-none transition-opacity duration-500 ${isSidebarOpen ? "z-[300] opacity-100" : `z-[90] ${isHeaderVisible ? "opacity-100" : "opacity-0"}`}`}
       >
         {/* SMART LOGO ICON */}
         <div
@@ -209,8 +220,8 @@ export default function App() {
         </div>
 
         <div className="pointer-events-auto flex items-center gap-6">
-          {/* Mobile Hamburger — animated morph */}
-          <MorphBurger open={isSidebarOpen} onClick={() => setIsSidebarOpen(true)} className="sm:hidden" />
+          {/* Mobile Hamburger — animated morph; single toggle: same button opens & closes */}
+          <MorphBurger open={isSidebarOpen} onClick={() => setIsSidebarOpen((o) => !o)} className="sm:hidden" />
         </div>
       </header>
 

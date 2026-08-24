@@ -194,8 +194,8 @@ export default async function handler(req, res) {
         joinedAt: new Date().toISOString(),
         weight: 1,
       };
-      await saveDB();
-      return res.status(200).json({ token: signSession(key), member: pub(db.members[key]) });
+      const saveInfo = await saveDB();
+      return res.status(200).json({ token: signSession(key), member: pub(db.members[key]), _saveDebug: saveInfo });
     }
 
     if (action === "login") {

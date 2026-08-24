@@ -6,9 +6,10 @@ import { Loader2, ExternalLink } from 'lucide-react'
 import { AERODROME_ROUTER_ABI, ERC20_ABI } from '@/lib/abis'
 import { AERODROME, EXPLORER, TOKEN_META } from '@/lib/constants'
 import { formatTokenAmount, cn } from '@/lib/utils'
+import { KnownPool } from '@/lib/constants'
 
 interface Props {
-  pool: { id: string; name: string; tokenA: `0x${string}`; tokenB: `0x${string}`; stable: boolean }
+  pool: KnownPool;
 }
 
 export function LiquidityAdd({ pool }: Props) {
@@ -49,7 +50,7 @@ export function LiquidityAdd({ pool }: Props) {
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 1200)
     writeContract({
       address: AERODROME.routerV2, abi: AERODROME_ROUTER_ABI, functionName: 'addLiquidity',
-      args: [pool.tokenA, pool.tokenB, pool.stable, amountABigInt, amountBBigInt, amountAMin, amountBMin, address, deadline],
+      args: [pool.tokenA, pool.tokenB, Boolean(pool.stable), amountABigInt, amountBBigInt, amountAMin, amountBMin, address, deadline],
     })
   }, [pool, amountABigInt, amountBBigInt, address, writeContract])
 

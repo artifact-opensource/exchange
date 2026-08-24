@@ -14,6 +14,30 @@ const BlockchainHeroContent: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ─── Treasury embed: same-origin wallet handoff ─────────────────────
+  const dashRef = useRef<HTMLIFrameElement>(null);
+  const [dashReady, setDashReady] = useState(false);
+
+  // Pre-stage the account so the embedded dapp picks it up on first mount
+  useEffect(() => {
+    if (!isConnected || !address) return;
+    try { localStorage.setItem('av_handoff_account', address); } catch {}
+  }, [isConnected, address]);
+
+  // Also push it across post-mount (covers slow iframe loads / reconnects)
+  useEffect(() => {
+    if (!isConnected || !address || !dashReady) return;
+    dashRef.current?.contentWindow?.postMessage(
+      { type: 'av_wallet', address },
+      window.location.origin,
+    );
+  }, [isConnected, address, dashReady]);
+
+  useEffect(() => {
+    if (!isConnected) setDashReady(false);
+  }, [isConnected]);
+
+
   // ─── Live market data via /api/market (pool → dexscreener → oracle) ───
   const [market, setMarket] = useState<any>(null);
 
@@ -55,24 +79,6 @@ const BlockchainHeroContent: React.FC = () => {
     chainId,
   });
 
-  const { data: auBalance } = useReadContract({
-    abi: ERC20_ABI,
-    address: BASESCAN.auToken,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    chainId,
-    query: { enabled: isConnected && !!address },
-  });
-
-  const { data: agBalance } = useReadContract({
-    abi: ERC20_ABI,
-    address: BASESCAN.agToken,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    chainId,
-    query: { enabled: isConnected && !!address },
-  });
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -96,12 +102,6 @@ const BlockchainHeroContent: React.FC = () => {
     if (raw === undefined || raw === null) return `— ${symbol}`;
     const n = Number(formatUnits(raw, 18));
     return `${n.toLocaleString('en-US', { maximumFractionDigits: 0 })} ${symbol}`;
-  };
-
-  const formatBalance = (raw: bigint | undefined, symbol: string) => {
-    if (isConnected && raw === undefined) return '… ' + symbol;
-    if (!isConnected || raw === undefined || raw === null) return `0.0000 ${symbol}`;
-    return `${Number(formatUnits(raw, 18)).toLocaleString('en-US', { maximumFractionDigits: 4 })} ${symbol}`;
   };
 
   const formatPriceUsd = (v: number) =>
@@ -163,33 +163,29 @@ const BlockchainHeroContent: React.FC = () => {
           </div>
         </header>
 
-        {/* Dynamic DApp Panel */}
-        <div className={`transition-all duration-700 overflow-hidden ${isConnected ? 'max-h-[500px] opacity-100 mb-8' : 'max-h-0 opacity-0 mb-0'}`}>
-          <div className="border border-emerald-500/20 bg-black p-6 md:p-8 flex flex-col gap-6">
-            <div className="flex justify-between items-center border-b border-emerald-500/10 pb-4">
+        {/* AV Treasury — embedded dapp (auto-swaps in on wallet connect) */}
+        <div className={`transition-all duration-700 overflow-hidden ${isConnected ? 'max-h-[900px] opacity-100 mb-8' : 'max-h-0 opacity-0 mb-0'}`}>
+          <div className="border border-emerald-500/20 bg-black flex flex-col">
+            <div className="flex justify-between items-center border-b border-emerald-500/10 px-6 md:px-8 py-4">
               <h3 className="font-mono text-emerald-400 uppercase tracking-widest text-sm font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-emerald-400 animate-pulse"></span>
-                Authorized DApp Interface
+                AV Treasury — Live Dashboard
               </h3>
-              <span className="font-mono text-[10px] text-emerald-500/50 uppercase tracking-[0.2em]">Secure Session</span>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <a href={basescanUrl('auToken')} target="_blank" rel="noreferrer" className="border border-white/5 hover:border-white/20 bg-white/[0.02] p-4 flex flex-col gap-2 transition-colors">
-                <span className="font-mono text-[9px] text-white/40 uppercase tracking-[0.2em]">Your AU Balance</span>
-                <span className="font-mono text-xl text-white">{formatBalance(auBalance, 'Au')}</span>
-              </a>
-              <a href={basescanUrl('agToken')} target="_blank" rel="noreferrer" className="border border-white/5 hover:border-white/20 bg-white/[0.02] p-4 flex flex-col gap-2 transition-colors">
-                <span className="font-mono text-[9px] text-white/40 uppercase tracking-[0.2em]">Your AG Balance</span>
-                <span className="font-mono text-xl text-white">{formatBalance(agBalance, 'Ag')}</span>
-              </a>
-              <a href={basescanUrl('staking')} target="_blank" rel="noreferrer" className="border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors p-4 flex items-center justify-between group cursor-pointer h-full">
-                <span className="font-mono text-xs text-emerald-400 uppercase tracking-widest group-hover:scale-105 transition-transform">Stake Interface</span>
-                <ExternalLink className="w-4 h-4 text-emerald-400/70" />
+              <a href="/treasury/" target="_blank" rel="noreferrer" className="font-mono text-[10px] text-emerald-500/50 hover:text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-1 transition-colors">
+                Standalone <ExternalLink className="w-3 h-3" />
               </a>
             </div>
-            <p className="font-mono text-[10px] text-white/30 uppercase tracking-[0.1em] text-center mt-4">
-              Reading live balances from verified Base contracts
+            {isConnected && (
+              <iframe
+                ref={dashRef}
+                src="/treasury/"
+                title="AV Treasury Dashboard"
+                onLoad={() => setDashReady(true)}
+                className="w-full h-[760px] bg-black border-0"
+              />
+            )}
+            <p className="font-mono text-[9px] text-white/25 uppercase tracking-[0.15em] text-center py-2 border-t border-white/5">
+              Same-origin embed · wallet session passed through · no re-connect
             </p>
           </div>
         </div>

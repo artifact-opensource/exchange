@@ -4,10 +4,10 @@ import { useState, useCallback } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Loader2, ExternalLink } from 'lucide-react'
 import { AERODROME_ROUTER_ABI, ERC20_ABI } from '@/lib/abis'
-import { AERODROME, EXPLORER } from '@/lib/constants'
+import { AERODROME, EXPLORER, KnownPool } from '@/lib/constants'
 
 interface Props {
-  pool: { id: string; name: string; tokenA: `0x${string}`; tokenB: `0x${string}`; stable: boolean }
+  pool: KnownPool;
 }
 
 export function LiquidityRemove({ pool }: Props) {
@@ -24,7 +24,7 @@ export function LiquidityRemove({ pool }: Props) {
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 1200)
     writeContract({
       address: AERODROME.routerV2, abi: AERODROME_ROUTER_ABI, functionName: 'removeLiquidity',
-      args: [pool.tokenA, pool.tokenB, pool.stable, removeBigInt, 0n, 0n, address, deadline],
+      args: [pool.tokenA, pool.tokenB, Boolean(pool.stable), removeBigInt, 0n, 0n, address, deadline],
     })
   }, [pool, removeBigInt, address, writeContract])
 
