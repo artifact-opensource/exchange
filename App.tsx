@@ -204,9 +204,12 @@ export default function App() {
           }}
         >
           <div className="flex items-center gap-3 transition-transform duration-500 group-hover:-translate-y-1">
-            <div className="w-6 h-6 md:w-8 md:h-8 border border-white flex items-center justify-center font-bold text-white italic text-xs md:text-sm group-hover:bg-white group-hover:text-black transition-all duration-500 shadow-none group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-              AV
-            </div>
+            <img
+              src="/brand/av-logo-white.png"
+              alt="Artifact Virtual"
+              draggable={false}
+              className="h-6 md:h-8 w-auto select-none transition-all duration-500 group-hover:drop-shadow-[0_0_14px_rgba(255,255,255,0.45)]"
+            />
             <div className="flex flex-col">
               <span className="font-black tracking-[0.5em] md:tracking-[0.8em] text-[10px] md:text-[11px] uppercase text-white">
                 ARTIFACT VIRTUAL
