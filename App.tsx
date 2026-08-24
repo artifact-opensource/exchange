@@ -36,16 +36,6 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  // Escape closes the navigation overlay
-  useEffect(() => {
-    if (!isSidebarOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsSidebarOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isSidebarOpen]);
-
   if (route.startsWith("#/investors")) {
     return <Web3Provider><InvestorPortalApp /></Web3Provider>;
   }
@@ -58,6 +48,16 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+
+  // Escape closes the navigation overlay
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isSidebarOpen]);
 
   // AVA open_document: resolve nodeId/title against the research catalog and
   // surface it in the markdown viewer overlay.
