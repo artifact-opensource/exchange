@@ -208,20 +208,6 @@ const CACHE_TTL_MS = 25_000;
 
 export default async function handler(req, res) {
   try {
-    // TEMP DEBUG: ?debug=rpc&host=<hostname> — raw probe of one provider from inside the function
-    const url0 = new URL(req.url, `https://${req.headers.host || "localhost"}`);
-    const dbgHost = url0.searchParams.get("host");
-    if (url0.searchParams.get("debug") === "rpc" && dbgHost) {
-      const target = `https://${dbgHost}`;
-      const r = await fetch(target, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] }),
-        signal: AbortSignal.timeout(5000),
-      });
-      const text = await r.text();
-      return res.status(200).json({ target, status: r.status, ct: r.headers.get("content-type"), head: text.slice(0, 200) });
-    }
     if (CACHE.data && Date.now() - CACHE.ts < CACHE_TTL_MS) {
       return res.status(200).json(CACHE.data);
     }
