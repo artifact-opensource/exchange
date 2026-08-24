@@ -54,8 +54,8 @@ let _db = null;
 let _sha = null;
 async function loadDB(force = false) {
   if (_db && !force) return _db;
-  const url = `https://api.github.com/repos/${REPO()}/contents/${DB_PATH}?ref=${BRANCH()}`;
-  const r = await fetch(url, { headers: githubHeaders() });
+  const url = `https://api.github.com/repos/${REPO()}/contents/${DB_PATH}?ref=${BRANCH()}&t=${Date.now()}`;
+  const r = await fetch(url, { headers: githubHeaders(), cache: "no-store" });
   if (!r.ok) {
     _db = { members: {}, payments: [], votes: {}, proposalsExtra: [], seq: 100 };
     _sha = null;
@@ -71,19 +71,39 @@ async function loadDB(force = false) {
 async function saveDB() {
   const enc = encryptJSON(_db);
   const url = `https://api.github.com/repos/${REPO()}/contents/${DB_PATH}`;
-  const put = await fetch(url, {
-    method: "PUT",
-    headers: { ...githubHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: `investor-db: sync (${new Date().toISOString().slice(0, 16)})`,
-      content: enc,
-      branch: BRANCH(),
-      ...(_sha ? { sha: _sha } : {}),
-    }),
-  });
-  const j = await put.json();
-  if (!put.ok) throw new Error(j.message || "db save failed");
-  _sha = j.content?.sha || j.commit?.sha || _sha;
+  const attempt = async (sha?: string) => {
+    const put = await fetch(url, {
+      method: "PUT",
+      headers: { ...githubHeaders(), "Content-Type": "application/json", "cache-control": "no-cache" },
+      body: JSON.stringify({
+        message: `investor-db: sync (${new Date().toISOString().slice(0, 16)})`,
+        content: enc,
+        branch: BRANCH(),
+        ...(sha ? { sha } : {}),
+      }),
+    });
+    let j: any = null;
+    try { j = await put.json(); } catch { /* html error body */ }
+    return { ok: put.ok, status: put.status, j };
+  };
+  let res = await attempt(_sha || undefined);
+  // stale-sha conflict → refresh and retry once
+  if (!res.ok && (res.status === 409 || res.status === 422)) {
+    const fresh = await fetch(`https://api.github.com/repos/${REPO()}/contents/${DB_PATH}?ref=${BRANCH()}&t=${Date.now()}`, { headers: githubHeaders() });
+    if (fresh.ok) {
+      const fj = await fresh.json();
+      res = await attempt(fj.sha);
+    } else if (fresh.status === 404) {
+      res = await attempt(undefined);
+    }
+  }
+  if (!res.ok) {
+    throw new Error(`db_save_failed status=${res.status} msg=${res.j?.message || "unknown"} repo=${REPO()} branch=${BRANCH()}`);
+  }
+  _sha = res.j?.content?.sha || _sha;
+  // verify visibility (contents API can lag a beat)
+  const verify = await fetch(`https://api.github.com/repos/${REPO()}/contents/${DB_PATH}?ref=${BRANCH()}&t=${Date.now()}`, { headers: githubHeaders() });
+  return { saved: true, verified: verify.ok, verifyStatus: verify.status, commitSha: res.j?.commit?.sha?.slice(0, 10) };
 }
 
 // ---------- passwords / sessions ----------
