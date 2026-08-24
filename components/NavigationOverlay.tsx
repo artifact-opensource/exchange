@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SectionId } from '../types';
-import { X } from 'lucide-react';
+import MorphBurger from './MorphBurger';
 
 interface NavigationOverlayProps {
   currentSection: SectionId;
@@ -35,7 +35,7 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
             onClick={onClose}
             className="absolute top-8 right-8 p-2 text-white/40 hover:text-white transition-colors sm:hidden"
           >
-            <X className="w-6 h-6" />
+            <MorphBurger open={true} onClick={onClose || (() => {})} />
           </button>
 
           <div className="flex flex-col items-end gap-8 md:gap-12">

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu } from "lucide-react";
+import MorphBurger from "./components/MorphBurger";
 import { SectionId } from "./types";
 import DimensionSection from "./components/DimensionSection";
 import NavigationOverlay from "./components/NavigationOverlay";
@@ -11,6 +11,9 @@ import InfoOverlay from "./components/InfoOverlay";
 import BlockchainHero from "./components/BlockchainHero";
 import LandingPage from "./components/LandingPage";
 import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
+import SpaceDivision from "./components/SpaceDivision";
+import InvestorPortalApp from "./components/InvestorPortal";
+import { Web3Provider } from "./components/Web3Provider";
 
 // Import dimension configs
 import { RESEARCH_CATALOG } from "./lib/research-data";
@@ -25,6 +28,16 @@ export const RefreshContext = createContext<{ triggerRefresh: () => void }>({ tr
 export const useRefresh = () => useContext(RefreshContext);
 
 export default function App() {
+  // Investor relations lives on its own hash-route
+  const [route, setRoute] = useState(() => window.location.hash);
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  if (route.startsWith("#/investors")) {
+    return <Web3Provider><InvestorPortalApp /></Web3Provider>;
+  }
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [currentSection, setCurrentSection] = useState<SectionId>(SectionId.RD);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
@@ -196,13 +209,8 @@ export default function App() {
         </div>
 
         <div className="pointer-events-auto flex items-center gap-6">
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="sm:hidden p-2 text-white/30 hover:text-white transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          {/* Mobile Hamburger — animated morph */}
+          <MorphBurger open={isSidebarOpen} onClick={() => setIsSidebarOpen(true)} className="sm:hidden" />
         </div>
       </header>
 
@@ -269,14 +277,8 @@ export default function App() {
                 />
               )}
 
-              {/* AV/ST placeholder */}
-              {config.id === SectionId.ST && (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="font-mono text-[10px] text-white/20 tracking-[0.5em] uppercase border border-white/5 p-12">
-                    Orbital_Ops // Foundation_Node
-                  </div>
-                </div>
-              )}
+              {/* AV/ST — Space Tech Division */}
+              {config.id === SectionId.ST && <SpaceDivision />}
 
               {/* Empty space for IM */}
               {config.id === SectionId.IM && (
