@@ -35,18 +35,32 @@ function encryptJSON(obj) {
   const ct = Buffer.concat([cipher.update(pt), cipher.final()]);
   return Buffer.concat([iv, cipher.getAuthTag(), ct]).toString("base64");
 }
-function decryptJSON(b64) {
-  try {
-    const buf = Buffer.from(b64, "base64");
-    const iv = buf.subarray(0, 12);
-    const tag = buf.subarray(12, 28);
-    const ct = buf.subarray(28);
-    const decipher = crypto.createDecipheriv("aes-256-gcm", masterKey(), iv);
-    decipher.setAuthTag(tag);
-    return JSON.parse(Buffer.concat([decipher.update(ct), decipher.final()]).toString("utf-8"));
-  } catch {
-    return null;
+function decryptJSON(input) {
+  // File format on disk: iv(12) + authTag(16) + ciphertext (raw bytes —
+  // GitHub Contents API PUT decodes the base64 `content` field, so the
+  // stored file is BINARY, not base64 text). Legacy fallback: utf8 file
+  // containing a base64 blob.
+  const attempts = [];
+  if (Buffer.isBuffer(input)) {
+    attempts.push(input);
+    attempts.push(Buffer.from(input.toString("utf8").trim(), "base64"));
+  } else {
+    attempts.push(Buffer.from(String(input).trim(), "base64"));
   }
+  for (const buf of attempts) {
+    try {
+      if (buf.length < 12 + 16 + 1) continue;
+      const iv = buf.subarray(0, 12);
+      const tag = buf.subarray(12, 28);
+      const ct = buf.subarray(28);
+      const decipher = crypto.createDecipheriv("aes-256-gcm", masterKey(), iv);
+      decipher.setAuthTag(tag);
+      return JSON.parse(Buffer.concat([decipher.update(ct), decipher.final()]).toString("utf-8"));
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 // ---------- db (lazy, cached per warm instance) ----------
@@ -63,8 +77,9 @@ async function loadDB(force = false) {
   }
   const j = await r.json();
   _sha = j.sha;
-  const raw = j.encoding === "base64" ? Buffer.from(j.content, "base64").toString("utf-8") : j.content;
-  const obj = decryptJSON(raw.trim());
+  // pass RAW file bytes — GitHub stores binary ciphertext (see decryptJSON)
+  const fileBytes = j.encoding === "base64" ? Buffer.from(j.content, "base64") : Buffer.from(j.content, "utf8");
+  const obj = decryptJSON(fileBytes);
   _db = obj && obj.members ? obj : { members: {}, payments: [], votes: {}, proposalsExtra: [], seq: 100 };
   return _db;
 }
