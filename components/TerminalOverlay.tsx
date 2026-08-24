@@ -179,16 +179,16 @@ const TerminalOverlay: React.FC<TerminalOverlayProps> = ({ isOpen, onClose }) =>
         window.dispatchEvent(new CustomEvent("OPEN_DOCUMENT", { detail: { nodeId: args.nodeId, meta: args.meta } }));
         return JSON.stringify({ success: true, message: `Document '${args.nodeId}' opened in UI.` });
       } else if (name === "fs_read") {
-        const res = await fetch("/api/fs/read", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
+        const res = await fetch("/api/ava/read", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
       } else if (name === "fs_write") {
-        const res = await fetch("/api/fs/write", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
+        const res = await fetch("/api/ava/write", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
       } else if (name === "shell_exec") {
-        const res = await fetch("/api/shell/exec", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
+        const res = await fetch("/api/ava/shell", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
       } else if (name === "js_eval") {
-        const res = await fetch("/api/js/eval", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ code: args.code }) });
+        const res = await fetch("/api/ava/eval", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ code: args.code }) });
         return JSON.stringify(await res.json());
       } else if (name === "web_search") {
         const res = await fetch("/api/web/search", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
