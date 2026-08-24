@@ -71,7 +71,7 @@ async function loadDB(force = false) {
 async function saveDB() {
   const enc = encryptJSON(_db);
   const url = `https://api.github.com/repos/${REPO()}/contents/${DB_PATH}`;
-  const attempt = async (sha?: string) => {
+  const attempt = async (sha) => {
     const put = await fetch(url, {
       method: "PUT",
       headers: { ...githubHeaders(), "Content-Type": "application/json", "cache-control": "no-cache" },
@@ -82,7 +82,7 @@ async function saveDB() {
         ...(sha ? { sha } : {}),
       }),
     });
-    let j: any = null;
+    let j = null;
     try { j = await put.json(); } catch { /* html error body */ }
     return { ok: put.ok, status: put.status, j };
   };
