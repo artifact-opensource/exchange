@@ -37,6 +37,29 @@ const api = async (action: string, body?: any, token?: string | null) => {
 interface Member { email: string; handle: string; tier: TierId; credits: number; weight: number; pendingTier?: string | null; tester?: boolean }
 interface Proposal { id: string; title: string; desc: string; state: string; yes: number; no: number; closes?: string }
 
+/** Containment: a render fault shows a fault card — never a blank tree. */
+export class PortalBoundary extends React.Component<{ children: React.ReactNode }, { err: string | null }> {
+  state = { err: null as string | null };
+  static getDerivedStateFromError(e: unknown) { return { err: String((e as Error)?.message || e) }; }
+  render() {
+    if (this.state.err) {
+      return (
+        <div className="min-h-screen bg-[#030303] text-neutral-300 font-mono flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <div className="text-[10px] tracking-[0.35em] text-red-400">PORTAL FAULT // CONTAINED</div>
+          <div className="text-xs text-neutral-500 max-w-md break-words">{this.state.err}</div>
+          <button
+            onClick={() => { this.setState({ err: null }); location.reload(); }}
+            className="border border-white/25 px-6 py-3 text-[11px] tracking-[0.25em] hover:bg-white hover:text-black transition-colors"
+          >
+            RELOAD PORTAL
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function InvestorPortalApp() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('av_inv_token'));
   const [member, setMember] = useState<Member | null>(null);
@@ -372,7 +395,7 @@ function BackerRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const load = () => api('proposals').then(setProposals);
+  const load = () => api('proposals').then((d: any) => setProposals(Array.isArray(d?.proposals) ? d.proposals : Array.isArray(d) ? d : []));
   useEffect(() => { load(); }, []);
 
   const vote = async (proposalId: string, support: boolean) => {

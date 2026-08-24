@@ -12,7 +12,7 @@ import BlockchainHero from "./components/BlockchainHero";
 import LandingPage from "./components/LandingPage";
 import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
 import SpaceDivision from "./components/SpaceDivision";
-import InvestorPortalApp from "./components/InvestorPortal";
+import InvestorPortalApp, { PortalBoundary } from "./components/InvestorPortal";
 import { Web3Provider } from "./components/Web3Provider";
 
 // Import dimension configs
@@ -176,7 +176,7 @@ export default function App() {
 
   // Route split AFTER all hooks — hook order must be identical across renders
   if (route.startsWith("#/investors")) {
-    return <Web3Provider><InvestorPortalApp /></Web3Provider>;
+    return <Web3Provider><PortalBoundary><InvestorPortalApp /></PortalBoundary></Web3Provider>;
   }
 
   return (
