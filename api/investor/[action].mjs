@@ -297,6 +297,22 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, id });
     }
 
+    if (action === "switch_tier") {
+      sessionEmail = verifySession(bearer);
+      if (!sessionEmail) return res.status(401).json({ error: "sign in first" });
+      const { tier } = body;
+      if (!["free", "backer", "pillar"].includes(tier)) return res.status(400).json({ error: "bad tier" });
+      const db = await loadDB(true);
+      const m = db.members[sessionEmail];
+      if (!m || !m.tester) return res.status(403).json({ error: "not a tester account" });
+      m.tier = tier;
+      m.pendingTier = null;
+      m.tierPaid = true;
+      if (tier === "backer") m.credits = Math.max(m.credits || 0, 200);
+      await saveDB();
+      return res.status(200).json({ ok: true, member: pub(m) });
+    }
+
     // ---------- admin (marketing / founder) ----------
     if (action === "admin") {
       if (!isAdmin(req)) return res.status(403).json({ error: "admin token required" });
@@ -323,15 +339,30 @@ export default async function handler(req, res) {
         await saveDB();
         return res.status(200).json({ ok: true, member: pub(m) });
       }
+      // marketing can pin which percentile band the portal displays
       if (op === "setband") {
-        // marketing can pin which percentile band the portal displays
         process.env && (globalThis.__AV_BAND__ = body.band);
         return res.status(200).json({ ok: true, band: body.band });
+      }
+      // direct tier control (admin/testing): no payment needed
+      if (op === "settier") {
+        const key = String(body.email || "").toLowerCase();
+        const m = db.members[key];
+        if (!m) return res.status(404).json({ error: "member not found" });
+        const tier = body.tier;
+        if (!["free", "backer", "pillar"].includes(tier)) return res.status(400).json({ error: "bad tier" });
+        m.tier = tier;
+        m.pendingTier = null;
+        m.tierPaid = true;
+        if (tier === "backer") m.credits = Math.max(m.credits || 0, 200);
+        if (body.tester !== undefined) m.tester = Boolean(body.tester);
+        await saveDB();
+        return res.status(200).json({ ok: true, member: pub(m) });
       }
       return res.status(400).json({ error: "unknown op" });
     }
 
-    return res.status(404).json({ error: `unknown action '${action}'`, available: ["signup","login","me","proposals","vote","propose","claim_payment","admin"] });
+    return res.status(404).json({ error: `unknown action '${action}'`, available: ["signup","login","me","proposals","vote","propose","claim_payment","switch_tier","admin"] });
   } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
   }
@@ -346,6 +377,7 @@ function pub(m) {
     credits: m.credits,
     weight: m.weight,
     pendingTier: m.pendingTier || null,
+    tester: Boolean(m.tester),
     joinedAt: m.joinedAt,
   };
 }

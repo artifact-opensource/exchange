@@ -34,7 +34,7 @@ const api = async (action: string, body?: any, token?: string | null) => {
   return r.json();
 };
 
-interface Member { email: string; handle: string; tier: TierId; credits: number; weight: number; pendingTier?: string | null }
+interface Member { email: string; handle: string; tier: TierId; credits: number; weight: number; pendingTier?: string | null; tester?: boolean }
 interface Proposal { id: string; title: string; desc: string; state: string; yes: number; no: number; closes?: string }
 
 export default function InvestorPortalApp() {
@@ -42,6 +42,14 @@ export default function InvestorPortalApp() {
   const [member, setMember] = useState<Member | null>(null);
   const [myVotes, setMyVotes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+
+  // index.html locks body overflow for the horizontal snap experience —
+  // restore scrolling while the portal is mounted.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'auto';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
 
   useEffect(() => {
     if (!token) { setLoading(false); return; }
@@ -60,13 +68,16 @@ export default function InvestorPortalApp() {
   const pending = member?.pendingTier ?? null;
 
   return (
-    <div className="min-h-[100dvh] bg-[#030308] text-white relative overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-[#030303] text-white relative overflow-x-hidden">
       <Atmosphere tier={member ? tier : 'free'} />
 
       {/* top bar */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#030308]/80 border-b border-white/10">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#030303]/85 border-b border-white/10">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-          <a href="#/" onClick={() => { window.location.hash = ''; window.location.reload(); }} className="font-mono text-[11px] tracking-[0.35em] text-white/50 hover:text-white transition-colors uppercase">← Artifact Virtual</a>
+          <a href="#/" onClick={() => { window.location.hash = ''; window.location.reload(); }} className="flex items-center gap-3 group">
+            <img src="/brand/av-logo-white.png" alt="AV" draggable={false} className="h-4 w-auto select-none" />
+            <span className="font-mono text-[11px] tracking-[0.35em] text-white/50 group-hover:text-white transition-colors uppercase">← Artifact Virtual</span>
+          </a>
           <span className="font-mono text-[11px] tracking-[0.35em] uppercase" style={{ color: TIERS[tier].accent }}>
             {TIERS[tier].name} {pending && <span className="text-white/30">· {pending.toUpperCase()} PENDING</span>}
           </span>
@@ -143,34 +154,35 @@ function AuthView({ onAuthed }: { onAuthed: (t: string, m: Member) => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto pt-10">
-      <h1 className="text-3xl font-black tracking-tight mb-2">INVESTOR_RELATIONS</h1>
+    <div className="max-w-md mx-auto pt-10 pb-4">
+      <p className="font-mono text-[9px] tracking-[0.45em] text-white/30 uppercase mb-2">Access_Node // Membership</p>
+      <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase mb-2">INVESTOR_RELATIONS</h1>
       <p className="text-sm text-white/45 leading-relaxed mb-6">
         One account across every membership universe. Start free — upgrade when you want deeper access.
         Backers put $200 in and get it back as platform credits.
       </p>
 
-      <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 space-y-4">
-        <div className="flex rounded-xl border border-white/10 overflow-hidden font-mono text-[11px] tracking-widest">
+      <div className="border border-white/10 bg-black/40 backdrop-blur-sm p-5 md:p-6 space-y-4">
+        <div className="flex border border-white/10 overflow-hidden font-mono text-[11px] tracking-widest">
           {(['signup', 'login'] as const).map((m) => (
             <button key={m} onClick={() => setMode(m)}
-              className={`flex-1 py-2.5 transition-colors ${mode === m ? 'bg-white text-black' : 'text-white/50 hover:text-white'}`}>
+              className={`flex-1 py-3 transition-colors ${mode === m ? 'bg-white text-black font-bold' : 'text-white/50 hover:text-white'}`}>
               {m === 'signup' ? 'CREATE ACCOUNT' : 'SIGN IN'}
             </button>
           ))}
         </div>
 
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" type="email"
-          className="w-full h-11 px-4 rounded-lg border border-white/10 bg-white/5 text-base placeholder-white/25 focus:outline-none focus:border-sky-300/50" />
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" type="email" autoComplete="email"
+          className="w-full h-12 px-4 border border-white/10 bg-white/[0.04] text-base placeholder-white/25 focus:outline-none focus:border-emerald-400/60 transition-colors" />
         {mode === 'signup' && (
-          <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="display handle"
-            className="w-full h-11 px-4 rounded-lg border border-white/10 bg-white/5 text-base placeholder-white/25 focus:outline-none focus:border-sky-300/50" />
+          <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="display handle" autoComplete="username"
+            className="w-full h-12 px-4 border border-white/10 bg-white/[0.04] text-base placeholder-white/25 focus:outline-none focus:border-emerald-400/60 transition-colors" />
         )}
-        <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password (8+ chars)" type="password" onKeyDown={(e) => e.key === 'Enter' && submit()}
-          className="w-full h-11 px-4 rounded-lg border border-white/10 bg-white/5 text-base placeholder-white/25 focus:outline-none focus:border-sky-300/50" />
+        <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password (8+ chars)" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} onKeyDown={(e) => e.key === 'Enter' && submit()}
+          className="w-full h-12 px-4 border border-white/10 bg-white/[0.04] text-base placeholder-white/25 focus:outline-none focus:border-emerald-400/60 transition-colors" />
         {err && <p className="text-xs font-mono text-red-400">{err}</p>}
         <button onClick={submit} disabled={busy}
-          className="w-full h-11 rounded-lg bg-sky-400 hover:bg-sky-300 disabled:opacity-40 text-black font-mono text-xs tracking-[0.25em] font-bold transition-colors">
+          className="w-full h-12 bg-white hover:bg-white/85 disabled:opacity-40 text-black font-mono text-xs tracking-[0.3em] font-bold transition-colors">
           {busy ? 'WORKING…' : mode === 'signup' ? 'INITIALIZE ACCOUNT' : 'ENTER'}
         </button>
         <p className="text-[10px] font-mono text-white/25 leading-relaxed">
@@ -193,7 +205,7 @@ function TierCards({ current, onSelect }: { current: TierId | null; onSelect: (t
         const isCurrent = current === id;
         return (
           <div key={id}
-            className="rounded-2xl border p-5 flex flex-col gap-3 backdrop-blur-sm transition-all hover:-translate-y-0.5"
+            className="border p-5 flex flex-col gap-3 backdrop-blur-sm transition-all hover:-translate-y-0.5"
             style={{
               borderColor: isCurrent ? t.accent : `${t.accent}33`,
               background: `linear-gradient(160deg, ${t.accent}0d, transparent 60%), rgba(0,0,0,0.45)`,
@@ -213,10 +225,10 @@ function TierCards({ current, onSelect }: { current: TierId | null; onSelect: (t
               ))}
             </ul>
             {isCurrent ? (
-              <div className="text-center font-mono text-[10px] tracking-widest py-2 rounded-lg border" style={{ borderColor: `${t.accent}44`, color: t.accent }}>CURRENT LEVEL</div>
+              <div className="text-center font-mono text-[10px] tracking-widest py-2 border" style={{ borderColor: `${t.accent}44`, color: t.accent }}>CURRENT LEVEL</div>
             ) : (
               <button onClick={() => onSelect(id)}
-                className="py-2 rounded-lg font-mono text-[10px] tracking-[0.25em] font-bold transition-colors"
+                className="py-2 font-mono text-[10px] tracking-[0.25em] font-bold transition-colors"
                 style={{ backgroundColor: `${t.accent}1a`, color: t.accent, border: `1px solid ${t.accent}44` }}>
                 {id === 'free' ? 'SWITCH TO FREE' : `UPGRADE — $${t.priceUSD}`}
               </button>
@@ -237,7 +249,7 @@ function Dashboard({ member, myVotes, token, refresh }: { member: Member; myVote
   return (
     <div className="space-y-8">
       {/* identity strip */}
-      <div className="rounded-2xl border p-6 backdrop-blur-sm"
+      <div className="border p-6 backdrop-blur-sm"
         style={{ borderColor: `${TIERS[tier].accent}33`, background: `linear-gradient(150deg, ${TIERS[tier].accent}12, rgba(0,0,0,0.4))` }}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -254,6 +266,20 @@ function Dashboard({ member, myVotes, token, refresh }: { member: Member; myVote
           <p className="mt-4 font-mono text-[11px] text-amber-300/80">⏳ {member.pendingTier.toUpperCase()} payment under verification — unlocks automatically.</p>
         )}
       </div>
+
+      {member.tester && (
+        <section>
+          <SectionTitle>TESTER — TIER OVERRIDE</SectionTitle>
+          <div className="grid grid-cols-3 gap-2">
+            {(['free', 'backer', 'pillar'] as TierId[]).map((t) => (
+              <button key={t} onClick={() => api('switch_tier', { tier: t }, token).then((d) => d.member && refresh())}
+                className={`py-3 font-mono text-[10px] tracking-[0.25em] uppercase border transition-colors ${tier === t ? 'bg-white text-black font-bold border-white' : 'text-white/60 border-white/15 hover:border-white/40 hover:text-white'}`}>
+                {TIERS[t].name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {!member.pendingTier && tier !== 'pillar' && (
         <section>
@@ -299,7 +325,7 @@ function FreeRoom() {
         <SectionTitle>WIP PROJECTS — PUBLIC PREVIEW</SectionTitle>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {KANBAN.map((col) => (
-            <div key={col.column} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+            <div key={col.column} className="border border-white/10 bg-white/[0.02] p-3">
               <p className="font-mono text-[9px] tracking-[0.25em] text-white/30 mb-2">{col.column} ({col.items.length})</p>
               {col.items.map((it) => (
                 <div key={it} className="font-mono text-[10px] text-white/45 py-1 truncate blur-[3px] hover:blur-none transition-all cursor-default" title="Upgrade to see full boards">{it}</div>
@@ -315,7 +341,7 @@ function FreeRoom() {
           {Object.entries(DOC_LIBRARY).map(([key, d]) => {
             const open = CONTENT_MAP_FREE.has(key);
             return (
-              <div key={key} className={`rounded-lg border px-3 py-2.5 ${open ? 'border-white/15 bg-white/[0.03]' : 'border-white/5'}`}>
+              <div key={key} className={`border px-3 py-2.5 ${open ? 'border-white/15 bg-white/[0.03]' : 'border-white/5'}`}>
                 <p className="font-mono text-[10px] tracking-widest text-white/70">{d.title}</p>
                 <p className="text-[10px] text-white/30 mt-0.5">{open ? d.summary : '🔒 Pillar access'}</p>
               </div>
@@ -331,9 +357,9 @@ const CONTENT_MAP_FREE = new Set(['business-profile', 'products-catalog', 'servi
 
 function MetricCard({ m, band, locked }: { m: Banded; band: Band; locked: boolean }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="border border-white/10 bg-white/[0.03] p-4">
       <p className="font-mono text-[9px] tracking-[0.2em] text-white/35 uppercase">{m.label}</p>
-      <p className={`text-2xl font-black mt-1 ${locked ? 'blur-[5px] select-none' : ''}`} style={{ color: locked ? undefined : '#7dd3fc' }}>
+      <p className={`text-2xl font-black mt-1 ${locked ? 'blur-[5px] select-none' : ''}`} style={{ color: locked ? undefined : '#ffffff' }}>
         {fmtMetric(m, band)}
       </p>
       {locked && <p className="font-mono text-[9px] text-white/25 mt-1">🔒 PILLAR</p>}
@@ -363,7 +389,7 @@ function BackerRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
     <div className="space-y-8">
       <section>
         <SectionTitle>CREDITS LEDGER</SectionTitle>
-        <div className="rounded-xl border p-5" style={{ borderColor: '#fbbf2433', background: '#fbbf240a' }}>
+        <div className="border p-5" style={{ borderColor: '#fbbf2433', background: '#fbbf240a' }}>
           <div className="flex items-end justify-between">
             <div><p className="font-mono text-[9px] tracking-[0.25em] text-white/35 uppercase">Platform credits</p>
               <p className="text-4xl font-black text-amber-300">{member.credits}</p></div>
@@ -376,10 +402,10 @@ function BackerRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
         <SectionTitle>PROJECT KANBANS — LIVE BOARDS</SectionTitle>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {KANBAN.map((col) => (
-            <div key={col.column} className="rounded-xl border border-amber-300/15 bg-amber-300/[0.03] p-3">
+            <div key={col.column} className="border border-amber-300/15 bg-amber-300/[0.03] p-3">
               <p className="font-mono text-[9px] tracking-[0.25em] text-amber-200/60 mb-2">{col.column} ({col.items.length})</p>
               {col.items.map((it) => (
-                <div key={it} className="rounded-lg bg-black/40 border border-white/5 px-3 py-2 mb-1.5 font-mono text-[10px] text-white/70 hover:border-amber-300/30 transition-colors">{it}</div>
+                <div key={it} className="bg-black/40 border border-white/5 px-3 py-2 mb-1.5 font-mono text-[10px] text-white/70 hover:border-amber-300/30 transition-colors">{it}</div>
               ))}
             </div>
           ))}
@@ -394,22 +420,22 @@ function BackerRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
             const total = p.yes + p.no;
             const pctYes = total ? Math.round((p.yes / total) * 100) : 0;
             return (
-              <div key={p.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div key={p.id} className="border border-white/10 bg-white/[0.02] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-mono text-[10px] text-white/30">{p.id} · {p.state}{p.closes ? ` · ${p.closes}` : ''}</span>
                   {mine ? (
                     <span className="font-mono text-[9px] text-white/30">YOU VOTED {mine.toUpperCase()}</span>
                   ) : p.state === 'VOTING' && (
                     <div className="flex gap-2">
-                      <button onClick={() => vote(p.id, true)} className="px-3 py-1 rounded font-mono text-[10px] bg-emerald-400/15 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-400/25">YAY</button>
-                      <button onClick={() => vote(p.id, false)} className="px-3 py-1 rounded font-mono text-[10px] bg-red-400/10 text-red-300 border border-red-400/30 hover:bg-red-400/20">NAY</button>
+                      <button onClick={() => vote(p.id, true)} className="px-3 py-1.5 border font-mono text-[10px] bg-emerald-400/15 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-400/25">YAY</button>
+                      <button onClick={() => vote(p.id, false)} className="px-3 py-1.5 border font-mono text-[10px] bg-red-400/10 text-red-300 border border-red-400/30 hover:bg-red-400/20">NAY</button>
                     </div>
                   )}
                 </div>
                 <h4 className="text-sm font-semibold mt-1.5">{p.title}</h4>
                 <p className="text-xs text-white/45 mt-0.5">{p.desc}</p>
                 {total > 0 && (
-                  <div className="mt-2 h-1.5 rounded-full bg-red-400/20 overflow-hidden">
+                  <div className="mt-2 h-1.5 bg-red-400/20 overflow-hidden">
                     <div className="h-full bg-emerald-400/70" style={{ width: `${pctYes}%` }} />
                   </div>
                 )}
@@ -418,13 +444,13 @@ function BackerRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
             );
           })}
         </div>
-        <div className="rounded-xl border border-white/10 p-4 mt-3 space-y-2">
+        <div className="border border-white/10 p-4 mt-3 space-y-2">
           <p className="font-mono text-[10px] tracking-widest text-white/40">FILE A NEW PROPOSAL</p>
           <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Proposal title"
-            className="w-full h-10 px-3 rounded-lg border border-white/10 bg-white/5 text-sm placeholder-white/25 focus:outline-none focus:border-amber-300/50" />
+            className="w-full h-10 px-3 border border-white/10 bg-white/5 text-sm placeholder-white/25 focus:outline-none focus:border-amber-300/50" />
           <textarea value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="What & why (optional detail)" rows={2}
-            className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm placeholder-white/25 focus:outline-none focus:border-amber-300/50" />
-          <button onClick={propose} className="px-4 py-2 rounded-lg bg-amber-300/15 text-amber-200 border border-amber-300/30 font-mono text-[10px] tracking-widest hover:bg-amber-300/25">SUBMIT FOR DELIBERATION</button>
+            className="w-full px-3 py-2 border border-white/10 bg-white/5 text-sm placeholder-white/25 focus:outline-none focus:border-amber-300/50" />
+          <button onClick={propose} className="px-4 py-2 bg-amber-300/15 text-amber-200 border border-amber-300/30 font-mono text-[10px] tracking-widest hover:bg-amber-300/25">SUBMIT FOR DELIBERATION</button>
         </div>
       </section>
     </div>
@@ -438,10 +464,10 @@ function PillarRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
       <section>
         <div className="flex items-center justify-between mb-4">
           <SectionTitle>LIVE LEDGER &amp; FINANCIAL MODEL — BANDED</SectionTitle>
-          <div className="flex rounded-lg border border-sky-300/30 overflow-hidden font-mono text-[9px] tracking-widest">
+          <div className="flex border border-sky-300/30 overflow-hidden font-mono text-[9px] tracking-widest">
             {(['P6', 'P50', 'P75'] as Band[]).map((b) => (
               <button key={b} onClick={() => setBand(b)}
-                className={`px-3 py-1.5 transition-colors ${band === b ? 'bg-sky-400 text-black font-bold' : 'text-sky-200/60 hover:text-sky-100'}`}>
+                className={`px-3 py-1.5 transition-colors ${band === b ? 'bg-white text-black font-bold' : 'text-white/50 hover:text-white'}`}>
                 {b === 'P6' ? 'CONSERVATIVE' : b === 'P50' ? 'EXPECTED' : 'UPSIDE'}
               </button>
             ))}
@@ -457,7 +483,7 @@ function PillarRoom({ member, myVotes, token }: { member: Member; myVotes: Recor
         <SectionTitle>DOCUMENT VAULT — FULL ACCESS</SectionTitle>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {Object.entries(DOC_LIBRARY).map(([key, d]) => (
-            <div key={key} className="rounded-lg border border-sky-300/20 bg-sky-300/[0.03] px-3 py-3 hover:border-sky-300/50 transition-colors cursor-pointer group">
+            <div key={key} className="border border-sky-300/20 bg-sky-300/[0.03] px-3 py-3 hover:border-sky-300/50 transition-colors cursor-pointer group">
               <div className="flex items-center justify-between">
                 <p className="font-mono text-[10px] tracking-widest text-sky-100/90 group-hover:text-sky-50">{d.title}</p>
                 <span className="text-sky-300/60 text-xs">↗</span>
@@ -515,7 +541,7 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-lg rounded-2xl border border-white/15 bg-[#050510] p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-lg border border-white/15 bg-[#050510] p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-black">UPGRADE — {t.name}</h3>
@@ -524,7 +550,7 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
           <button onClick={onClose} className="text-white/40 hover:text-white text-xl leading-none">×</button>
         </div>
 
-        <div className="flex rounded-xl border border-white/10 overflow-hidden font-mono text-[10px] tracking-widest">
+        <div className="flex border border-white/10 overflow-hidden font-mono text-[10px] tracking-widest">
           {(['crypto', 'iban'] as const).map((m) => (
             <button key={m} onClick={() => setMethod(m)}
               className={`flex-1 py-2.5 transition-colors ${method === m ? 'bg-white text-black' : 'text-white/50 hover:text-white'}`}>
@@ -535,7 +561,7 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
 
         {method === 'crypto' ? (
           <div className="space-y-3 text-sm">
-            <div className="rounded-xl border border-sky-300/25 bg-sky-300/[0.05] p-4 space-y-2 font-mono text-[11px]">
+            <div className="border border-sky-300/25 bg-sky-300/[0.05] p-4 space-y-2 font-mono text-[11px]">
               <p className="text-white/50">NETWORK: <span className="text-sky-200">{PAYMENT.crypto.network}</span></p>
               <p className="break-all text-white/80">ADDRESS: <span className="select-all text-sky-200">{PAYMENT.crypto.evmAddress}</span></p>
               <p className="text-white/50">BASE NAME: <span className="text-sky-200">{PAYMENT.crypto.ensBase}</span></p>
@@ -544,7 +570,7 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
             {address ? (
               <>
                 <button onClick={payUSDC} disabled={busy}
-                  className="w-full h-11 rounded-xl bg-sky-400 hover:bg-sky-300 disabled:opacity-40 text-black font-mono text-[11px] font-bold tracking-[0.2em] transition-colors">
+                  className="w-full h-11 bg-white hover:bg-white/85 disabled:opacity-40 text-black font-mono text-[11px] font-bold tracking-[0.2em] transition-colors">
                   {busy ? 'BROADCASTING…' : `ONE-CLICK PAY $${t.priceUSD} USDC (BASE)`}
                 </button>
                 <p className="text-center font-mono text-[9px] text-white/30">connected: {address.slice(0, 8)}…{address.slice(-6)} · chain {chain?.id}</p>
@@ -554,7 +580,7 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
             )}
           </div>
         ) : (
-          <div className="rounded-xl border border-amber-300/25 bg-amber-300/[0.05] p-4 space-y-2 font-mono text-[11px]">
+          <div className="border border-amber-300/25 bg-amber-300/[0.05] p-4 space-y-2 font-mono text-[11px]">
             <p className="text-white/50">IBAN: <span className="select-all text-amber-200">{PAYMENT.iban.iban}</span></p>
             <p className="text-white/50">AMOUNT: <span className="text-amber-200">${t.priceUSD}</span> · memo: your email handle</p>
             <p className="text-white/30 text-[10px]">{PAYMENT.iban.note}</p>
@@ -564,9 +590,9 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
         <div className="space-y-2">
           <label className="font-mono text-[10px] tracking-widest text-white/40 uppercase">Verification reference (tx hash / wire ref)</label>
           <input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="0x… or bank reference"
-            className="w-full h-11 px-4 rounded-lg border border-white/10 bg-white/5 text-sm font-mono placeholder-white/25 focus:outline-none focus:border-sky-300/50" />
+            className="w-full h-11 px-4 border border-white/10 bg-white/5 text-sm font-mono placeholder-white/25 focus:outline-none focus:border-sky-300/50" />
           <button onClick={() => submitClaim()} disabled={!reference.trim() || busy}
-            className="w-full h-11 rounded-xl border border-emerald-400/40 bg-emerald-400/15 text-emerald-200 font-mono text-[11px] tracking-[0.2em] hover:bg-emerald-400/25 disabled:opacity-40 transition-colors">
+            className="w-full h-11 border border-emerald-400/40 bg-emerald-400/15 text-emerald-200 font-mono text-[11px] tracking-[0.2em] hover:bg-emerald-400/25 disabled:opacity-40 transition-colors">
             SUBMIT FOR VERIFICATION
           </button>
           {msg && <p className="text-xs font-mono text-center pt-1 text-white/70">{msg}</p>}
