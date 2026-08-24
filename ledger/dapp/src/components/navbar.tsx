@@ -29,13 +29,12 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/av-logo-white.png"
+              {/* plain img + explicit basePath: next/image drops basePath on static export */}
+              <img
+                src="/treasury/av-logo-white.png"
                 alt="AV"
-                width={42}
-                height={28}
-                priority
-                className="h-7 w-auto"
+                draggable={false}
+                className="h-7 w-auto select-none"
               />
               <span className="font-semibold text-lg hidden sm:block">AV Treasury</span>
             </Link>
