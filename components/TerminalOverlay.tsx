@@ -20,7 +20,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "fs_read",
-      description: "Read the contents of a file",
+      description: "Read a file or list a directory from the Artifact content repo (GitHub-backed). Paths are repo-relative, e.g. 'docs/notes.md' or 'lib'.",
       parameters: {
         type: "object",
         properties: { path: { type: "string" } },
@@ -32,10 +32,14 @@ const TOOLS = [
     type: "function",
     function: {
       name: "fs_write",
-      description: "Write content to a file",
+      description: "Create or update a file by committing it to the Artifact content repo (GitHub-backed). Provide repo-relative path and full file content.",
       parameters: {
         type: "object",
-        properties: { path: { type: "string" }, content: { type: "string" } },
+        properties: {
+          path: { type: "string" },
+          content: { type: "string" },
+          message: { type: "string", description: "Optional commit message" }
+        },
         required: ["path", "content"]
       }
     }
@@ -44,11 +48,23 @@ const TOOLS = [
     type: "function",
     function: {
       name: "shell_exec",
-      description: "Execute a shell command",
+      description: "Attempt to execute a shell command. NOTE: the hosted runtime has no persistent shell; this returns guidance on available alternatives.",
       parameters: {
         type: "object",
         properties: { command: { type: "string" } },
         required: ["command"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "js_eval",
+      description: "Evaluate JavaScript for computation (math, string/data transforms, quick algorithms). Supports a bare expression or statements with an explicit return. No filesystem access.",
+      parameters: {
+        type: "object",
+        properties: { code: { type: "string" } },
+        required: ["code"]
       }
     }
   },
@@ -79,11 +95,51 @@ const TOOLS = [
   {
     type: "function",
     function: {
-      name: "open_document",
-      description: "Open a research document in the UI",
+      name: "market_price",
+      description: "Get live AU/AG market data (Base chain pool spot + oracle bootstrap) from the exchange market API.",
       parameters: {
         type: "object",
-        properties: { 
+        properties: {},
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "ipfs_catalog",
+      description: "List the IPFS research catalog (CIDs, gateway URLs, titles).",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "github_read",
+      description: "Read a file or directory from any public GitHub repository via the GitHub Contents API.",
+      parameters: {
+        type: "object",
+        properties: {
+          owner: { type: "string" },
+          repo: { type: "string" },
+          path: { type: "string", description: "File or dir path inside the repo; empty for repo root" }
+        },
+        required: ["owner", "repo"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "open_document",
+      description: "Open a research document in the user interface",
+      parameters: {
+        type: "object",
+        properties: {
           nodeId: { type: "string", description: "The ID or Title of the document" },
           meta: { type: "string", description: "Optional metadata label" }
         },
@@ -95,7 +151,7 @@ const TOOLS = [
 
 const TerminalOverlay: React.FC<TerminalOverlayProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', content: 'You are AVA, an AI assistant operating within the Artifact Network terminal. You have access to local filesystem (read/write), shell execution, web search, web fetch, and you can open documents in the user interface (open_document). Be concise, professional, and execute commands efficiently.' }
+    { role: 'system', content: 'You are AVA, an AI assistant operating within the Artifact Network terminal. Capabilities: (1) fs_read/fs_write — read and persist files by committing them to the Artifact content repo on GitHub (paths are repo-relative; writes create real commits); (2) js_eval — sandboxed JavaScript for computation; there is NO persistent shell, so never claim to have run shell commands — use js_eval/fs tools instead and say so honestly if asked; (3) web_search/web_fetch — live internet access; (4) market_price — live AU/AG prices from the exchange API; (5) ipfs_catalog — the IPFS research catalog; (6) github_read — read files/dirs from any public GitHub repo; (7) open_document — open a research document visually in the user interface (use the item ID or exact title). Be concise, professional, honest about failures, and execute tasks efficiently.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -131,12 +187,45 @@ const TerminalOverlay: React.FC<TerminalOverlayProps> = ({ isOpen, onClose }) =>
       } else if (name === "shell_exec") {
         const res = await fetch("/api/shell/exec", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
+      } else if (name === "js_eval") {
+        const res = await fetch("/api/js/eval", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ code: args.code }) });
+        return JSON.stringify(await res.json());
       } else if (name === "web_search") {
         const res = await fetch("/api/web/search", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
       } else if (name === "web_fetch") {
         const res = await fetch("/api/web/fetch", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
+      } else if (name === "market_price") {
+        const res = await fetch("/api/market/route");
+        return JSON.stringify(await res.json());
+      } else if (name === "ipfs_catalog") {
+        const res = await fetch("/api/ipfs/catalog", { method: "POST", headers: {"Content-Type": "application/json"}, body: "{}" });
+        return JSON.stringify(await res.json());
+      } else if (name === "github_read") {
+        const { owner, repo, path = "" } = args;
+        const res = await fetch(`/api/github/contents/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}?path=${encodeURIComponent(path)}`);
+        const j = await res.json();
+        // Down-select big directory listings / file payloads for the model
+        if (Array.isArray(j)) {
+          return JSON.stringify(j.slice(0, 50).map((x) => ({ name: x.name, path: x.path, type: x.type, size: x.size })));
+        }
+        if (j && j.type === "file" && typeof j.content === "string") {
+          let text = j.content;
+          let truncated = false;
+          if (text.length > 20000) { text = text.slice(0, 20000); truncated = true; }
+          if (j.encoding === "base64") {
+            try {
+              const bin = atob(text);
+              const bytes = new Uint8Array(bin.length);
+              for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+              text = new TextDecoder().decode(bytes).slice(0, 20000);
+            } catch { /* keep as-is */ }
+            return JSON.stringify({ path: j.path, content: text, truncated });
+          }
+          return JSON.stringify({ path: j.path, content: text, truncated });
+        }
+        return JSON.stringify(j);
       }
     } catch (e: any) {
       return JSON.stringify({ error: e.message });

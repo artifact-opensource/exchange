@@ -41,7 +41,8 @@ const SOURCE_ICONS: Record<string, string> = {
   'Enterprise': '🏢',
 };
 
-export default function NodeGraph({ items, onNodeClick, selectedId, width = 900, height = 600 }: NodeGraphProps) {
+export default function NodeGraph({ items, onNodeClick, selectedId, width: defaultWidth = 900, height: defaultHeight = 600 }: NodeGraphProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<GraphNode[]>([]);
   const edgesRef = useRef<GraphEdge[]>([]);
@@ -50,8 +51,41 @@ export default function NodeGraph({ items, onNodeClick, selectedId, width = 900,
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const transformRef = useRef({ scale: 1, offsetX: 0, offsetY: 0 });
-  const isDraggingRef = useRef(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
+
+  // Responsive sizing: fill parent container instead of fixed pixel canvas
+  const [measured, setMeasured] = useState<{ w: number; h: number } | null>(null);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0].contentRect;
+      if (r.width > 0 && r.height > 0) {
+        setMeasured({ w: Math.floor(r.width), h: Math.floor(r.height) });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const width = Math.max(280, measured?.w ?? defaultWidth);
+  const height = Math.max(240, measured?.h ?? defaultHeight);
+
+  // Re-center existing node positions proportionally when container resizes,
+  // so the cluster stays in view (critical on mobile rotation / panel resize).
+  const prevDimsRef = useRef<{ w: number; h: number } | null>(null);
+  useEffect(() => {
+    const prev = prevDimsRef.current;
+    if (prev && (prev.w !== width || prev.h !== height) && nodesRef.current.length > 0) {
+      const sx = width / prev.w;
+      const sy = height / prev.h;
+      for (const n of nodesRef.current) {
+        n.x *= sx;
+        n.y *= sy;
+      }
+    }
+    prevDimsRef.current = { w: width, h: height };
+  }, [width, height]);
 
   // Initialize graph data from items
   useEffect(() => {
@@ -309,7 +343,7 @@ export default function NodeGraph({ items, onNodeClick, selectedId, width = 900,
     };
   }, [items, selectedId, hoveredNode, width, height]);
 
-  // Mouse interaction handlers
+  // Coordinate + hit-test helpers
   const screenToWorld = useCallback((screenX: number, screenY: number) => {
     const transform = transformRef.current;
     return {
@@ -331,50 +365,97 @@ export default function NodeGraph({ items, onNodeClick, selectedId, width = 900,
     return null;
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
+  // Unified pointer interactions: mouse + single-finger pan + two-finger pinch
+  const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const tapStateRef = useRef<{ startX: number; startY: number; lastX: number; lastY: number; moved: boolean; startTime: number } | null>(null);
+  const pinchRef = useRef<{ dist: number; scale: number; midX: number; midY: number } | null>(null);
 
-    if (isDraggingRef.current) {
-      const dx = screenX - dragStartRef.current.x;
-      const dy = screenY - dragStartRef.current.y;
-      transformRef.current.offsetX += dx;
-      transformRef.current.offsetY += dy;
-      dragStartRef.current = { x: screenX, y: screenY };
+  const getLocalPos = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    return { x: e.clientX - (rect?.left ?? 0), y: e.clientY - (rect?.top ?? 0) };
+  }, []);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+    const p = getLocalPos(e);
+    pointersRef.current.set(e.pointerId, p);
+    if (pointersRef.current.size === 1) {
+      tapStateRef.current = { startX: p.x, startY: p.y, lastX: p.x, lastY: p.y, moved: false, startTime: Date.now() };
+    } else if (pointersRef.current.size === 2) {
+      const [a, b] = [...pointersRef.current.values()];
+      pinchRef.current = {
+        dist: Math.hypot(a.x - b.x, a.y - b.y),
+        scale: transformRef.current.scale,
+        midX: (a.x + b.x) / 2,
+        midY: (a.y + b.y) / 2,
+      };
+      tapStateRef.current = null;
+    }
+  }, [getLocalPos]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    const p = getLocalPos(e);
+
+    if (!pointersRef.current.has(e.pointerId)) {
+      // Pure hover (mouse only, nothing pressed)
+      if (e.pointerType === 'mouse') {
+        const world = screenToWorld(p.x, p.y);
+        const node = findNodeAt(world.x, world.y);
+        if (node !== hoveredNode) {
+          setHoveredNode(node);
+          if (node) setTooltipPos({ x: p.x, y: p.y });
+        }
+      }
       return;
     }
 
-    const world = screenToWorld(screenX, screenY);
-    const node = findNodeAt(world.x, world.y);
+    pointersRef.current.set(e.pointerId, p);
 
-    if (node !== hoveredNode) {
-      setHoveredNode(node);
-      if (node) {
-        setTooltipPos({ x: screenX, y: screenY });
+    // Two-finger pinch zoom around the initial midpoint
+    if (pointersRef.current.size === 2 && pinchRef.current) {
+      const [a, b] = [...pointersRef.current.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinchRef.current.dist > 0) {
+        const t = transformRef.current;
+        const newScale = Math.max(0.2, Math.min(3, pinchRef.current.scale * (dist / pinchRef.current.dist)));
+        t.offsetX = pinchRef.current.midX - (pinchRef.current.midX - t.offsetX) * (newScale / t.scale);
+        t.offsetY = pinchRef.current.midY - (pinchRef.current.midY - t.offsetY) * (newScale / t.scale);
+        t.scale = newScale;
       }
+      return;
     }
-  }, [hoveredNode, screenToWorld, findNodeAt]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
-    const world = screenToWorld(screenX, screenY);
-    const node = findNodeAt(world.x, world.y);
-
-    if (node) {
-      onNodeClick(node.item);
-    } else {
-      isDraggingRef.current = true;
-      dragStartRef.current = { x: screenX, y: screenY };
+    // Single-pointer pan (touch or mouse drag)
+    const d = tapStateRef.current;
+    if (d) {
+      if (!d.moved && Math.hypot(p.x - d.startX, p.y - d.startY) > 6) d.moved = true;
+      if (d.moved) {
+        transformRef.current.offsetX += p.x - d.lastX;
+        transformRef.current.offsetY += p.y - d.lastY;
+      }
+      d.lastX = p.x;
+      d.lastY = p.y;
     }
+  }, [hoveredNode, screenToWorld, findNodeAt, getLocalPos]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    pointersRef.current.delete(e.pointerId);
+    if (pointersRef.current.size < 2) pinchRef.current = null;
+
+    // Tap (no movement) selects a node — works for touch and mouse
+    const d = tapStateRef.current;
+    if (d && !d.moved && Date.now() - d.startTime < 600) {
+      const world = screenToWorld(d.startX, d.startY);
+      const node = findNodeAt(world.x, world.y);
+      if (node) onNodeClick(node.item);
+    }
+    tapStateRef.current = null;
   }, [screenToWorld, findNodeAt, onNodeClick]);
 
-  const handleMouseUp = useCallback(() => {
-    isDraggingRef.current = false;
+  const handlePointerLeave = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    pointersRef.current.delete(e.pointerId);
+    tapStateRef.current = null;
+    setHoveredNode(null);
   }, []);
 
   const handleWheel = useCallback((e: React.WheelEvent<HTMLCanvasElement>) => {
@@ -394,15 +475,16 @@ export default function NodeGraph({ items, onNodeClick, selectedId, width = 900,
   }, []);
 
   return (
-    <div className="relative">
+    <div ref={wrapRef} className="relative w-full h-full min-h-[320px]">
       <canvas
         ref={canvasRef}
         style={{ width, height }}
-        className="rounded-lg bg-gray-950 cursor-grab active:cursor-grabbing"
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        className="block max-w-full rounded-lg bg-gray-950 cursor-grab active:cursor-grabbing touch-none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerLeave}
+        onPointerLeave={handlePointerLeave}
         onWheel={handleWheel}
       />
       {/* Tooltip */}

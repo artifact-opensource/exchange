@@ -12,17 +12,25 @@ const CATEGORY_ICONS: Record<React.ReactNode, React.ReactNode> = {
 }
 
 const CATEGORY_ORDER: ResearchCategory[] = [
-  'transformers-architecture',
-  'ai-ml',
-  'consciousness-philosophy',
-  'blockchain-governance',
-  'general-intelligence',
-  'multi-modal',
-  'time-series',
-  'agent-systems',
-  'tokenomics',
-  'security',
+  'Transformers/Architecture',
+  'AI/ML',
+  'Consciousness/Philosophy',
+  'Blockchain/Governance',
+  'Tokenomics',
+  'Security',
+  'Uncategorized',
 ]
+
+// Short display names for filter chips (CATEGORY_LABELS are long-form)
+const CATEGORY_SHORT: Partial<Record<ResearchCategory, string>> = {
+  'AI/ML': 'AI/ML',
+  'Blockchain/Governance': 'Blockchain',
+  'Transformers/Architecture': 'Transformers',
+  'Consciousness/Philosophy': 'Consciousness',
+  'Tokenomics': 'Tokenomics',
+  'Security': 'Security',
+  'Uncategorized': 'Other',
+}
 
 export default function ResearchPortal() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -121,26 +129,26 @@ export default function ResearchPortal() {
       <div className="sticky top-0 z-20 bg-[#030303]/95 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
           {/* Search */}
-          <div className="relative flex-1 w-full">
+          <div className="relative flex-1 min-w-0 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
             <input
               type="text"
               placeholder="Search research... (multi-term: 'transformer attention')"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-white/10 bg-white/5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30"
+              className="w-full h-11 sm:h-auto pl-10 pr-10 py-2.5 rounded-lg border border-white/10 bg-white/5 text-base sm:text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30"
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1">
                 <X className="h-4 w-4 text-white/40 hover:text-white" />
               </button>
             )}
           </div>
 
           {/* Stats */}
-          <div className="flex items-center gap-4 text-xs font-mono text-white/40">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-white/40">
             <span className="flex items-center gap-1"><Database className="h-3 w-3" /> {stats.total} items</span>
-            <span className="flex items-center gap-1"><Layers className="h-3 w-3" /> ObjectCategory.byCategory transformers-architecture</span>
+            <span className="flex items-center gap-1"><Layers className="h-3 w-3" /> {Object.keys(stats.byCategory).length} categories</span>
           </div>
 
           {/* View toggle */}
@@ -183,26 +191,24 @@ export default function ResearchPortal() {
               }`}
               style={selectedCategory === cat ? { backgroundColor: CATEGORY_COLORS[cat] } : {}}
             >
-              {CATEGORY_LABELS[cat]} ({stats.byCategory[cat] || 0})
+              {CATEGORY_SHORT[cat] ?? CATEGORY_LABELS[cat] ?? cat} ({stats.byCategory[cat] || 0})
             </button>
           ))}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex h-[calc(100vh-160px)]">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-160px)] min-h-0">
         {/* Graph / List view */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0 min-h-[420px] lg:min-h-0">
           {view === 'graph' ? (
             <NodeGraph
               items={filteredItems}
               onNodeClick={handleNodeClick}
               selectedId={selectedItem?.id}
-              width={1200}
-              height={800}
             />
           ) : (
-            <div className="h-full overflow-y-auto px-6 py-4 space-y-2">
+            <div className="h-full overflow-y-auto px-4 sm:px-6 py-4 space-y-2">
               {filteredItems.map(item => (
                 <ListItem key={item.id} item={item} onClick={() => handleNodeClick(item)} />
               ))}
@@ -213,9 +219,14 @@ export default function ResearchPortal() {
           )}
         </div>
 
-        {/* Detail sidebar */}
+        {/* Detail sidebar — slide-over on mobile, static panel on desktop */}
         {selectedItem && (
-          <div className="w-96 border-l border-white/10 bg-white/[0.02] overflow-y-auto p-6 space-y-4">
+          <>
+            <div
+              className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+              onClick={() => setSelectedItem(null)}
+            />
+            <div className="fixed right-0 top-0 z-40 h-full w-[88%] max-w-sm border-l border-white/10 bg-[#050505] overflow-y-auto p-5 space-y-4 lg:static lg:z-auto lg:w-96 lg:max-w-none lg:h-auto lg:bg-white/[0.02] lg:p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -329,7 +340,8 @@ export default function ResearchPortal() {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+          </>
         )}
       </div>
 

@@ -10,8 +10,10 @@ import ResearchPortal from "./components/ResearchPortal";
 import InfoOverlay from "./components/InfoOverlay";
 import BlockchainHero from "./components/BlockchainHero";
 import LandingPage from "./components/LandingPage";
+import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
 
 // Import dimension configs
+import { RESEARCH_CATALOG } from "./lib/research-data";
 import { rdConfig } from "./rd/config";
 import { mlConfig } from "./ml/config";
 import { ftConfig } from "./ft/config";
@@ -32,6 +34,31 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+
+  // AVA open_document: resolve nodeId/title against the research catalog and
+  // surface it in the markdown viewer overlay.
+  const [avaDoc, setAvaDoc] = useState<{ nodeId: string; meta: string } | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { nodeId, meta } = (e as CustomEvent<{ nodeId: string; meta?: string }>).detail || {};
+      if (!nodeId) return;
+      let label = meta || "AVA // OPENED_DOCUMENT";
+      const item = RESEARCH_CATALOG.find(
+        (x) =>
+          x.id === nodeId ||
+          x.title.toLowerCase() === String(nodeId).toLowerCase() ||
+          x.title.toLowerCase().includes(String(nodeId).toLowerCase())
+      );
+      if (item) {
+        label = meta || `${item.category} · ${item.source} · ${item.date}`;
+        return setAvaDoc({ nodeId: item.title, meta: label });
+      }
+      setAvaDoc({ nodeId, meta: label });
+    };
+    window.addEventListener("OPEN_DOCUMENT", handler);
+    return () => window.removeEventListener("OPEN_DOCUMENT", handler);
+  }, []);
 
   // Force-refresh trigger (bumps key to re-fetch GitHub data)
   const triggerRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
@@ -277,6 +304,15 @@ export default function App() {
       />
 
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
+
+      {/* AVA document viewer (open_document tool) */}
+      {avaDoc && (
+        <NodeMarkdownViewer
+          nodeId={avaDoc.nodeId}
+          metadata={avaDoc.meta}
+          onClose={() => setAvaDoc(null)}
+        />
+      )}
 
       {/* Persistence Telemetry (Mobile Optimized) */}
       <div className="fixed bottom-6 left-6 md:bottom-12 md:left-12 z-40 pointer-events-none opacity-20 hidden xs:block">
