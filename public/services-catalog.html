@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARTIFACT VIRTUAL — BUSINESS SERVICES & PRICING | www.artifactvirtual.com</title>
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#030303;--surf:#0a0a0c;--silver:#b0b0b0;--mercury:#e8e8e8;--accent:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--mercury);line-height:1.35;overflow-x:hidden}
+::-webkit-scrollbar{width:0}
+::selection{background:rgba(255,255,255,.12)}
+.grain{position:fixed;inset:-150%;width:300%;height:300%;background-image:url("https://upload.wikimedia.org/wikipedia/commons/5/5c/Image_with_unfiltered_noise.png");opacity:.035;pointer-events:none;z-index:9999;animation:grain 10s steps(10) infinite;mix-blend-mode:overlay}
+@keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-4%,-8%)}20%{transform:translate(-12%,4%)}30%{transform:translate(6%,-20%)}40%{transform:translate(-4%,20%)}50%{transform:translate(-12%,8%)}60%{transform:translate(12%,0)}70%{transform:translate(0,12%)}80%{transform:translate(2%,30%)}90%{transform:translate(-8%,8%)}}
+.vertical{writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.35em;text-transform:uppercase;font-family:'Space Mono',monospace;font-size:.55rem;color:rgba(255,255,255,.35)}
+.mono{font-family:'Space Mono',monospace}
+.section-num{font-family:'Space Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.25);letter-spacing:.2em}
+.card{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:2rem;transition:all .35s ease;backdrop-filter:blur(4px)}
+.card:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.05);transform:translateY(-4px)}
+.price-tag{font-family:'Space Mono',monospace;font-size:1.8rem;color:var(--accent);letter-spacing:-.03em;line-height:1}
+</style>
+</head>
+<body class="grain">
+
+<!-- Section 1: Header / Catalogue -->
+<section id="catalogue" class="min-h-screen flex flex-col justify-center px-[6vw] pt-24 pb-12 relative overflow-hidden" style="background:linear-gradient(160deg,#030303 50%,#050a10 100%);">
+  <div style="position:absolute;top:10vh;left:6vw;opacity:.08;font-size:12vw;font-weight:700;color:rgba(255,255,255,.06);line-height:.8;pointer-events:none;">EX</div>
+  <div class="max-w-5xl">
+    <span class="section-num">01 / CATALOGUE — MAYA CHEN (COO) / 2026-08-30</span>
+    <h1 style="font-size:clamp(3.5rem,11vw,9rem);line-height:.88;font-weight:300;letter-spacing:-.04em;color:var(--accent);margin-top:.5rem;">BUSINESS<br>SERVICES</h1>
+    <p style="font-size:1.05rem;color:rgba(255,255,255,.55);max-width:42ch;margin-top:2rem;line-height:1.6;">34 services across AI/LLM, compute, trading, enterprise data, smart contracts, security, and hospitality. Pakistan cost base (60–75% below US/EU). Pass-through pricing — structural cost moat, not discount.</p>
+    <div class="mt-10 flex gap-3 text-xs mono text-white/30">
+      <span class="border border-white/10 px-3 py-1">www.artifactvirtual.com</span>
+      <span class="border border-white/10 px-3 py-1">exchange.artifactvirtual.com</span>
+      <span class="border border-white/10 px-3 py-1">COO: Maya Chen</span>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-[6vw] mono text-[10px] text-white/20">ARTIFACT VIRTUAL / BUSINESS SERVICES / PRICING / 2026</div>
+</section>
+
+<!-- Section 2: Offerings (from BUSINESS_SERVICES_CATALOG.md) -->
+<section id="offerings" class="min-h-screen px-[6vw] pt-28 py-16" style="background:var(--surf);">
+  <span class="section-num">02 / OFFERINGS — 6 DOMAINS</span>
+  <h2 style="font-size:clamp(2.5rem,7vw,5rem);line-height:.92;font-weight:300;color:var(--accent);margin-top:.5rem;">WHAT WE<br>DELIVER</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-6xl">
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">AI / LLM PLATFORM</h3>
+      <p class="text-sm text-white/50 leading-relaxed">ARTIFACT-ENGINE (GPU inference), HEKTOR retrieval, GLADIUS cognitive kernel, SYMBIOTE daemon, OSYMBIOTE runtime, SPOR independent agent bin. All served from Pakistan cost base.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">SVC-001 → SVC-014 / R&D + LIVE</span>
+    </article>
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">COMPUTE / INFRASTRUCTURE</h3>
+      <p class="text-sm text-white/50 leading-relaxed">Cloudflare Tunnels (12+ sites: arc, ava, brand, comb, erp, gdi, mach6, research, singularity, anvil), VPS Vietnam origin, PostgreSQL/Redis/Vector DB, Colocation, CDNs, Monitoring.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">SVC-017 → SVC-027 / LIVE + PIPELINE</span>
+    </article>
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">ENTERPRISE / GOVERNANCE</h3>
+      <p class="text-sm text-white/50 leading-relaxed">COMB mechanism framework, ERP integrations, Treasury framework (AV-TREASURY), Smart-contract governance, Audit-Logger, Oracle-Admin-Canary, Blackbox/Obelisk beacons.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">SVC-030 → SVC-034 / LIVE</span>
+    </article>
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">TRADING / QUANT</h3>
+      <p class="text-sm text-white/50 leading-relaxed">Symbiote Gateway, Trading quant platform, PoW smart-contract trading, AV-Exchange (crypto), Token registry, Treasury safe ceremonies, Liquidity routing.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">SVC-009 / SYMBIOTE / AV-EXCHANGE</span>
+    </article>
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">HOSPITALITY / REAL-WORLD</h3>
+      <p class="text-sm text-white/50 leading-relaxed">Hospitality OS, GDI Landing, VRP / HRP pages, real-world services (Skardu, Hunza, Gilgit Baltistan), Tour platforms, Hotel/resort integrations, Identity layer.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">PROD-034 → PROD-035 / R&D + LIVE</span>
+    </article>
+    <article class="card">
+      <h3 class="mono text-sm text-white mb-2">SECURITY / TRUST</h3>
+      <p class="text-sm text-white/50 leading-relaxed">Blackbox Flight Recorder, Obelisk Beacon, Audit Logger (SVC-032), Oracle-Admin-Canary, Prometheus-Grafana monitoring, Security audits per board protocol.</p>
+      <span class="mono text-xs text-white/25 mt-4 block">SVC-030 → SVC-034 / MANDATORY</span>
+    </article>
+  </div>
+</section>
+
+<!-- Section 3: Pricing (real data from docs/services-pricing/README.md) -->
+<section id="pricing" class="min-h-screen px-[6vw] pt-28 pb-16" style="background:var(--bg);">
+  <span class="section-num">03 / PRICING — USD + PKR (70% DISCOUNT DOMESTIC)</span>
+  <h2 style="font-size:clamp(2.5rem,7vw,5rem);line-height:.92;font-weight:300;color:var(--accent);margin-top:.5rem;">SCOPE<br>& BUDGET</h2>
+  <p style="color:rgba(255,255,255,.45);margin-top:1rem;max-width:60ch;font-size:.95rem;">All prices backed by observed Pakistan cost base (60–75% below US/EU). Enterprise contracts start at $25,000/mo global / PKR 6,950,000/mo domestic. 30-day cancellation, SLA credits: 5% Starter / 10% Pro / 25% Enterprise.</p>
+
+  <div class="overflow-x-auto mt-10 max-w-6xl">
+  <table class="w-full text-sm mono border-collapse" style="border-top:1px solid rgba(255,255,255,.15);">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;">
+        <th class="text-left py-3 px-2">ID</th><th class="text-left py-3 px-2">SERVICE</th><th class="text-right py-3 px-2">STARTER USD</th><th class="text-right py-3 px-2">PRO USD</th><th class="text-right py-3 px-2">ENTERPRISE USD</th><th class="text-right py-3 px-2">PKR (70% off)</th>
+      </tr>
+    </thead>
+    <tbody style="font-size:.82rem;color:rgba(255,255,255,.7);">
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-001</td><td class="py-2 px-2">av-api</td><td class="py-2 px-2 text-right">$200</td><td class="py-2 px-2 text-right">$600</td><td class="py-2 px-2 text-right">$5,000</td><td class="py-2 px-2 text-right">PKR 55,600 / 166,800 / 1,390,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-002</td><td class="py-2 px-2">av-mcp</td><td class="py-2 px-2 text-right">$150</td><td class="py-2 px-2 text-right">$450</td><td class="py-2 px-2 text-right">$3,000</td><td class="py-2 px-2 text-right">PKR 41,700 / 125,100 / 834,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-003</td><td class="py-2 px-2">av-vector</td><td class="py-2 px-2 text-right">$300</td><td class="py-2 px-2 text-right">$900</td><td class="py-2 px-2 text-right">$8,000</td><td class="py-2 px-2 text-right">PKR 83,400 / 250,200 / 2,224,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-004</td><td class="py-2 px-2">av-db</td><td class="py-2 px-2 text-right">$100</td><td class="py-2 px-2 text-right">$300</td><td class="py-2 px-2 text-right">$2,000</td><td class="py-2 px-2 text-right">PKR 27,800 / 83,400 / 556,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-007</td><td class="py-2 px-2">av-vector-db</td><td class="py-2 px-2 text-right">$500</td><td class="py-2 px-2 text-right">$1,500</td><td class="py-2 px-2 text-right">$12,000</td><td class="py-2 px-2 text-right">PKR 139,000 / 417,000 / 3,336,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-008</td><td class="py-2 px-2">Hermes-Gateway</td><td class="py-2 px-2 text-right">$1,000</td><td class="py-2 px-2 text-right">$3,000</td><td class="py-2 px-2 text-right">$25,000</td><td class="py-2 px-2 text-right">PKR 278,000 / 834,000 / 6,950,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-017</td><td class="py-2 px-2">Cloudflare-Tunnels</td><td class="py-2 px-2 text-right">$200</td><td class="py-2 px-2 text-right">$600</td><td class="py-2 px-2 text-right">$5,000</td><td class="py-2 px-2 text-right">PKR 55,600 / 166,800 / 1,390,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-020</td><td class="py-2 px-2">Vercel</td><td class="py-2 px-2 text-right">$300</td><td class="py-2 px-2 text-right">$900</td><td class="py-2 px-2 text-right">$8,000</td><td class="py-2 px-2 text-right">PKR 83,400 / 250,200 / 2,224,000</td></tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.06);"><td class="py-2 px-2">SVC-022</td><td class="py-2 px-2">VPS-Vietnam</td><td class="py-2 px-2 text-right">$500</td><td class="py-2 px-2 text-right">$1,500</td><td class="py-2 px-2 text-right">$8,000</td><td class="py-2 px-2 text-right">PKR 139,000 / 417,000 / 2,224,000</td></tr>
+      <tr><td class="py-2 px-2">SVC-032</td><td class="py-2 px-2">Audit-Logger</td><td class="py-2 px-2 text-right">$300</td><td class="py-2 px-2 text-right">$900</td><td class="py-2 px-2 text-right">$6,000</td><td class="py-2 px-2 text-right">PKR 83,400 / 250,200 / 1,668,000</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="max-w-6xl mt-8 grid md:grid-cols-4 gap-4">
+    <div class="card"><h3 class="mono text-xs text-white/60 mb-2">AGENT CORE</h3><p class="mono text-lg text-white">$1,750/mo</p><p class="text-xs text-white/40">av-api + av-vector + av-mcp + Hermes-Gateway</p><p class="mono text-xs text-white/25 mt-2">PKR 486,500/mo</p></div>
+    <div class="card"><h3 class="mono text-xs text-white/60 mb-2">TRADING STACK</h3><p class="mono text-lg text-white">$2,500/mo</p><p class="text-xs text-white/40">Symbiote + Blackbox + Audit-Logger + Oracle-Canary</p><p class="mono text-xs text-white/25 mt-2">PKR 695,000/mo</p></div>
+    <div class="card"><h3 class="mono text-xs text-white/60 mb-2">HOSPITALITY</h3><p class="mono text-lg text-white">$1,050/mo</p><p class="text-xs text-white/40">GDI + MQTT + Audit + Cloudflare + VPS</p><p class="mono text-xs text-white/25 mt-2">PKR 291,900/mo</p></div>
+    <div class="card"><h3 class="mono text-xs text-white/60 mb-2">ENTERPRISE FULL</h3><p class="mono text-lg text-white">$25,000/mo</p><p class="text-xs text-white/40">All 34 services, custom SLA</p><p class="mono text-xs text-white/25 mt-2">PKR 6,950,000/mo</p></div>
+  </div>
+</section>
+
+<!-- Section 4: Audit Request (from audit-request.md + board protocol) -->
+<section id="audit" class="min-h-screen px-[6vw] pt-28 py-16" style="background:linear-gradient(160deg,#030303 60%,#080c14 100%);border-top:1px solid rgba(255,255,255,.08);">
+  <span class="section-num">04 / AUDIT REQUEST — SCOPE & BUDGET</span>
+  <h2 style="font-size:clamp(2.5rem,7vw,5rem);line-height:.92;font-weight:300;color:var(--accent);margin-top:.5rem;">AUDIT<br>REQUEST</h2>
+  <p style="color:rgba(255,255,255,.5);margin-top:1.5rem;max-width:60ch;font-size:.95rem;">Every project requires independent audit before budget commitment — per CMO operating principle + board directive. This page is the audit form.</p>
+
+  <div style="max-width:800px;margin-top:3rem;border:1px solid rgba(255,255,255,.1);padding:2.5rem;background:rgba(255,255,255,.015);">
+    <h3 class="mono text-sm text-white/80 mb-6 tracking-wide">REQUIRED SUBMISSIONS</h3>
+    <ol class="space-y-4 text-sm text-white/50">
+      <li><span class="mono text-xs text-white/30">01.</span> Scope document — deliverables, timelines, exclusions</li>
+      <li><span class="mono text-xs text-white/30">02.</span> Budget framework — line-items + 15% contingency</li>
+      <li><span class="mono text-xs text-white/30">03.</span> Risk matrix — security, operational, economic</li>
+      <li><span class="mono text-xs text-white/30">04.</span> Stakeholder sign-off — CTO / CFO / Sirius (board)</li>
+      <li><span class="mono text-xs text-white/30">05.</span> Delivery timeline — standard 10 business days</li>
+    </ol>
+    <div class="mt-6 pt-6 border-t border-white/10 flex flex-wrap gap-3 text-xs mono text-white/30">
+      <span>DOMAIN: www.artifactvirtual.com</span><span>CONTACT: ali.shakil@artifactvirtual.com</span><span>SLAs: 48h (per rhythm.md)</span>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: Email / Next -->
+<section id="next" class="min-h-[60vh] flex items-center px-[6vw] pt-20 pb-12">
+  <div class="max-w-4xl">
+    <span class="section-num">05 / NEXT STEP</span>
+    <h2 style="font-size:clamp(2.5rem,7vw,5rem);line-height:.92;font-weight:300;color:var(--accent);margin-top:.5rem;">EMAIL<br>ALI</h2>
+    <p class="text-white/50 mt-4 max-w-xl">Audit request and services page submitted. Reference: <strong>www.artifactvirtual.com</strong> (Artifact Exchange / Vercel site). Response SLA 48h per operations rhythm.</p>
+    <a href="mailto:ali.shakil@artifactvirtual.com?subject=Artifact%20Virtual%20Business%20Services%20%26%20Audit%20Request&body=Audit%20request%20for%20Artifact%20Exchange%20services%20catalog%20and%20pricing%20page%20(www.artifactvirtual.com).%20Reference:%20business_services%20catalog%20(2026-08-30)." style="display:inline-block;margin-top:3rem;padding:1.25rem 2.5rem;border:1px solid rgba(255,255,255,.25);text-decoration:none;color:var(--accent);font-family:'Space Mono',monospace;font-size:.75rem;letter-spacing:.1em;transition:.3s;" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(255,255,255,.5)';" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,.25)';">SEND TO ALI →</a>
+  </div>
+  <div class="absolute bottom-6 left-[6vw] mono text-[10px] text-white/20">ARTIFACT VIRTUAL / MAYA CHEN / CATALOGUE / 2026</div>
+</section>
+
+</body>
+</html>
