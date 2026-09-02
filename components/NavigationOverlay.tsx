@@ -12,11 +12,13 @@ interface NavigationOverlayProps {
 
 const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, onNavigate, isOpen, onClose }) => {
   const sections = [
-    { id: SectionId.RD, label: 'RESEARCH & DEVELOPMENT' },
-    { id: SectionId.ML, label: 'MACHINE LEARNING' },
-    { id: SectionId.FT, label: 'FINANCIAL TECHNOLOGY' },
-    { id: SectionId.ST, label: 'SPACE TECHNOLOGY' },
-    { id: SectionId.IM, label: 'INVESTOR MANAGEMENT' }
+    { id: SectionId.RD, label: 'RESEARCH & DEVELOPMENT', href: null },
+    { id: SectionId.ML, label: 'MACHINE LEARNING', href: null },
+    { id: SectionId.FT, label: 'FINANCIAL TECHNOLOGY', href: null },
+    { id: SectionId.ST, label: 'SPACE TECHNOLOGY', href: null },
+    { id: SectionId.IM, label: 'INVESTOR MANAGEMENT', href: null },
+    { id: 'catalog' as any, label: 'CATALOG', href: '/services-catalog.html' },
+    { id: 'contact' as any, label: 'CONTACT', href: '/contact.html' }
   ];
 
   return (
@@ -38,13 +40,15 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
               <div className="w-full h-[1px] bg-white/5"></div>
             </div>
 
-            {sections.map((sec) => (
-              <button 
+            {sections.map((sec) => {
+              const isExternal = sec.href !== null && sec.href !== undefined;
+              const handleClick = isExternal
+                ? () => { window.location.href = sec.href!; if (onClose) onClose(); }
+                : () => { onNavigate(sec.id); if (onClose) onClose(); };
+              return (
+              <button
                 key={sec.id}
-                onClick={() => {
-                  onNavigate(sec.id);
-                  if (onClose) onClose();
-                }}
+                onClick={handleClick}
                 className="group flex flex-col items-end gap-2 focus:outline-none w-full"
               >
                 <div className="flex items-center gap-4">
@@ -62,7 +66,8 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
                   currentSection === sec.id ? 'bg-white/40 w-full' : 'bg-transparent w-0 group-hover:bg-white/10 group-hover:w-1/2'
                 }`}></div>
               </button>
-            ))}
+            );
+            })}
 
             <div className="w-full mt-12 pt-12 border-t border-white/5 flex flex-col items-end opacity-20 font-mono text-[8px] tracking-[0.3em] uppercase space-y-1">
               <p>SYSTEM_CORE_V3.0</p>
