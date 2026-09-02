@@ -20,15 +20,6 @@ const CatalogDimension: React.FC = () => {
   return (
     <div className="w-full h-full flex items-center overflow-y-auto px-6 md:px-12 py-16">
       <div className="max-w-6xl w-full space-y-10">
-        {/* Header */}
-        <div>
-          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase">01 / CATALOGUE — COO: MAYA CHEN / 2026-08-30</p>
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight text-white mt-3 leading-none">BUSINESS<br/>SERVICES</h2>
-          <p className="text-white/40 text-sm mt-4 max-w-2xl leading-relaxed">
-            34 services across AI/LLM, compute, trading, enterprise data, smart contracts, security, and hospitality. Pakistan cost base (60–75% below US/EU). Pass-through pricing.
-          </p>
-        </div>
-
         {/* Service categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {services.map((s) => (

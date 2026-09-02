@@ -25,20 +25,6 @@ const ContactDimension: React.FC = () => {
   return (
     <div className="w-full h-full flex items-center overflow-y-auto px-6 md:px-12 py-16">
       <div className="max-w-4xl w-full space-y-10">
-        {/* Header */}
-        <div>
-          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase">01 / CONTACT — ARTIFACT VIRTUAL / 2026</p>
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight text-white mt-3 leading-none">CONTACT<br/>NODE</h2>
-          <p className="text-white/40 text-sm mt-4 max-w-xl leading-relaxed">
-            Direct line to operations. Audit requests, services, enterprise engagements — all routed through the board-authorized contact point.
-          </p>
-          <div className="flex flex-wrap gap-3 mt-5">
-            <a href="mailto:ali.shakil@artifactvirtual.com" className="font-mono text-[10px] tracking-widest uppercase border border-white/10 px-4 py-2 text-white/60 hover:text-white hover:border-white/40 transition-all">
-              ali.shakil@artifactvirtual.com →
-            </a>
-          </div>
-        </div>
-
         {/* Channels */}
         <div>
           <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase mb-5">02 / CHANNELS</p>
