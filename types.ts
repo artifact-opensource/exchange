@@ -4,7 +4,9 @@ export enum SectionId {
   ML = 'ml',
   FT = 'ft',
   ST = 'st',
-  IM = 'im'
+  IM = 'im',
+  CATALOG = 'catalog',
+  CONTACT = 'contact'
 }
 
 export interface DimensionConfig {

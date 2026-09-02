@@ -13,6 +13,8 @@ import LandingPage from "./components/LandingPage";
 import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
 import SpaceDivision from "./components/SpaceDivision";
 import InvestorPortalApp, { PortalBoundary } from "./components/InvestorPortal";
+import CatalogDimension from "./components/CatalogDimension";
+import ContactDimension from "./components/ContactDimension";
 import { Web3Provider } from "./components/Web3Provider";
 
 // Import dimension configs
@@ -22,6 +24,8 @@ import { mlConfig } from "./ml/config";
 import { ftConfig } from "./ft/config";
 import { stConfig } from "./st/config";
 import { imConfig } from "./im/config";
+import { catalogConfig } from "./catalog/config";
+import { contactConfig } from "./contact/config";
 
 // Global force-refresh context (used by logo click to trigger GitHub refresh)
 export const RefreshContext = createContext<{ triggerRefresh: () => void }>({ triggerRefresh: () => {} });
@@ -84,8 +88,8 @@ export default function App() {
   // Force-refresh trigger (bumps key to re-fetch GitHub data)
   const triggerRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
-  // New order: RD -> ML -> FT -> ST -> IM
-  const dimensions = [rdConfig, mlConfig, ftConfig, stConfig, imConfig];
+  // New order: RD -> ML -> FT -> ST -> IM -> CATALOG -> CONTACT
+  const dimensions = [rdConfig, mlConfig, ftConfig, stConfig, imConfig, catalogConfig, contactConfig];
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -141,6 +145,8 @@ export default function App() {
       SectionId.FT,
       SectionId.ST,
       SectionId.IM,
+      SectionId.CATALOG,
+      SectionId.CONTACT,
     ];
     if (
       sections[scrollPosition] &&
@@ -162,6 +168,8 @@ export default function App() {
       SectionId.FT,
       SectionId.ST,
       SectionId.IM,
+      SectionId.CATALOG,
+      SectionId.CONTACT,
     ];
     const index = sections.indexOf(section);
 
@@ -323,6 +331,12 @@ export default function App() {
                   </div>
                 </div>
               )}
+
+              {/* AV/CATALOG — Business Services Dimension */}
+              {config.id === SectionId.CATALOG && <CatalogDimension />}
+
+              {/* AV/CONTACT — Contact Dimension */}
+              {config.id === SectionId.CONTACT && <ContactDimension />}
             </DimensionSection>
           ))}
         </motion.div>
