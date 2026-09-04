@@ -41,14 +41,14 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
 
   return (
     <motion.div initial={{ x: '100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }} transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[60] md:inset-y-0 md:right-0 md:left-auto md:w-[46rem] bg-black/50 backdrop-blur-xl flex flex-col border border-white/15 shadow-2xl overflow-hidden">
+      className="fixed inset-0 z-[120] md:inset-y-0 md:right-0 md:left-auto md:w-[46rem] bg-black flex flex-col border border-white/15 shadow-2xl overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
-        <button onClick={onClose} className="flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black">
+        <button onClick={onClose} className="relative z-[130] flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
           <span className="w-5 h-5 flex items-center justify-center border border-white/25 group-hover:border-white/50">←</span>
           Back
         </button>
-        <div className="flex items-center gap-1 font-mono text-[9px]">
+        <div className="relative z-[130] flex items-center gap-1 font-mono text-[9px]">
           <button onClick={() => setMode('view')} className={`px-2 py-1 border ${mode === 'view' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>View</button>
           <button onClick={() => { setMode('edit'); setEdited(content || '') }} className={`px-2 py-1 border ${mode === 'edit' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>Edit</button>
           <button onClick={downloadMd} className="px-2 py-1 border border-white/15 text-white/40 hover:text-white/70">Save</button>
@@ -145,9 +145,9 @@ export default function Library() {
   }, [cat, items, search])
 
   return (
-    <div className="min-h-[100dvh] bg-black/50 text-white font-sans selection:bg-white selection:text-black">
+    <div className="min-h-[100dvh] bg-black text-white font-sans selection:bg-white selection:text-black">
       {/* Library header */}
-      <header className="sticky top-0 z-40 bg-black/50 backdrop-blur-md border-b border-white/15 px-5 md:px-10 py-4">
+      <header className="sticky top-0 z-30 bg-black border-b border-white/15 px-5 md:px-10 py-4">
         <div className="max-w-6xl mx-auto flex items-center gap-3 mb-3">
           <h1 className="text-sm font-black tracking-tighter uppercase text-white">Library</h1>
           <span className="font-mono text-[9px] text-white/30">/ file manager</span>
