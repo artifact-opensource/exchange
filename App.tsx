@@ -6,7 +6,7 @@ import DimensionSection from "./components/DimensionSection";
 import NavigationOverlay from "./components/NavigationOverlay";
 import TerminalOverlay from "./components/TerminalOverlay";
 import ProjectCatalogue from "./components/ProjectCatalogue";
-import ResearchPortal from "./components/ResearchPortal";
+import Library from "./components/Library";
 import InfoOverlay from "./components/InfoOverlay";
 import BlockchainHero from "./components/BlockchainHero";
 import LandingPage from "./components/LandingPage";
@@ -280,7 +280,7 @@ export default function App() {
               isHero={config.id === SectionId.FT}
             >
               {/* AV/RD */}
-              {config.id === SectionId.RD && <ResearchPortal />}
+              {config.id === SectionId.RD && <Library />}
 
               {/* AV/FT specific Hero */}
               {config.id === SectionId.FT && <BlockchainHero />}
