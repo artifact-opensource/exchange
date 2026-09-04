@@ -58,7 +58,7 @@ const CatalogDimension: React.FC = () => {
             <span className="text-[9px] font-mono font-bold tracking-[0.4em] uppercase text-white/40">AV / CATALOG</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-white/90 leading-none">CATALOG</h2>
-          <p className="text-xs text-white/30 font-mono mt-2 tracking-wider">Services, tiers, and operational footprint</p>
+          <p className="text-xs text-white/30 font-mono mt-2 tracking-wider">Services · Tiers & Operational Footprint</p>
         </div>
 
         {/* Domains */}

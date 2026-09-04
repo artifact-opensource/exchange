@@ -35,7 +35,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0 bg-[#030712]/90">
         <button onClick={onClose} className="flex items-center gap-2 text-white/60 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
-          <span className="w-5 h-5 flex items-center justify-center rounded-full border border-white/20 group-hover:border-white/40">←</span>
+          <span className="w-5 h-5 flex items-center justify-center  border border-white/20 group-hover:border-white/40">←</span>
           Back to Library
         </button>
         <span className="text-[10px] font-mono text-white/20 truncate max-w-[40%]">{item.category || 'Paper'}</span>
@@ -50,7 +50,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
         {item.cid && <p className="text-[9px] font-mono text-blue-400/60 break-all mb-4">CID: {item.cid}</p>}
         {item.tags && Array.isArray(item.tags) && (item.tags as string[]).length > 0 && (
           <div className="flex flex-wrap gap-1 mb-5">
-            {(item.tags as string[]).map(t => <span key={t} className="px-2 py-0.5 rounded text-[9px] font-mono text-white/40 bg-white/[0.05] border border-white/[0.08]">{t}</span>)}
+            {(item.tags as string[]).map(t => <span key={t} className="px-2 py-0.5   text-[9px] font-mono text-white/40 bg-white/[0.05] border border-white/[0.08]">{t}</span>)}
           </div>
         )}
         {item.summary && <p className="text-sm text-white/50 mb-5 italic">{item.summary}</p>}
@@ -63,7 +63,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
             <h4 className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em] mb-3">Related Papers</h4>
             <div className="space-y-2">
               {related.slice(0, 4).map(r => (
-                <button key={r.id} onClick={() => { setContent(null); setLoading(true); }} className="w-full text-left px-3 py-2 rounded bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/20 transition-all">
+                <button key={r.id} onClick={() => { setContent(null); setLoading(true); }} className="w-full text-left px-3 py-2   bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/20 transition-all">
                   <p className="text-xs font-medium text-white/70 truncate">{r.title}</p>
                 </button>
               ))}
@@ -81,6 +81,13 @@ export default function Library() {
   const [selected, setSelected] = useState<IndexedResearchItem | null>(null)
   const [related, setRelated] = useState<IndexedResearchItem[]>([])
   const [search, setSearch] = useState('')
+
+  // Close sheet on page change / scroll away
+  useEffect(() => {
+    const onScroll = () => setSelected(null);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); setSelected(null); };
+  }, [])
 
   useEffect(() => {
     async function init() { try { await initDB(); await buildFullIndex(RESEARCH_CATALOG); const all = await searchIndex(''); setItems(all) } catch { setItems(RESEARCH_CATALOG.map(i => ({ ...i, indexedAt: Date.now(), userTags: [], aiTags: [], semanticScore: i.importance/10, colorCode: 'white', contextLayers: i.context ? [i.context.field, i.context.domain, i.context.specificTopic] : [] }))) } }
@@ -117,7 +124,7 @@ export default function Library() {
           <h1 className="text-sm font-black tracking-tighter uppercase text-white">Library</h1>
           <span className="font-mono text-[9px] text-white/30">/ file manager</span>
         </div>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter papers…" className="w-full max-w-md bg-white/[0.04] border border-white/10 text-white/80 text-xs font-mono placeholder:text-white/25 px-3 py-2 rounded focus:outline-none focus:border-white/30" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter papers…" className="w-full max-w-md bg-white/[0.04] border border-white/10 text-white/80 text-xs font-mono placeholder:text-white/25 px-3 py-2   focus:outline-none focus:border-white/30" />
       </header>
 
       <main className="max-w-6xl mx-auto px-5 md:px-10 py-8 pb-24">
@@ -131,7 +138,7 @@ export default function Library() {
                 const label = c === 'Transformers/Architecture' ? 'AI / Arch' : c === 'Consciousness/Philosophy' ? 'Consciousness' : c === 'Blockchain/Governance' ? 'Governance' : c === 'Security' ? 'Security' : c === 'AI/ML' ? 'AI / ML' : c === 'Tokenomics' ? 'Tokenomics' : 'Other'
                 const color = CATEGORY_COLORS[c as ResearchCategory] || '#888'
                 return (
-                  <button key={c} onClick={() => { setCat(c); setSearch('') }} className="group text-left p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/25 hover:bg-white/[0.05] transition-all">
+                  <button key={c} onClick={() => { setCat(c); setSearch('') }} className="group text-left p-5  bg-white/[0.02] border border-white/[0.06] hover:border-white/25 hover:bg-white/[0.05] transition-all">
                     <FileIcon color={color} />
                     <h3 className="text-sm font-bold text-white/90 mt-3">{label}</h3>
                     <p className="text-[10px] font-mono text-white/30">{count} papers</p>
@@ -152,14 +159,14 @@ export default function Library() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredPapers.map(p => (
-                <button key={p.id} onClick={() => openPaper(p)} className="text-left px-5 py-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/25 transition-all group">
+                <button key={p.id} onClick={() => openPaper(p)} className="text-left px-5 py-4  bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/25 transition-all group">
                   <h3 className="text-sm font-semibold text-white/90 leading-snug group-hover:text-white transition-colors line-clamp-2">{p.title}</h3>
                   <div className="flex items-center gap-2 mt-2 text-[10px] font-mono text-white/30">
                     <span>{p.source || 'local'}</span>
                     <span>·</span><span>Imp {p.importance}/10</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
-                    {(p.tags || []).slice(0, 3).map(t => <span key={t} className="text-[8px] font-mono text-white/30 bg-white/[0.04] px-1.5 py-0.5 rounded">{t}</span>)}
+                    {(p.tags || []).slice(0, 3).map(t => <span key={t} className="text-[8px] font-mono text-white/30 bg-white/[0.04] px-1.5 py-0.5  ">{t}</span>)}
                   </div>
                 </button>
               ))}
