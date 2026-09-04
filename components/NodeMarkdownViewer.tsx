@@ -8,26 +8,69 @@ interface NodeMarkdownViewerProps {
   nodeId: string;
   metadata: string;
   onClose: () => void;
+  /** Full markdown content — passed directly so the parent controls the fetch */
+  content?: string;
+  /** Image URL for papers stored as images (IPFS CIDs, etc.) */
+  imageUrl?: string;
+  /** Loading state — lets parent control loading externally */
+  loading?: boolean;
 }
 
-const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({ nodeId, metadata, onClose }) => {
-  const [content, setContent] = React.useState('');
-  const [loading, setLoading] = React.useState(true);
+function stripFrontmatter(text: string): string {
+  // Remove YAML frontmatter ---...--- from the top of the document
+  if (text.trimStart().startsWith('---')) {
+    const endIdx = text.indexOf('\n---', 3);
+    if (endIdx !== -1) {
+      return text.slice(endIdx + 4).trimStart();
+    }
+  }
+  return text;
+}
+
+function cleanMarkdown(text: string): string {
+  // Strip frontmatter
+  let cleaned = stripFrontmatter(text);
+  // Normalise line endings
+  cleaned = cleaned.replace(/\r\n/g, '\n');
+  // Collapse 3+ consecutive blank lines to 2 (clean up excessive spacing)
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  // Remove trailing whitespace on lines
+  cleaned = cleaned.replace(/[ \t]+$/gm, '');
+  return cleaned.trim();
+}
+
+const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({
+  nodeId,
+  metadata,
+  onClose,
+  content: externalContent,
+  imageUrl,
+  loading: externalLoading,
+}) => {
+  const [internalContent, setInternalContent] = React.useState('');
+  const [internalLoading, setInternalLoading] = React.useState(true);
+
+  // Use external content/loading if provided, otherwise fall back to internal fetch
+  const loading = externalLoading !== undefined ? externalLoading : internalLoading;
+  const content = cleanMarkdown(externalContent ?? internalContent);
 
   React.useEffect(() => {
-    // If a node is an IPFS directory node or similar, we fetch the live content
+    if (externalContent !== undefined) {
+      setInternalLoading(false);
+      return;
+    }
+    // Fetch live content from IPFS index endpoint
     fetch('/api/ipfs/index')
       .then(res => res.text())
       .then(text => {
-        const header = `# Node Specifications: ${nodeId}\n\n## Overview\n${metadata}\n\n`;
-        setContent(header + text);
-        setLoading(false);
+        setInternalContent(text);
+        setInternalLoading(false);
       })
-      .catch(err => {
-        setContent(`# Node Specifications: ${nodeId}\n\n## Overview\n${metadata}\n\n> **Error**: Failed to connect to IPFS gateway.`);
-        setLoading(false);
+      .catch(() => {
+        setInternalContent(`# Node Specifications: ${nodeId}\n\n## Overview\n${metadata}\n\n> **Error**: Failed to connect to IPFS gateway.`);
+        setInternalLoading(false);
       });
-  }, [nodeId, metadata]);
+  }, [nodeId, metadata, externalContent]);
 
   const modalContent = (
     <div 
@@ -78,7 +121,7 @@ const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({ nodeId, metadat
 
         {/* Content */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 bg-[#020202] relative" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '16px 16px' }}>
-          <div className="max-w-none mx-auto prose prose-invert prose-sm md:prose-base 
+          <div className="max-w-none mx-auto prose prose-invert prose-sm md:prose-base
             prose-p:text-white/70 prose-p:leading-relaxed prose-p:font-sans
             prose-headings:font-mono prose-headings:text-cyan-400 prose-headings:uppercase prose-headings:tracking-widest prose-headings:font-bold
             prose-h1:text-xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4 prose-h1:mb-8
@@ -95,8 +138,23 @@ const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({ nodeId, metadat
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
                 <span>Establishing uplink... fetching {nodeId}...</span>
               </div>
+            ) : imageUrl ? (
+              <div className="flex flex-col items-center">
+                <img
+                  src={imageUrl}
+                  alt={nodeId}
+                  className="max-w-full h-auto border border-white/10 rounded"
+                  loading="lazy"
+                />
+              </div>
             ) : (
-              <ReactMarkdown>{content}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p className="my-3">{children}</p>,
+                  h1: ({ children }) => <h1 className="mt-0">{children}</h1>,
+                  br: () => <br />,
+                }}
+              >{content}</ReactMarkdown>
             )}
           </div>
         </div>

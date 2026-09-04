@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { RESEARCH_CATALOG, CATEGORY_COLORS, CATEGORY_LABELS, ResearchCategory, ResearchItem } from '@/lib/research-data'
 import { initDB, buildFullIndex, search as searchIndex, getRelated, getContextPathway, IndexedResearchItem } from '@/lib/research-index'
-import NodeGraph from './NodeGraph'
+import BrainMap from './BrainMap'
 import ResearchBrowser from './ResearchBrowser'
 import { Search, X, Loader2, ExternalLink, Database, Beaker, Cpu, Shield, Clock, Layers, Network, Brain, Globe } from 'lucide-react'
 
@@ -202,7 +202,7 @@ export default function ResearchPortal() {
         {/* Graph / List view */}
         <div className="flex-1 min-w-0 min-h-[420px] lg:min-h-0">
           {view === 'graph' ? (
-            <NodeGraph
+            <BrainMap
               items={filteredItems}
               onNodeClick={handleNodeClick}
               selectedId={selectedItem?.id}
@@ -295,12 +295,16 @@ export default function ResearchPortal() {
             {/* Links */}
             <div className="border-t border-white/10 pt-4 space-y-2">
               {selectedItem.cid && (
-                <button
-                  onClick={() => setBrowserUrl(`https://ipfs.io/ipfs/${selectedItem.cid}`)}
-                  className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 w-full text-left"
-                >
-                  <Globe className="h-3 w-3" /> Open in Browser: IPFS {selectedItem.cid.slice(0, 20)}...
-                </button>
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => setBrowserUrl(`https://ipfs.io/ipfs/${selectedItem.cid}`)}
+                    className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 w-full text-left"
+                  >
+                    <Globe className="h-3 w-3 shrink-0" />
+                    <span className="truncate font-mono">IPFS: {selectedItem.cid.slice(0, 20)}…</span>
+                  </button>
+                  <span className="text-[9px] font-mono text-white/25 px-1">{selectedItem.cid}</span>
+                </div>
               )}
               {selectedItem.hfModel && (
                 <button
@@ -311,12 +315,13 @@ export default function ResearchPortal() {
                 </button>
               )}
               {selectedItem.localPath && (
-                <a
-                  href={`file://${selectedItem.localPath}`}
-                  className="flex items-center gap-2 text-xs text-white/40"
-                >
-                  <Database className="h-3 w-3" /> {selectedItem.localPath}
-                </a>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 text-xs text-white/40">
+                    <Database className="h-3 w-3 shrink-0" />
+                    <span className="truncate font-mono text-[10px]">Local path</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-white/25 px-1 break-all leading-relaxed">{selectedItem.localPath}</span>
+                </div>
               )}
             </div>
 

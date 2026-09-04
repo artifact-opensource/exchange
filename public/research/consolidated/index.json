@@ -1,0 +1,305 @@
+{
+  "count": 140,
+  "papers": [
+    {
+      "id": "ipfs-neural-topology-v4",
+      "title": "Neural Topology v4",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+      "title": "Lattice Consensus Architecture",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "bafybeih5b4kcx2v4mndp3sc7p4x2oayp3uuxp3j4c45u6o5e44o6wxbuea",
+      "title": "Synthetic Entropy Generation",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "bafybeib7vok53z3h4f3z25p34l4g4cvy7yv6c4y4s4u4k54c4n4x4g4o4m",
+      "title": "Gladius Research Corpus",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-qorvex-v8-shards",
+      "title": "Qorvex V8 Shards",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-artifact-articles",
+      "title": "Artifact Articles Dataset",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-artifact-research",
+      "title": "Artifact Research Data",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-uranium-series",
+      "title": "Uranium Series Dataset",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-arc-whitepaper",
+      "title": "ARC Whitepaper Data",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-gladius-training",
+      "title": "Gladius Training Data",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-lattice-clock",
+      "title": "Lattice Clock Temporal Data",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-shared-socket-theorem",
+      "title": "Shared Socket Theorem Data",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-arc-research",
+      "title": "ARC Research Corpus",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-gladius-model",
+      "title": "Gladius",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-qorvex-v9",
+      "title": "Qorvex V9",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-qorvex-v8",
+      "title": "Qorvex V8",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-gladius-v2-kernel",
+      "title": "Gladius V2 Kernel",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "hf-project-emergent",
+      "title": "Project Emergent",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-resonance-architecture",
+      "title": "GLADIUS Resonance Architecture",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-forward-pass",
+      "title": "GLADIUS Forward Pass Map",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-moda-depth",
+      "title": "GLADIUS MoDA Depth Attention",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-cognition-awakening",
+      "title": "GLADIUS Cognition Awakening",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-progressive-expansion",
+      "title": "Progressive Growth: 6.9M to 141M Parameters",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-lattice-clock-ieee",
+      "title": "Lattice Clock Temporal Quantization (IEEE)",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-distillation-report",
+      "title": "Cross-Architecture Knowledge Distillation: GPT-2 to GLADIUS",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-mnist-dissection",
+      "title": "GLADIUS MNIST Dissection",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-invariant-analysis",
+      "title": "The Invariant: What GLADIUS Is Actually Learning",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-spectre-cycle",
+      "title": "GLADIUS Spectre Cycle",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-habitat-paper",
+      "title": "GLADIUS Habitat: Cognitive Environment",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-muonclip",
+      "title": "MuonClip Orthogonal Optimization",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-time-series",
+      "title": "GLADIUS Seed x Time Series Definitive",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-cell-division",
+      "title": "Cell Division: Function-Preserving Neural Growth",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-multi-script",
+      "title": "Multi-Script Attention: Root Writing Systems",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-cross-modal-geometry",
+      "title": "GLADIUS Cross-Modal Geometry",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-vlm-feeding",
+      "title": "GLADIUS VLM Feeding Pipeline",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-hatchling",
+      "title": "GLADIUS Hatchling Training",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-broadcast",
+      "title": "GLADIUS Broadcast Experiment",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-adaptive-cognitive",
+      "title": "GLADIUS Adaptive Cognitive Model",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-distillation-edge",
+      "title": "GLADIUS Distillation Edge",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-muonclip-collapse",
+      "title": "MuonClip vs Function Word Collapse Thesis",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-golden-ratio",
+      "title": "Golden Ratio Investigation",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-geometry",
+      "title": "GLADIUS Geometry Derivation",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-allspark",
+      "title": "AllSpark Numbers Analysis",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-stress-test",
+      "title": "GLADIUS Stress Test Report",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-nanobot-audit",
+      "title": "Nanobot Audit Report",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-moda-v2",
+      "title": "MoDA V2 Synthase Design",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-depth-attention",
+      "title": "Depth Attention Survey 2026",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-atp-resonance",
+      "title": "ATP Resonance Analysis",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-karpathy",
+      "title": "Karpathy Trilogy Dissection",
+      "source": "registry",
+      "paginated": "consolidated"
+    },
+    {
+      "id": "gladius-muonclip-benchmark",
+      "title": "MuonClip Benchmark Results",
+      "source": "registry",
+      "paginated": "consolidated"
+    }
+  ]
+}
