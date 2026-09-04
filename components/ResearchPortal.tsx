@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { RESEARCH_CATALOG, CATEGORY_COLORS, CATEGORY_LABELS, ResearchCategory, ResearchItem } from '@/lib/research-data'
 import { initDB, buildFullIndex, search as searchIndex, getRelated, getContextPathway, IndexedResearchItem } from '@/lib/research-index'
-import BrainMap from './BrainMap'
+import SemanticLinkView from './SemanticLinkView'
 import ResearchBrowser from './ResearchBrowser'
 import { Search, X, Loader2, ExternalLink, Database, Beaker, Cpu, Shield, Clock, Layers, Network, Brain, Globe } from 'lucide-react'
 
@@ -202,7 +202,7 @@ export default function ResearchPortal() {
         {/* Graph / List view */}
         <div className="flex-1 min-w-0 min-h-[420px] lg:min-h-0">
           {view === 'graph' ? (
-            <BrainMap
+            <SemanticLinkView
               items={filteredItems}
               onNodeClick={handleNodeClick}
               selectedId={selectedItem?.id}
