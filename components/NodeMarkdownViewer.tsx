@@ -72,7 +72,7 @@ const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({
         setInternalLoading(false);
       })
       .catch(() => {
-        setInternalContent(`# Document: ${nodeId || basename || 'Unknown'}\n\n> Note: Paper content not available locally. CID reference: ${metadata || '(none)'.}`);
+        setInternalContent(`# Document: ${nodeId || basename || 'Unknown'}\n\n> Note: Paper content not available locally. CID reference: ${metadata || '(none)'}.`);
         setInternalLoading(false);
       });
   }, [nodeId, metadata, externalContent]);
