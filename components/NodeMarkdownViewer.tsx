@@ -59,15 +59,20 @@ const NodeMarkdownViewer: React.FC<NodeMarkdownViewerProps> = ({
       setInternalLoading(false);
       return;
     }
-    // Fetch live content from IPFS index endpoint
-    fetch('/api/ipfs/index')
-      .then(res => res.text())
+    // Try local paper first, then fall back gracefully
+    const basename = nodeId ? (nodeId.includes('/') ? nodeId.split('/').pop() : nodeId) || '' : ''
+    const fileName = basename.endsWith('.md') ? basename : `${basename || nodeId || 'unknown'}.md`
+    fetch(`/papers/consolidated/${fileName}`)
+      .then(r => {
+        if (!r.ok) throw new Error('not found');
+        return r.text();
+      })
       .then(text => {
         setInternalContent(text);
         setInternalLoading(false);
       })
       .catch(() => {
-        setInternalContent(`# Node Specifications: ${nodeId}\n\n## Overview\n${metadata}\n\n> **Error**: Failed to connect to IPFS gateway.`);
+        setInternalContent(`# Document: ${nodeId || basename || 'Unknown'}\n\n> Note: Paper content not available locally. CID reference: ${metadata || '(none)'.}`);
         setInternalLoading(false);
       });
   }, [nodeId, metadata, externalContent]);

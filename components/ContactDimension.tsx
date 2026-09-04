@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const ContactDimension: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -13,26 +13,45 @@ const ContactDimension: React.FC = () => {
     signoff: ''
   });
 
+  // Parallax: same bg-letter drift as other dimension sections
+  const bgLetterRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = bgLetterRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let raf = 0;
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+    const onMove = (e: MouseEvent) => {
+      target.x = e.clientX / window.innerWidth - 0.5;
+      target.y = e.clientY / window.innerHeight - 0.5;
+    };
+    const loop = () => {
+      current.x += (target.x - current.x) * 0.06;
+      current.y += (target.y - current.y) * 0.06;
+      el.style.transform = `translate(calc(-50% + ${(-current.x * 60).toFixed(2)}px), calc(-50% + ${(-current.y * 40).toFixed(2)}px))`;
+      raf = requestAnimationFrame(loop);
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    raf = requestAnimationFrame(loop);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const handle = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [k]: e.target.value });
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Open mailto with form data — owner: ali.shakil@artifactvirtual.com
     const body = [
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      `Purpose: ${form.purpose}`,
-      ``,
-      `Scope:\n${form.scope}`,
-      ``,
-      `Budget:\n${form.budget}`,
-      ``,
-      `Risk:\n${form.risk}`,
-      ``,
-      `Timeline: ${form.timeline} business days`,
-      ``,
+      `Name: ${form.name}`, `Email: ${form.email}`, `Purpose: ${form.purpose}`, ``,
+      `Scope:\n${form.scope}`, ``,
+      `Budget:\n${form.budget}`, ``,
+      `Risk:\n${form.risk}`, ``,
+      `Timeline: ${form.timeline} business days`, ``,
       `Stakeholder sign-off:\n${form.signoff}`
     ].join('\n');
     const subject = `Artifact Virtual // ${form.purpose.toUpperCase()} // ${form.name || 'contact'}`;
@@ -41,11 +60,32 @@ const ContactDimension: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center overflow-y-auto px-6 md:px-12 py-16">
-      <div className="max-w-4xl w-full space-y-10">
+    <div className="w-full h-full flex items-start overflow-y-auto px-6 md:px-12 py-16 relative">
+      {/* Parallax bg letter — same as other sections */}
+      <div
+        ref={bgLetterRef}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] will-change-transform"
+      >
+        <h1 className="text-[30vw] font-black uppercase tracking-tighter leading-none select-none text-white">CONTACT</h1>
+      </div>
+
+      {/* Top accent line */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-20 md:h-32 bg-gradient-to-b from-transparent to-white/20" />
+
+      <div className="max-w-4xl w-full space-y-10 relative z-10">
+        {/* Header — matching other sections */}
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+            <span className="text-[9px] font-mono font-bold tracking-[0.4em] uppercase text-white/40">AV / CONTACT</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-white/90 leading-none">CONTACT</h2>
+          <p className="text-xs text-white/30 font-mono mt-2 tracking-wider">Operations · Board · Enterprise Engagements</p>
+        </div>
+
         {/* Channels */}
         <div>
-          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase mb-5">02 / CHANNELS</p>
+          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase mb-5">01 / CHANNELS</p>
           <div className="space-y-3">
             <div className="border border-white/10 bg-white/[0.02] p-5 hover:border-white/25 hover:bg-white/[0.04] transition-all">
               <p className="font-mono text-[9px] tracking-[0.25em] text-white/40 uppercase mb-2">OPERATIONS / BOARD</p>
@@ -58,7 +98,7 @@ const ContactDimension: React.FC = () => {
 
         {/* Contact Form */}
         <div>
-          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase mb-5">03 / SUBMIT AUDIT — CONTACT FORM</p>
+          <p className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase mb-5">02 / SUBMIT — CONTACT FORM</p>
           {submitted ? (
             <div className="border border-emerald-500/30 bg-emerald-500/5 p-6">
               <p className="font-mono text-[10px] tracking-[0.3em] text-emerald-400 uppercase mb-2">Submission packaged</p>
