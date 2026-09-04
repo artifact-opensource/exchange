@@ -16,56 +16,75 @@ function FileIcon({ color = '#fff' }: { color?: string }) {
   )
 }
 
-/* Slide-over paper viewer */
+/* Slide-over paper viewer with built-in markdown editor */
 function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; related: IndexedResearchItem[]; onClose: () => void }) {
   const [content, setContent] = useState<string | null>(null)
+  const [edited, setEdited] = useState<string>('')
+  const [mode, setMode] = useState<'view' | 'edit'>('view')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setContent(null); setLoading(true)
+    setContent(null); setEdited(''); setMode('view'); setLoading(true)
     const basename = item.localPath ? item.localPath.split('/').pop() || '' : ''
     const url = basename ? `/papers/consolidated/${basename}` : ''
     if (!url) { setLoading(false); return }
     fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(t => { setContent(t); setLoading(false) }).catch(() => { setContent('Not available locally.'); setLoading(false) })
   }, [item.id])
 
+  const downloadMd = () => {
+    const blob = new Blob([edited || content || ''], { type: 'text/markdown' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = (item.localPath?.split('/').pop() || 'paper.md')
+    a.click()
+  }
+
   return (
     <motion.div initial={{ x: '100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }} transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[60] bg-[#030712]/95 backdrop-blur-md flex flex-col md:ml-auto md:w-[46rem] md:border-l md:border-white/10 shadow-2xl overflow-hidden">
+      className="fixed inset-0 z-[60] md:inset-y-0 md:right-0 md:left-auto md:w-[46rem] bg-black/50 backdrop-blur-xl flex flex-col border border-white/15 shadow-2xl overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0 bg-[#030712]/90">
-        <button onClick={onClose} className="flex items-center gap-2 text-white/60 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
-          <span className="w-5 h-5 flex items-center justify-center  border border-white/20 group-hover:border-white/40">←</span>
-          Back to Library
+      <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
+        <button onClick={onClose} className="flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
+          <span className="w-5 h-5 flex items-center justify-center border border-white/25 group-hover:border-white/50">←</span>
+          Back
         </button>
-        <span className="text-[10px] font-mono text-white/20 truncate max-w-[40%]">{item.category || 'Paper'}</span>
+        <div className="flex items-center gap-1 font-mono text-[9px]">
+          <button onClick={() => setMode('view')} className={`px-2 py-1 border ${mode === 'view' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>View</button>
+          <button onClick={() => { setMode('edit'); setEdited(content || '') }} className={`px-2 py-1 border ${mode === 'edit' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>Edit</button>
+          <button onClick={downloadMd} className="px-2 py-1 border border-white/15 text-white/40 hover:text-white/70">Save</button>
+        </div>
       </div>
-      {/* Body scroll */}
+      {/* Body */}
       <div className="flex-1 overflow-y-auto px-5 py-6 md:px-8">
         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white leading-tight mb-2">{item.title}</h2>
-        <div className="flex gap-3 text-[10px] font-mono text-white/30 mb-3">
+        <div className="flex gap-3 text-[10px] font-mono text-white/35 mb-3">
           <span>{item.source || 'local'}</span>
           <span>·</span><span>Imp {item.importance}/10</span>
         </div>
-        {item.cid && <p className="text-[9px] font-mono text-blue-400/60 break-all mb-4">CID: {item.cid}</p>}
+        {item.cid && <p className="text-[9px] font-mono text-white/40 break-all mb-4">CID: {item.cid}</p>}
         {item.tags && Array.isArray(item.tags) && (item.tags as string[]).length > 0 && (
           <div className="flex flex-wrap gap-1 mb-5">
-            {(item.tags as string[]).map(t => <span key={t} className="px-2 py-0.5   text-[9px] font-mono text-white/40 bg-white/[0.05] border border-white/[0.08]">{t}</span>)}
+            {(item.tags as string[]).map(t => <span key={t} className="px-2 py-0.5 text-[9px] font-mono text-white/50 bg-white/[0.05] border border-white/10">{t}</span>)}
           </div>
         )}
-        {item.summary && <p className="text-sm text-white/50 mb-5 italic">{item.summary}</p>}
-        <div className="border-t border-white/10 pt-5">
-          <h3 className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em] mb-3">Full Text</h3>
-          {loading ? <p className="text-xs text-white/30 font-mono">Loading…</p> : <pre className="font-mono text-[11px] md:text-xs text-white/70 leading-loose whitespace-pre-wrap">{content}</pre>}
+        {item.summary && <p className="text-sm text-white/60 mb-5 italic">{item.summary}</p>}
+        <div className="border-t border-white/15 pt-5">
+          {mode === 'edit' ? (
+            <textarea value={edited} onChange={e => setEdited(e.target.value)} spellCheck={false}
+              className="w-full min-h-[60vh] bg-black/40 border border-white/15 text-white/80 font-mono text-[11px] md:text-xs leading-loose p-3 focus:outline-none focus:border-white/30 resize-y" />
+          ) : (
+            <>
+              <h3 className="text-[10px] font-mono text-white/35 uppercase tracking-[0.3em] mb-3">Paper</h3>
+              {loading ? <p className="text-xs text-white/35 font-mono">Loading…</p> : <pre className="font-mono text-[11px] md:text-xs text-white/75 leading-loose whitespace-pre-wrap">{content}</pre>}
+            </>
+          )}
         </div>
-        {related.length > 0 && (
-          <div className="mt-8 pt-5 border-t border-white/10">
-            <h4 className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em] mb-3">Related Papers</h4>
+        {related.length > 0 && mode === 'view' && (
+          <div className="mt-8 pt-5 border-t border-white/15">
+            <h4 className="text-[10px] font-mono text-white/35 uppercase tracking-[0.3em] mb-3">Related</h4>
             <div className="space-y-2">
               {related.slice(0, 4).map(r => (
-                <button key={r.id} onClick={() => { setContent(null); setLoading(true); }} className="w-full text-left px-3 py-2   bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/20 transition-all">
-                  <p className="text-xs font-medium text-white/70 truncate">{r.title}</p>
-                </button>
+                <p key={r.id} className="px-3 py-2 bg-white/[0.03] border border-white/10 text-xs font-medium text-white/70 truncate">{r.title}</p>
               ))}
             </div>
           </div>
@@ -82,12 +101,21 @@ export default function Library() {
   const [related, setRelated] = useState<IndexedResearchItem[]>([])
   const [search, setSearch] = useState('')
 
-  // Close sheet on page change / scroll away
   useEffect(() => {
     const onScroll = () => setSelected(null);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => { window.removeEventListener('scroll', onScroll); setSelected(null); };
   }, [])
+
+  // Lock body scroll when overlay is open (prevents horizontal snap scroll from triggering)
+  useEffect(() => {
+    if (selected) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [selected])
 
   useEffect(() => {
     async function init() { try { await initDB(); await buildFullIndex(RESEARCH_CATALOG); const all = await searchIndex(''); setItems(all) } catch { setItems(RESEARCH_CATALOG.map(i => ({ ...i, indexedAt: Date.now(), userTags: [], aiTags: [], semanticScore: i.importance/10, colorCode: 'white', contextLayers: i.context ? [i.context.field, i.context.domain, i.context.specificTopic] : [] }))) } }
@@ -117,9 +145,9 @@ export default function Library() {
   }, [cat, items, search])
 
   return (
-    <div className="min-h-[100dvh] bg-[#030712] text-white font-sans selection:bg-white selection:text-black">
+    <div className="min-h-[100dvh] bg-black/50 text-white font-sans selection:bg-white selection:text-black">
       {/* Library header */}
-      <header className="sticky top-0 z-40 bg-[#030712]/90 backdrop-blur-md border-b border-white/10 px-5 md:px-10 py-4">
+      <header className="sticky top-0 z-40 bg-black/50 backdrop-blur-md border-b border-white/15 px-5 md:px-10 py-4">
         <div className="max-w-6xl mx-auto flex items-center gap-3 mb-3">
           <h1 className="text-sm font-black tracking-tighter uppercase text-white">Library</h1>
           <span className="font-mono text-[9px] text-white/30">/ file manager</span>
