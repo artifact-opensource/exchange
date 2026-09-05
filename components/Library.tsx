@@ -42,7 +42,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
 
   return (
     <motion.div initial={{ x: '-100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '-100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }}transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[120] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/70 backdrop-blur-xl backdrop-saturate-150">
+      className="fixed inset-0 z-[9999] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/85 backdrop-blur-xl backdrop-saturate-150">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
         <div className="flex items-center gap-3">
