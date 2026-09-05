@@ -217,10 +217,10 @@ export default function Library({ onOpenPaper }: { onOpenPaper?: () => void }) {
           <h1 className="text-sm font-black tracking-tighter uppercase text-white">Library</h1>
           <span className="font-mono text-[9px] text-white/30">/ file manager</span>
         </div>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter papers…" className="w-full max-w-md bg-white/[0.04] border border-white/10 text-white/80 text-xs font-mono placeholder:text-white/25 px-3 py-2   focus:outline-none focus:border-white/30" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter…" className="ml-auto w-36 md:w-48 bg-white/[0.04] border border-white/10 text-white/80 text-[10px] font-mono placeholder:text-white/25 px-3 py-1.5 focus:outline-none focus:border-white/30 shrink-0" />
       </header>
 
-      <main className="max-w-6xl mx-auto px-5 md:px-10 py-8 pb-24">
+      <main className="max-w-6xl mx-auto px-5 md:px-10 py-6 pb-4">
         {/* Top-level: folder icons for categories */}
         {!cat && (
           <div>

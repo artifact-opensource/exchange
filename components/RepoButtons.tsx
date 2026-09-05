@@ -41,7 +41,7 @@ const REPOS = [
 
 export default function RepoButtons() {
   return (
-    <div className="w-full mt-6 border-t border-white/10 flex flex-col">
+    <div className="w-full mt-2 border-t border-white/10 flex flex-col">
       {REPOS.map((repo, idx) => (
         <a
           key={repo.label}
