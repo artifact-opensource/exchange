@@ -50,6 +50,18 @@ export default function App() {
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
+  // Restore header visibility when markdown editor closes
+  useEffect(() => {
+    const onAttr = () => {
+      const open = document.body.getAttribute('data-md-editor') === 'true';
+      setIsHeaderVisible(!open);
+    };
+    const observer = new MutationObserver(onAttr);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-md-editor'] });
+    onAttr();
+    return () => observer.disconnect();
+  }, []);
+
   // Escape closes the navigation overlay
   useEffect(() => {
     if (!isSidebarOpen) return;
@@ -280,7 +292,7 @@ export default function App() {
               isHero={config.id === SectionId.FT}
             >
               {/* AV/RD */}
-              {config.id === SectionId.RD && <Library />}
+              {config.id === SectionId.RD && <Library onOpenPaper={() => { setIsSidebarOpen(false); setIsInfoOpen(false); setIsHeaderVisible(false); }} />}
 
               {/* AV/FT specific Hero */}
               {config.id === SectionId.FT && <BlockchainHero />}

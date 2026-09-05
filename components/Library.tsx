@@ -44,7 +44,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
 
   return (
     <motion.div initial={{ x: '-100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '-100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }}transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[201] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/85 backdrop-blur-xl backdrop-saturate-150">
+      className="fixed inset-0 z-[201] md:inset-y-0 md:left-0 md:right-auto w-full flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/85 backdrop-blur-xl backdrop-saturate-150">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
         <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
   )
 }
 
-export default function Library() {
+export default function Library({ onOpenPaper }: { onOpenPaper?: () => void }) {
   const [cat, setCat] = useState<string | null>(null)
   const [items, setItems] = useState<IndexedResearchItem[]>([])
   const [selected, setSelected] = useState<IndexedResearchItem | null>(null)
@@ -160,10 +160,19 @@ export default function Library() {
 
   const openPaper = async (item: IndexedResearchItem) => {
     setSelected(item)
+    onOpenPaper?.()
     try { const rel = await getRelated(item.id); setRelated(rel) } catch { setRelated([]) }
   }
 
-  const closePaper = () => setSelected(null)
+  const closePaper = () => {
+    setSelected(null)
+    document.body.setAttribute('data-md-editor', 'false')
+  }
+
+  // Signal to App that md editor state changed (force-close nav + header on open, restore header on close)
+  React.useEffect(() => {
+    document.body.setAttribute('data-md-editor', selected ? 'true' : 'false')
+  }, [selected])
 
   const filteredPapers = useMemo(() => {
     if (!cat) return []
