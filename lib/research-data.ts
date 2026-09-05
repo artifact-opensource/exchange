@@ -1,6 +1,5 @@
 import type { ResearchItem, ResearchCategory } from "./research-index";
 export type { ResearchItem, ResearchCategory };
-
 // Keyword-based auto-categorization
 export const CATEGORY_KEYWORDS: Record<ResearchCategory, string[]> = {
   "AI/ML": [
@@ -80,11 +79,9 @@ export const CATEGORY_KEYWORDS: Record<ResearchCategory, string[]> = {
   ],
   "Uncategorized": [],
 };
-
 export function autoCategorize(title: string, content?: string): ResearchCategory {
-  const text = `${title} ${""}`.toLowerCase();
+  const text = `${title} ${content ?? ""}`.toLowerCase();
   const scores: Partial<Record<ResearchCategory, number>> = {};
-
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     if (category === "Uncategorized") continue;
     let score = 0;
@@ -97,18 +94,14 @@ export function autoCategorize(title: string, content?: string): ResearchCategor
       scores[category as ResearchCategory] = score;
     }
   }
-
   const entries = Object.entries(scores) as [ResearchCategory, number][];
   if (entries.length === 0) return "Uncategorized";
-
   entries.sort((a, b) => b[1] - a[1]);
   return entries[0][0];
 }
-
 export function autoTag(title: string, content?: string): string[] {
-  const text = `${title} ${""}`.toLowerCase();
+  const text = `${title} ${content ?? ""}`.toLowerCase();
   const tags: string[] = [];
-
   const TAG_KEYWORDS: Record<string, string[]> = {
     "neural-network": ["neural", "neuron", "deep learning"],
     "transformer": ["transformer", "attention", "self-attention"],
@@ -140,19 +133,15 @@ export function autoTag(title: string, content?: string): string[] {
     "simulation": ["simulation", "simulator", "environment"],
     "theory": ["theory", "theorem", "proof", "formal"],
   };
-
   for (const [tag, keywords] of Object.entries(TAG_KEYWORDS)) {
     if (keywords.some((kw) => text.includes(kw))) {
       tags.push(tag);
     }
   }
-
   return tags.slice(0, 6);
 }
-
 export function calculateImportance(item: Partial<ResearchItem>): number {
   let score = 20;
-
   if (item.date) {
     const now = new Date();
     const itemDate = new Date(item.date);
@@ -161,25 +150,20 @@ export function calculateImportance(item: Partial<ResearchItem>): number {
     else if (daysDiff < 90) score += 15;
     else if (daysDiff < 365) score += 5;
   }
-
   if (item.source === "IPFS") score += 10;
   if (item.source === "HuggingFace") score += 15;
   if (item.source === "Enterprise") score += 12;
-
   if (item.tags && item.tags.length > 3) score += 5;
   if (item.cid) score += 10;
   if (item.relatedIds && item.relatedIds.length > 2) score += 10;
-
   return Math.min(100, score);
 }
-
 export function makeItem(base: Omit<ResearchItem, "category" | "tags" | "importance">): ResearchItem {
   const category = autoCategorize(base.title, base.summary);
   const tags = autoTag(base.title, base.summary);
   const importance = calculateImportance({ ...base, tags });
   return { ...base, category, tags, importance };
 }
-
 // === IPFS Research Items ===
 const ipfsItems = [
   makeItem({
@@ -216,7 +200,6 @@ const ipfsItems = [
     context: { field: "Security", domain: "Cryptography", specificTopic: "Entropy Generation" },
   }),
 ];
-
 // === HuggingFace Datasets ===
 const hfDatasetItems = [
   makeItem({
@@ -340,7 +323,6 @@ const hfDatasetItems = [
     author: "amuzetnoM",
   }),
 ];
-
 // === HuggingFace Models ===
 const hfModelItems = [
   makeItem({
@@ -404,21 +386,8 @@ const hfModelItems = [
     author: "amuzetnoM",
   }),
 ];
-
 // === Gladius Research Papers ===
 const gladiusItems = [
-  makeItem({
-    id: "gladius-resonance-architecture",
-    title: "GLADIUS Resonance Architecture",
-    localPath: "/home/adam/worxpace/gladius/research/gladius-resonance-architecture.md",
-    source: "Local",
-    date: "2025-12-10",
-    summary:
-      "Foundational paper describing the resonance architecture underlying GLADIUS, where cognitive patterns emerge from harmonic oscillations in parameter space.",
-    relatedIds: ["hf-gladius-model", "gladius-forward-pass"],
-    context: { field: "Transformers/Architecture", domain: "Cognitive Architecture", specificTopic: "Resonance" },
-    author: "Ali Shakil",
-  }),
   makeItem({
     id: "gladius-forward-pass",
     title: "GLADIUS Forward Pass Map",
@@ -484,7 +453,7 @@ const gladiusItems = [
     title: "Cross-Architecture Knowledge Distillation: GPT-2 to GLADIUS",
     localPath: "/home/adam/worxpace/gladius/research/papers/gladius-distillation-gpt2-report.md",
     source: "Local",
-    date: "2025-66-22",
+    date: "2025-06-22",
     summary:
       "Complete report on distilling GPT-2 (124M) knowledge into GLADIUS (256M) with 94% retention of teacher performance at 58% inference cost.",
     relatedIds: ["hf-gladius-v2-kernel", "gladius-progressive-expansion"],
@@ -660,18 +629,6 @@ const gladiusItems = [
     author: "Ali Shakil",
   }),
   makeItem({
-    id: "gladius-muonclip-collapse",
-    title: "MuonClip vs Function Word Collapse Thesis",
-    localPath: "/home/adam/worxpace/gladius/research/muonclip-collapse-thesis.md",
-    source: "Local",
-    date: "2024-04-10",
-    summary:
-      "Thesis addressing the function word collapse problem in GLADIUS Hatchling when using MuonClip optimization, proposing solutions for repetitive generation.",
-    relatedIds: ["gladius-muonclip", "gladius-hatchling"],
-    context: { field: "AI/ML", domain: "Optimization", specificTopic: "Collapse Prevention" },
-    author: "Ali Shakil",
-  }),
-  makeItem({
     id: "gladius-golden-ratio",
     title: "Golden Ratio Investigation",
     localPath: "/home/adam/worxpace/gladius/research/reports/golden-ratio-investigation.md",
@@ -768,30 +725,6 @@ const gladiusItems = [
     author: "Ali Shakil",
   }),
   makeItem({
-    id: "gladius-karpathy",
-    title: "Karpathy Trilogy Dissection",
-    localPath: "/home/adam/worxpace/gladius/research/karpathy-trilogy-dissection.md",
-    source: "Local",
-    date: "2025-10-01",
-    summary:
-      "Detailed dissection of Andrej Karpathy's neural network trilogy from the perspective of GLADIUS cognitive architecture development.",
-    relatedIds: ["gladius-forward-pass", "gladius-distillation-report"],
-    context: { field: "AI/ML", domain: "Education", specificTopic: "Architecture Analysis" },
-    author: "Ali Shakil",
-  }),
-  makeItem({
-    id: "gladius-muonclip-benchmark",
-    title: "MuonClip Benchmark Results",
-    localPath: "/home/adam/worxpace/gladius/research/muonclip-benchmark.md",
-    source: "Local",
-    date: "2025-09-12",
-    summary:
-      "Comprehensive benchmarking of MuonClip optimizer against Adam, AdamW, and Lion on GLADIUS training tasks with convergence rate comparisons.",
-    relatedIds: ["gladius-muonclip", "gladius-muonclip-collapse"],
-    context: { field: "AI/ML", domain: "Optimization", specificTopic: "Benchmarking" },
-    author: "Ali Shakil",
-  }),
-  makeItem({
     id: "gladius-complete-findings",
     title: "GLADIUS Complete Findings",
     localPath: "/home/adam/worxpace/gladius/research/papers/GLADIUS-COMPLETE-FINDINGS.md",
@@ -801,18 +734,6 @@ const gladiusItems = [
       "Comprehensive compilation of all GLADIUS research findings, including cross-modal invariants, temporal quantization, resonance patterns, and cognitive emergence.",
     relatedIds: ["hf-gladius-model", "gladius-cognition-awakening"],
     context: { field: "AI/ML", domain: "Comprehensive", specificTopic: "All Findings" },
-    author: "Ali Shakil",
-  }),
-  makeItem({
-    id: "gladius-qwen3-distillation",
-    title: "GLADIUS x Qwen3-1.7B Distillation",
-    localPath: "/home/adam/worxpace/gladius/research/gladius-qwen3-distillation-report.md",
-    source: "Local",
-    date: "2025-08-25",
-    summary:
-      "Phase 2 distillation results transferring knowledge from Qwen3-1.7B to GLADIUS, achieving 89% of teacher performance with 40% fewer parameters.",
-    relatedIds: ["gladius-distillation-report", "hf-gladius-v2-kernel"],
-    context: { field: "AI/ML", domain: "Knowledge Distillation", specificTopic: "Qwen3 Transfer" },
     author: "Ali Shakil",
   }),
   makeItem({
@@ -828,7 +749,6 @@ const gladiusItems = [
     author: "Ali Shakil",
   }),
 ];
-
 // === Enterprise Research ===
 const enterpriseItems = [
   makeItem({
@@ -916,7 +836,6 @@ const enterpriseItems = [
     author: "Ali Shakil",
   }),
 ];
-
 // === Consolidated Papers ===
 const consolidatedItems = [
   makeItem({
@@ -1414,7 +1333,6 @@ const consolidatedItems = [
     author: "Ali Shakil",
   }),
 ];
-
 // === ARC Ecosystem Papers ===
 const arcItems = [
   makeItem({
@@ -1538,7 +1456,6 @@ const arcItems = [
     author: "Ali Shakil",
   }),
 ];
-
 // === Design Documents ===
 const designItems = [
   makeItem({
@@ -1614,33 +1531,8 @@ const designItems = [
     author: "Ali Shakil",
   }),
 ];
-
 // === MQL5 Trading Research ===
 const mql5Items = [
-  makeItem({
-    id: "mql5-risk-management",
-    title: "MQL5 Risk Management Fundamentals",
-    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/16820-Risk-Management-Part-1-Fundamentals-for-Building-a-Risk-Management-Class.md",
-    source: "Enterprise",
-    date: "2025-06-15",
-    summary:
-      "Foundations for building a comprehensive risk management class in MQL5, covering position sizing, drawdown limits, and portfolio-level controls.",
-    relatedIds: ["mql5-gains-management", "mql5-trading-system"],
-    context: { field: "Security", domain: "Trading", specificTopic: "Risk Management" },
-    author: "Ali Shakil",
-  }),
-  makeItem({
-    id: "mql5-gains-management",
-    title: "MQL5 Managing Gains Through Structured Exits",
-    localPath: "/home/adam/workspace/enterprise/docs/research/mql5/phase1/articles/19693-Building-a-Trading-System-Part-5-Managing-Gains-Through-Structured-Trade-Exits.md",
-    source: "Enterprise",
-    date: "2025-06-20",
-    summary:
-      "Structured trade exit strategies in MQL5 including trailing stops, time-based exits, and conditional profit-taking mechanisms.",
-    relatedIds: ["mql5-risk-management", "mql5-trading-system"],
-    context: { field: "Tokenomics", domain: "Trading", specificTopic: "Exit Strategies" },
-    author: "Ali Shakil",
-  }),
   makeItem({
     id: "mql5-trading-system",
     title: "MQL5 Professional Trading System",
@@ -1822,7 +1714,6 @@ const mql5Items = [
     author: "Ali Shakil",
   }),
 ];
-
 // === Articles (Creative/Philosophical) ===
 const articleItems = [
   makeItem({
@@ -1958,7 +1849,6 @@ const articleItems = [
     author: "AVA",
   }),
 ];
-
 // === Complete Research Catalog ===
 export const RESEARCH_CATALOG: ResearchItem[] = [
   ...ipfsItems,
@@ -1972,7 +1862,6 @@ export const RESEARCH_CATALOG: ResearchItem[] = [
   ...mql5Items,
   ...articleItems,
 ];
-
 // === Final Exports ===
 export const CATEGORY_COLORS: Record<ResearchCategory, string> = {
   "AI/ML": "#3b82f6",
@@ -1983,7 +1872,6 @@ export const CATEGORY_COLORS: Record<ResearchCategory, string> = {
   "Security": "#ef4444",
   "Uncategorized": "#6b7280",
 };
-
 export const CATEGORY_LABELS: Record<ResearchCategory, string> = {
   "AI/ML": "Artificial Intelligence & Machine Learning",
   "Blockchain/Governance": "Blockchain & Governance",

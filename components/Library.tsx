@@ -40,14 +40,11 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
   }
 
   return (
-    <motion.div initial={{ x: '100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }} transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[120] md:inset-y-0 md:right-0 md:left-auto md:w-[46rem] bg-black flex flex-col border border-white/15 shadow-2xl overflow-hidden">
+    <motion.div initial={{ x: '-100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '-100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }}transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
+      className="fixed inset-0 z-[120] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] bg-black flex flex-col border border-white/15 shadow-2xl overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black">
-        <button onClick={onClose} className="relative z-[130] flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">
-          <span className="w-5 h-5 flex items-center justify-center border border-white/25 group-hover:border-white/50">←</span>
-          Back
-        </button>
+        <button onClick={onClose} className="relative z-[130] flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">Back <span className="w-5 h-5 flex items-center justify-center border border-white/25 group-hover:border-white/50">→</span></button>
         <div className="relative z-[130] flex items-center gap-1 font-mono text-[9px]">
           <button onClick={() => setMode('view')} className={`px-2 py-1 border ${mode === 'view' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>View</button>
           <button onClick={() => { setMode('edit'); setEdited(content || '') }} className={`px-2 py-1 border ${mode === 'edit' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>Edit</button>
