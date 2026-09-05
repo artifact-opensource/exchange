@@ -5,7 +5,8 @@ import { SectionId } from "./types";
 import DimensionSection from "./components/DimensionSection";
 import NavigationOverlay from "./components/NavigationOverlay";
 import TerminalOverlay from "./components/TerminalOverlay";
-import ProjectCatalogue from "./components/ProjectCatalogue";
+import ProjectCatalogue from './components/ProjectCatalogue';
+import RepoButtons from './components/RepoButtons';
 import Library from "./components/Library";
 import InfoOverlay from "./components/InfoOverlay";
 import BlockchainHero from "./components/BlockchainHero";
@@ -292,7 +293,12 @@ export default function App() {
               isHero={config.id === SectionId.FT}
             >
               {/* AV/RD */}
-              {config.id === SectionId.RD && <Library onOpenPaper={() => { setIsSidebarOpen(false); setIsInfoOpen(false); setIsHeaderVisible(false); }} />}
+              {config.id === SectionId.RD && (
+                <>
+                  <Library onOpenPaper={() => { setIsSidebarOpen(false); setIsInfoOpen(false); setIsHeaderVisible(false); }} />
+                  <RepoButtons />
+                </>
+              )}
 
               {/* AV/FT specific Hero */}
               {config.id === SectionId.FT && <BlockchainHero />}
