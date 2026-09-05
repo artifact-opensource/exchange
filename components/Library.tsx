@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { RESEARCH_CATALOG, CATEGORY_LABELS, CATEGORY_COLORS, ResearchCategory } from '@/lib/research-data'
 import { initDB, buildFullIndex, search as searchIndex, getRelated, IndexedResearchItem } from '@/lib/research-index'
+import MorphX from './MorphX'
 
 /* Simple file icon component */
 function FileIcon({ color = '#fff' }: { color?: string }) {
@@ -41,10 +42,13 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
 
   return (
     <motion.div initial={{ x: '-100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '-100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }}transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[120] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] bg-black flex flex-col border border-white/15 shadow-2xl overflow-hidden">
+      className="fixed inset-0 z-[120] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/70 backdrop-blur-xl backdrop-saturate-150">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black">
-        <button onClick={onClose} className="relative z-[130] flex items-center gap-2 text-white/70 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-colors group">Back <span className="w-5 h-5 flex items-center justify-center border border-white/25 group-hover:border-white/50">→</span></button>
+      <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
+        <div className="flex items-center gap-3">
+          <MorphX onClick={onClose} />
+          <span className="font-mono text-[10px] tracking-widest uppercase text-white/50">Close</span>
+        </div>
         <div className="relative z-[130] flex items-center gap-1 font-mono text-[9px]">
           <button onClick={() => setMode('view')} className={`px-2 py-1 border ${mode === 'view' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>View</button>
           <button onClick={() => { setMode('edit'); setEdited(content || '') }} className={`px-2 py-1 border ${mode === 'edit' ? 'border-white text-white' : 'border-white/15 text-white/40 hover:text-white/70'}`}>Edit</button>
@@ -52,7 +56,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
         </div>
       </div>
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-5 py-6 md:px-8">
+      <div className="flex-1 overflow-y-auto px-5 py-6 md:px-8 bg-gradient-to-b from-white/[0.02] to-transparent">
         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white leading-tight mb-2">{item.title}</h2>
         <div className="flex gap-3 text-[10px] font-mono text-white/35 mb-3">
           <span>{item.source || 'local'}</span>
