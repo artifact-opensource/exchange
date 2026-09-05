@@ -27,9 +27,11 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
   useEffect(() => {
     setContent(null); setEdited(''); setMode('view'); setLoading(true)
     const basename = item.localPath ? item.localPath.split('/').pop() || '' : ''
-    const url = basename ? `/papers/consolidated/${basename}` : ''
-    if (!url) { setLoading(false); return }
-    fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(t => { setContent(t); setLoading(false) }).catch(() => { setContent('Not available locally.'); setLoading(false) })
+    // If no local file: show hash-linked reference for segregated IPFS-only papers
+    if (!basename) {
+      setContent(null); setLoading(false); return
+    }
+    fetch(`/papers/consolidated/${basename}`).then(r => r.ok ? r.text() : Promise.reject()).then(t => { setContent(t); setLoading(false) }).catch(() => { setContent('Not available locally.'); setLoading(false) })
   }, [item.id])
 
   const downloadMd = () => {
@@ -42,7 +44,7 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
 
   return (
     <motion.div initial={{ x: '-100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '-100%', opacity: 0, transition: { duration: 0.3, ease: [0.4,0,0.2,1] } }}transition={{ duration: 0.35, ease: [0.23,1,0.32,1] }}
-      className="fixed inset-0 z-[9999] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/85 backdrop-blur-xl backdrop-saturate-150">
+      className="fixed inset-0 z-[201] md:inset-y-0 md:left-0 md:right-auto md:w-[46rem] flex flex-col border-r border-white/20 shadow-2xl overflow-hidden bg-black/85 backdrop-blur-xl backdrop-saturate-150">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/15 shrink-0 bg-black/40">
         <div className="flex items-center gap-3">
@@ -76,7 +78,32 @@ function PaperOverlay({ item, related, onClose }: { item: IndexedResearchItem; r
           ) : (
             <>
               <h3 className="text-[10px] font-mono text-white/35 uppercase tracking-[0.3em] mb-3">Paper</h3>
-              {loading ? <p className="text-xs text-white/35 font-mono">Loading…</p> : <pre className="font-mono text-[11px] md:text-xs text-white/75 leading-loose whitespace-pre-wrap">{content}</pre>}
+              {loading ? <p className="text-xs text-white/35 font-mono">Loading…</p>
+                : !item.localPath ? (
+                  // Segregated: IPFS / hash-linked — show CID reference with external link
+                  <div className="border border-white/15 bg-white/[0.02] p-4 font-mono text-[11px]">
+                    <div className="flex items-center gap-2 text-white/50 mb-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                      <span className="uppercase tracking-widest text-[9px]">Segregated · IPFS Reference</span>
+                    </div>
+                    {item.cid ? (
+                      <a
+                        href={`https://ipfs.io/ipfs/${item.cid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-cyan-400 hover:text-cyan-300 break-all leading-relaxed"
+                      >
+                        ipfs://{item.cid}
+                      </a>
+                    ) : (
+                      <p className="text-white/40 italic">No CID hash on record.</p>
+                    )}
+                    <p className="text-white/30 text-[10px] mt-2">Click to open via IPFS gateway</p>
+                  </div>
+                ) : (
+                  <pre className="font-mono text-[11px] md:text-xs text-white/75 leading-loose whitespace-pre-wrap">{content}</pre>
+                )
+              }
             </>
           )}
         </div>
