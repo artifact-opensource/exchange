@@ -25,6 +25,18 @@ const REPOS = [
     accent: 'orange-400/20',
     hoverAccent: 'orange-400/80',
   },
+  {
+    label: 'Gitee',
+    sublabel: 'dashboard/projects',
+    href: 'https://gitee.com/dashboard/projects',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M11.985 0C5.4 0 0 5.4 0 11.985 0 18.57 5.4 24 11.985 24 18.57 24 24 18.57 24 11.985 24 5.4 18.57 0 11.985 0zm5.4 11.985c0 .9-.36 1.71-.945 2.295L11.7 19.035c-.585.585-1.395.945-2.295.945s-1.71-.36-2.295-.945c-1.26-1.26-1.26-3.33 0-4.59L11.85 9.69c.36-.36.54-.81.54-1.305s-.18-.945-.54-1.305c-.72-.72-1.89-.72-2.61 0l-4.74 4.74c-1.26 1.26-1.26 3.33 0 4.59 1.26 1.26 3.33 1.26 4.59 0l4.74-4.74c.585-.585 1.395-.945 2.295-.945s1.71.36 2.295.945c.585.585.945 1.395.945 2.295z"/>
+      </svg>
+    ),
+    accent: 'red-500/20',
+    hoverAccent: 'red-500/80',
+  },
 ] as const;
 
 export default function RepoButtons() {
