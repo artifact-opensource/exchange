@@ -66,9 +66,31 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
               </button>
             ))}
 
-            <div className="w-full mt-12 pt-12 border-t border-white/5 flex flex-col items-end opacity-20 font-mono text-[8px] tracking-[0.3em] uppercase space-y-1">
-              <p>SYSTEM_CORE_V3.0</p>
-              <p>ENCRYPTION: ACTIVE</p>
+            <div className="w-full mt-12 pt-12 border-t border-white/5 flex flex-col items-end gap-6">
+              <button
+                onClick={() => {
+                  document.body.setAttribute('data-open-paper', 'privacy');
+                  if (onClose) onClose();
+                }}
+                className="group flex flex-col items-end gap-1 focus:outline-none"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] font-mono tracking-[0.4em] uppercase text-white/20 group-hover:text-white/60 transition-all duration-300">Privacy Policy</span>
+                  <div className="h-[1px] w-0 group-hover:w-8 bg-white/10 group-hover:bg-white/30 transition-all duration-500"></div>
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  document.body.setAttribute('data-open-paper', 'terms');
+                  if (onClose) onClose();
+                }}
+                className="group flex flex-col items-end gap-1 focus:outline-none"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] font-mono tracking-[0.4em] uppercase text-white/20 group-hover:text-white/60 transition-all duration-300">Terms of Use</span>
+                  <div className="h-[1px] w-0 group-hover:w-8 bg-white/10 group-hover:bg-white/30 transition-all duration-500"></div>
+                </div>
+              </button>
             </div>
           </div>
         </motion.div>

@@ -174,6 +174,34 @@ export default function Library({ onOpenPaper }: { onOpenPaper?: () => void }) {
     document.body.setAttribute('data-md-editor', selected ? 'true' : 'false')
   }, [selected])
 
+  // Listen for nav-triggered paper opens (privacy / terms — accessible only via sidebar)
+  React.useEffect(() => {
+    const check = () => {
+      const val = document.body.getAttribute('data-open-paper');
+      if (!val) return;
+      document.body.removeAttribute('data-open-paper');
+      // Create a synthetic item for the sidebar-only docs
+      const meta = val === 'privacy' ? 'Privacy Policy' : val === 'terms' ? 'Terms of Use' : '';
+      const syntheticItem: IndexedResearchItem = {
+        id: val,
+        title: meta,
+        localPath: val === 'privacy' ? '/home/adam/workspace/research/papers-consolidated/privacy.md' : '/home/adam/workspace/research/papers-consolidated/terms.md',
+        source: 'Artifact Exchange',
+        category: 'Legal',
+        importance: 10,
+        tags: ['legal'],
+        indexedAt: Date.now(),
+        userTags: [],
+        aiTags: [],
+        semanticScore: 1,
+        colorCode: 'white',
+      };
+      openPaper(syntheticItem);
+    };
+    const timer = setInterval(check, 500);
+    return () => clearInterval(timer);
+  }, []);
+
   const filteredPapers = useMemo(() => {
     if (!cat) return []
     let list = papersInCat(cat)
