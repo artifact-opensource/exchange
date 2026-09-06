@@ -2,7 +2,7 @@
 
 import { http, createConfig } from 'wagmi'
 import { base } from 'wagmi/chains'
-import { coinbaseWallet } from 'wagmi/connectors'
+import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors'
 
 export const wagmiConfig = createConfig({
   chains: [base],
@@ -10,6 +10,10 @@ export const wagmiConfig = createConfig({
     coinbaseWallet({
       appName: 'AV Treasury',
       preference: 'smartWalletOnly',
+    }),
+    injected(),
+    walletConnect({
+      projectId: (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) ? process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID : '778966c138f2d8d1d6d5a26c883070f3',
     }),
   ],
   transports: {
