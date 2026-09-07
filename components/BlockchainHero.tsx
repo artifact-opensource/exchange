@@ -62,7 +62,7 @@ const BlockchainHero: React.FC = () => {
         {/* Flywheel Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/10 pb-6 gap-6 md:gap-0">
           <div className="flex flex-col gap-1">
-            <h2 className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter uppercase text-white leading-[0.8]">AV / FT</h2>
+            <h2 className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter uppercase text-white leading-[0.8]">FT</h2>
             <div className="flex items-center gap-3">
               <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40">Nexus Sync</span>
               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
