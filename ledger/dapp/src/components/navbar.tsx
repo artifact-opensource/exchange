@@ -1,7 +1,6 @@
 'use client'
 
-import Image from 'next/image'
-
+import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount, useDisconnect } from 'wagmi'
@@ -28,7 +27,6 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              {/* plain img + explicit basePath: next/image drops basePath on static export */}
               <img
                 src="/treasury/av-logo-white.png"
                 alt="AV"
@@ -60,7 +58,6 @@ export function Navbar() {
             </nav>
           </div>
           <div className="flex items-center gap-3">
-            {/* Wallet driven by parent exchange — no independent connect in dapp */}
             {isConnected ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm">
@@ -75,10 +72,12 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
+              <div className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
+                Connect on main site
+              </div>
             )}
           </div>
         </div>
-        {/* Mobile nav */}
         <nav className="flex md:hidden items-center gap-1 pb-3 overflow-x-auto">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
