@@ -300,11 +300,11 @@ export default function App() {
                 </>
               )}
 
-              {/* AV/FT specific Hero */}
+              {/* AV/FT — bottom valuation only; top content moved to AV/ST */}
               {config.id === SectionId.FT && <BlockchainHero />}
 
-              {/* AV/ML and AV/FT */}
-              {(config.id === SectionId.ML || config.id === SectionId.FT) && (
+              {/* AV/ML */}
+              {config.id === SectionId.ML && (
                 <ProjectCatalogue
                   accentColor={config.accentColor}
                   repoPaths={config.sourceUrls
@@ -319,8 +319,26 @@ export default function App() {
                 />
               )}
 
-              {/* AV/ST — Space Tech Division */}
-              {config.id === SectionId.ST && <SpaceDivision />}
+              {/* AV/ST — Space Tech Division + Edge / Hyperspace / Repo content (moved from FT) */}
+              {config.id === SectionId.ST && (
+                <>
+                  <BlockchainHero />
+                  <RepoButtons />
+                  <ProjectCatalogue
+                    accentColor={config.accentColor}
+                    repoPaths={config.sourceUrls
+                      .filter((url) => url.includes("github.com"))
+                      .map((url) => {
+                        const cleanUrl = url
+                          .replace("https://github.com/", "")
+                          .split("?")[0];
+                        const parts = cleanUrl.split("/");
+                        return `${parts[0]}/${parts[1]}`;
+                      })}
+                  />
+                  <SpaceDivision />
+                </>
+              )}
 
               {/* AV/IM — Investor Relations portal node */}
               {config.id === SectionId.IM && (
