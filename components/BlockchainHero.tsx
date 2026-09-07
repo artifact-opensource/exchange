@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ExternalLink } from 'lucide-react';
 import { BASESCAN, basescanUrl } from '../lib/contracts';
 
 const BlockchainHero: React.FC = () => {
@@ -78,27 +77,6 @@ const BlockchainHero: React.FC = () => {
             <span className="font-mono text-xs text-white font-bold tracking-widest">BASE · 8453</span>
           </div>
         </header>
-
-        {/* Open Treasury — wallet lives in treasury dapp */}
-        <div className="border border-orange-500/20 bg-black flex flex-col">
-          <div className="flex justify-between items-center border-b border-orange-500/10 px-6 md:px-8 py-4">
-            <h3 className="font-mono text-orange-400 uppercase tracking-widest text-sm font-bold flex items-center gap-2">
-              <span className="w-2 h-2 bg-orange-400 animate-pulse"></span>
-              AV Treasury — Connect Wallet Here
-            </h3>
-            <a href="/treasury/" target="_blank" rel="noreferrer" className="font-mono text-[10px] text-orange-500/50 hover:text-orange-400 uppercase tracking-[0.2em] flex items-center gap-1 transition-colors">
-              Open Treasury <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-          <iframe
-            src="/treasury/"
-            title="AV Treasury — Connect Wallet"
-            className="w-full h-[760px] bg-black border-0"
-          />
-          <p className="font-mono text-[9px] text-white/25 uppercase tracking-[0.15em] text-center py-2 border-t border-white/5">
-            Connect your wallet in the treasury dashboard above
-          </p>
-        </div>
 
         {/* Dual Token Valuation Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-24 relative">
