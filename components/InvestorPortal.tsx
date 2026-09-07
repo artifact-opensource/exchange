@@ -619,6 +619,15 @@ function PaymentModal({ tier, token, onClose, onSubmitted }: { tier: TierId; tok
           </p>
         </div>
       </div>
+
+      {/* Investor Docs — centered animated button */}
+      <div className="flex items-center justify-center w-full py-8">
+        <a href="https://artifactvirtual.gitbook.io/home" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 px-8 py-4 border border-emerald-400/30 bg-emerald-500/5 hover:bg-emerald-400/10 rounded-full animate-pulse hover:animate-none transition-all duration-300 shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]">
+          <span className="font-mono text-[11px] tracking-[0.2em] font-bold text-emerald-300">Investor Docs</span>
+          <span className="font-mono text-emerald-300/60">→</span>
+        </a>
+      </div>
     </div>
   );
 }

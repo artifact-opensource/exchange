@@ -91,6 +91,14 @@ const NavigationOverlay: React.FC<NavigationOverlayProps> = ({ currentSection, o
                   <div className="h-[1px] w-0 group-hover:w-8 bg-white/10 group-hover:bg-white/30 transition-all duration-500"></div>
                 </div>
               </button>
+              <a href="https://artifactvirtual.gitbook.io/home" target="_blank" rel="noopener noreferrer"
+                className="group flex flex-col items-end gap-1 focus:outline-none"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] font-mono tracking-[0.4em] uppercase text-emerald-400/60 group-hover:text-emerald-300 transition-all duration-300">DOCUMENTATION</span>
+                  <div className="h-[1px] w-0 group-hover:w-8 bg-emerald-400/20 group-hover:bg-emerald-300/50 transition-all duration-500"></div>
+                </div>
+              </a>
             </div>
           </div>
         </motion.div>
