@@ -24,10 +24,7 @@ const DimensionSection: React.FC<DimensionSectionProps> = ({
   return (
     <div className={`snap-start shrink-0 w-screen h-[100dvh] flex flex-col items-center justify-start overflow-x-hidden overflow-y-auto ${isHero ? 'pt-0' : 'pt-24 md:pt-32'} px-6 md:px-12 pb-12 transition-colors duration-700 relative`}>
 
-      {/* Structural Accents - only show if not hero to avoid clashing with hero elements */}
-      {!isHero && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-20 md:h-32 bg-gradient-to-b from-transparent to-white/20"></div>
-      )}
+      {/* Clean header — no vertical divider */}
 
       <div className={`z-10 w-full max-w-7xl flex flex-col items-start text-left ${isHero ? 'space-y-0' : 'space-y-4'}`}>
         {/* Title Block - Hide if it's a full-bleed Hero section */}

@@ -34,9 +34,7 @@ const ContactDimension: React.FC = () => {
 
   return (
     <div className="w-full h-full flex items-start overflow-y-auto px-6 md:px-12 py-16 relative">
-      {/* Top accent line */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-20 md:h-32 bg-gradient-to-b from-transparent to-white/20" />
-
+      {/* Top accent line removed for clean headers */}
       <div className="max-w-4xl w-full space-y-10 relative z-10">
         {/* Header — matching other sections */}
         <div>
