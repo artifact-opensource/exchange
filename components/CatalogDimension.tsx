@@ -1,32 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
 const CatalogDimension: React.FC = () => {
-  const bgLetterRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = bgLetterRef.current;
-    if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let raf = 0;
-    const target = { x: 0, y: 0 };
-    const current = { x: 0, y: 0 };
-    const onMove = (e: MouseEvent) => {
-      target.x = e.clientX / window.innerWidth - 0.5;
-      target.y = e.clientY / window.innerHeight - 0.5;
-    };
-    const loop = () => {
-      current.x += (target.x - current.x) * 0.06;
-      current.y += (target.y - current.y) * 0.06;
-      el.style.transform = `translate(calc(-50% + ${(-current.x * 60).toFixed(2)}px), calc(-50% + ${(-current.y * 40).toFixed(2)}px))`;
-      raf = requestAnimationFrame(loop);
-    };
-    window.addEventListener('mousemove', onMove, { passive: true });
-    raf = requestAnimationFrame(loop);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
   const domains = [
     { num: "01", title: "AI / LLM", items: ["av-api", "av-mcp", "av-vector", "Hermes-Gateway", "SYMBIOTE", "SPORE"], refs: "SVC-001 → SVC-014", status: "R&D + LIVE" },
     { num: "02", title: "COMPUTE / INFRA", items: ["Cloudflare Tunnels (12+ sites)", "Vercel", "VPS Vietnam", "PostgreSQL / Redis", "Colocation, CDNs"], refs: "SVC-017 → SVC-027", status: "LIVE + PIPELINE" },
@@ -45,9 +19,6 @@ const CatalogDimension: React.FC = () => {
 
   return (
     <div className="w-full h-full flex items-start overflow-y-auto px-6 md:px-12 py-16 relative">
-      <div ref={bgLetterRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] will-change-transform">
-        <h1 className="text-[30vw] font-black uppercase tracking-tighter leading-none select-none text-white">CATALOG</h1>
-      </div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-20 md:h-32 bg-gradient-to-b from-transparent to-white/20" />
 
       <div className="max-w-6xl w-full space-y-12 relative z-10">
