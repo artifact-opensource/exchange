@@ -75,9 +75,6 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
-                Connect wallet on main site
-              </div>
             )}
           </div>
         </div>

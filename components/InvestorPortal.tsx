@@ -135,7 +135,13 @@ function Atmosphere({ tier }: { tier: TierId }) {
     <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
       <style>{`
         @keyframes av-orb { 0%{transform:translate(0,0) scale(1)} 33%{transform:translate(40px,-60px) scale(1.15)} 66%{transform:translate(-30px,40px) scale(0.95)} 100%{transform:translate(0,0) scale(1)} }
+        @keyframes av-grid { from{background-position:0 0} to{background-position:80px 80px} }
       `}</style>
+      <div className="absolute inset-0 opacity-[0.05]" style={{
+        backgroundImage: 'linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)',
+        backgroundSize: '80px 80px',
+        animation: 'av-grid 26s linear infinite',
+      }} />
       {[0, 1, 2].map((i) => (
         <div key={i} className="absolute rounded-full blur-[110px] opacity-25"
           style={{

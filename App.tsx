@@ -172,13 +172,6 @@ export default function App() {
   const navigateTo = (section: SectionId) => {
     if (!scrollContainerRef.current) return;
 
-    // Gate FT / ST behind investor-auth
-    const tok = (typeof window !== 'undefined') ? localStorage.getItem('av_inv_token') : null;
-    if ((section === SectionId.FT || section === SectionId.ST) && !tok) {
-      // Redirect to IM (investor/membership) to sign in
-      section = SectionId.IM;
-    }
-
     const { clientWidth } = scrollContainerRef.current;
     if (clientWidth === 0) return;
 
@@ -307,18 +300,8 @@ export default function App() {
                 </>
               )}
 
-              {/* AV/FT specific Hero — gated */}
-              {config.id === SectionId.FT && (
-                typeof window !== 'undefined' && localStorage.getItem('av_inv_token')
-                  ? <BlockchainHero />
-                  : <div className="w-full h-full flex items-center justify-center text-center px-8">
-                      <div className="max-w-lg border border-white/10 bg-black/60 p-8 md:p-12 backdrop-blur-md">
-                        <span className="font-mono text-[9px] tracking-[0.35em] text-red-400">ACCESS_RESTRICTED</span>
-                        <h2 className="font-black text-2xl md:text-4xl tracking-tighter uppercase text-white mt-4">Financial Treasury</h2>
-                        <p className="font-mono text-[10px] text-white/40 mt-4 tracking-wider">Member authentication required. Sign in at Investor_Relations.</p>
-                      </div>
-                    </div>
-              )}
+              {/* AV/FT specific Hero */}
+              {config.id === SectionId.FT && <BlockchainHero />}
 
               {/* AV/ML and AV/FT */}
               {(config.id === SectionId.ML || config.id === SectionId.FT) && (
@@ -336,18 +319,8 @@ export default function App() {
                 />
               )}
 
-              {/* AV/ST — Space Tech Division — gated */}
-              {config.id === SectionId.ST && (
-                typeof window !== 'undefined' && localStorage.getItem('av_inv_token')
-                  ? <SpaceDivision />
-                  : <div className="w-full h-full flex items-center justify-center text-center px-8">
-                      <div className="max-w-lg border border-white/10 bg-black/60 p-8 md:p-12 backdrop-blur-md">
-                        <span className="font-mono text-[9px] tracking-[0.35em] text-red-400">ACCESS_RESTRICTED</span>
-                        <h2 className="font-black text-2xl md:text-4xl tracking-tighter uppercase text-white mt-4">Space Division</h2>
-                        <p className="font-mono text-[10px] text-white/40 mt-4 tracking-wider">Member authentication required. Sign in at Investor_Relations.</p>
-                      </div>
-                    </div>
-              )}
+              {/* AV/ST — Space Tech Division */}
+              {config.id === SectionId.ST && <SpaceDivision />}
 
               {/* AV/IM — Investor Relations portal node */}
               {config.id === SectionId.IM && (
