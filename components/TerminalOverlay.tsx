@@ -135,6 +135,18 @@ const TOOLS = [
   {
     type: "function",
     function: {
+      name: "execute_html",
+      description: "Generate and render an HTML artifact (landing page, dashboard, interactive UI) from a user prompt. Returns rendered URL / data-URI for viewing; user can open in webview.",
+      parameters: {
+        type: "object",
+        properties: { html: { type: "string", description: "Full HTML string to render" }, title: { type: "string" } },
+        required: ["html"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "open_document",
       description: "Open a research document in the user interface",
       parameters: {
@@ -150,8 +162,17 @@ const TOOLS = [
 ];
 
 const TerminalOverlay: React.FC<TerminalOverlayProps> = ({ isOpen, onClose }) => {
+  const isVerified = typeof window !== 'undefined' && !!localStorage.getItem('av_inv_token');
+  const [accountVerified, setAccountVerified] = useState(isVerified);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setAccountVerified(!!localStorage.getItem('av_inv_token'));
+    window.addEventListener('storage', check);
+    window.addEventListener('AV_ACCOUNT_VERIFIED', check as EventListener);
+    return () => { window.removeEventListener('storage', check); window.removeEventListener('AV_ACCOUNT_VERIFIED', check as EventListener); };
+  }, []);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', content: 'You are AVA, an AI assistant operating within the Artifact Network terminal. Capabilities: (1) fs_read/fs_write — read and persist files by committing them to the Artifact content repo on GitHub (paths are repo-relative; writes create real commits); (2) js_eval — sandboxed JavaScript for computation; there is NO persistent shell, so never claim to have run shell commands — use js_eval/fs tools instead and say so honestly if asked; (3) web_search/web_fetch — live internet access; (4) market_price — live AU/AG prices from the exchange API; (5) ipfs_catalog — the IPFS research catalog; (6) github_read — read files/dirs from any public GitHub repo; (7) open_document — open a research document visually in the user interface (use the item ID or exact title). Be concise, professional, honest about failures, and execute tasks efficiently.' }
+    { role: 'system', content: 'You are AVA, an AI assistant operating within the Artifact Network terminal. Capabilities: (1) fs_read/fs_write — read and persist files by committing them to the Artifact content repo on GitHub (paths are repo-relative; writes create real commits); (2) js_eval — sandboxed JavaScript for computation; there is NO persistent shell, so never claim to have run shell commands — use js_eval/fs tools instead and say so honestly if asked; (3) web_search/web_fetch — live internet access; (4) market_price — live AU/AG prices from the exchange API; (5) ipfs_catalog — the IPFS research catalog; (6) github_read — read files/dirs from any public GitHub repo; (7) open_document — open a research document visually in the user interface; (8) execute_html — generate and render full HTML artifacts (landing pages, dashboards, interactive UI) via blob URL, dispatched to OPEN_HTML_ARTIFACT event for the webview.\n\nACCOUNT GATE: If the user has no verified account (no av_inv_token in localStorage), respond ONLY to: artifact questions, workspace file queries, and documentation. Degrade all other requests to read-only. Add the [SIGN UP RESTRICTED — account required for full access] banner at the start of every restricted response and remind the user to create an account. After every 2 turns in restricted mode, add the [NO VERIFIED ACCOUNT — sign up to continue] prompt.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -178,6 +199,11 @@ const TerminalOverlay: React.FC<TerminalOverlayProps> = ({ isOpen, onClose }) =>
       if (name === "open_document") {
         window.dispatchEvent(new CustomEvent("OPEN_DOCUMENT", { detail: { nodeId: args.nodeId, meta: args.meta } }));
         return JSON.stringify({ success: true, message: `Document '${args.nodeId}' opened in UI.` });
+      } else if (name === "execute_html") {
+        const blob = new Blob([args.html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.dispatchEvent(new CustomEvent("OPEN_HTML_ARTIFACT", { detail: { url, title: args.title || 'HTML Artifact' } }));
+        return JSON.stringify({ success: true, message: `HTML artifact rendered (${args.html.length} chars). Opened at ${url}.`, dataUrl: url });
       } else if (name === "fs_read") {
         const res = await fetch("/api/ava/read", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(args) });
         return JSON.stringify(await res.json());
