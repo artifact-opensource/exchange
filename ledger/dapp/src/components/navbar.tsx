@@ -4,8 +4,8 @@ import Image from 'next/image'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { Wallet, ArrowLeftRight, Droplets, PieChart, Vote, Coins } from 'lucide-react'
+import { useAccount, useDisconnect } from 'wagmi'
+import { ArrowLeftRight, Droplets, PieChart, Vote, Coins } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatAddress } from '@/lib/utils'
 
@@ -20,7 +20,6 @@ const NAV_ITEMS = [
 export function Navbar() {
   const pathname = usePathname()
   const { address, isConnected } = useAccount()
-  const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
 
   return (
@@ -61,6 +60,7 @@ export function Navbar() {
             </nav>
           </div>
           <div className="flex items-center gap-3">
+            {/* Wallet driven by parent exchange — no independent connect in dapp */}
             {isConnected ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm">
@@ -75,16 +75,9 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  const wc = connectors.find((c) => c.id === 'walletConnect') || connectors.find((c) => c.id === 'walletconnect') || connectors[0]
-                  connect({ connector: wc })
-                }}
-                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                <Wallet className="h-4 w-4" />
-                Connect Wallet
-              </button>
+              <div className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
+                Connect wallet on main site
+              </div>
             )}
           </div>
         </div>
