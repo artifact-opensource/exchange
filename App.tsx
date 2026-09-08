@@ -326,10 +326,9 @@ export default function App() {
                 />
               )}
 
-              {/* ST — Space Tech Division + Edge / Hyperspace / Repo content (moved from FT) */}
+              {/* ST — Space Tech Division + Edge / Hyperspace / Repo content */}
               {config.id === SectionId.ST && (
                 <>
-                  <BlockchainHero />
                   <RepoButtons />
                   <ProjectCatalogue
                     accentColor={config.accentColor}
