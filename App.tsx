@@ -14,6 +14,7 @@ import LandingPage from "./components/LandingPage";
 import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
 import SpaceDivision from "./components/SpaceDivision";
 import InvestorPortalApp, { PortalBoundary } from "./components/InvestorPortal";
+import QuantumBackground from "./components/QuantumBackground";
 import CatalogDimension from "./components/CatalogDimension";
 import ContactDimension from "./components/ContactDimension";
 import { Web3Provider } from "./components/Web3Provider";
@@ -197,12 +198,18 @@ export default function App() {
 
   // Route split AFTER all hooks — hook order must be identical across renders
   if (route.startsWith("#/investors")) {
-    return <Web3Provider><PortalBoundary><InvestorPortalApp /></PortalBoundary></Web3Provider>;
+    return (
+      <>
+        <QuantumBackground />
+        <Web3Provider><PortalBoundary><InvestorPortalApp /></PortalBoundary></Web3Provider>
+      </>
+    );
   }
 
   return (
     <RefreshContext.Provider value={{ triggerRefresh }}>
     <main className="relative w-full h-[100dvh] bg-[#030303] selection:bg-white selection:text-black touch-pan-x overflow-hidden">
+      <QuantumBackground />
       {/* Landing Page */}
       <AnimatePresence>
         {showLanding && (

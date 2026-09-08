@@ -24,7 +24,7 @@ const CatalogDimension: React.FC = () => {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-            <span className="text-[9px] font-mono font-bold tracking-[0.4em] uppercase text-white/40">AV / CATALOG</span>
+            <span className="text-[9px] font-mono font-bold tracking-[0.4em] uppercase text-white/40">/CATALOG</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-white/90 leading-none">CATALOG</h2>
           <p className="text-xs text-white/30 font-mono mt-2 tracking-wider">Services · Tiers & Operational Footprint</p>

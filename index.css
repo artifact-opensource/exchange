@@ -26,3 +26,4 @@ html, body, * {
 .snap-container > * {
     overscroll-behavior: contain;
 }
+@keyframes quantumPan { 0% { background-position: 0 0; } 100% { background-position: 400px 400px; } }
