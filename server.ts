@@ -5,6 +5,8 @@ import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
+import { and, asc, eq } from "drizzle-orm";
+import { canAccess, documents, kanbanCards, membershipTier, memberships, platformDb, reports, requirePlatformDb } from "./lib/platform-db";
 
 async function startServer() {
   const app = express();
@@ -21,6 +23,42 @@ async function startServer() {
     }
     return genAI;
   };
+
+  // Production platform snapshot for the shared library, membership, kanban, and investor surfaces.
+  app.get("/api/platform/snapshot", async (req, res) => {
+    try {
+      const db = requirePlatformDb();
+      const userId = String(req.header("x-artifact-user") || "preview-user");
+      const requestedTier = membershipTier(req.header("x-artifact-tier"));
+      const [membershipRows, documentRows, kanbanRows, reportRows] = await Promise.all([
+        db.select().from(memberships).where(eq(memberships.userId, userId)).limit(1),
+        db.select().from(documents).orderBy(asc(documents.title)),
+        db.select().from(kanbanCards).orderBy(asc(kanbanCards.board), asc(kanbanCards.columnKey)),
+        db.select().from(reports).orderBy(asc(reports.createdAt)),
+      ]);
+      const tier = membershipRows[0]?.tier || requestedTier;
+      res.json({
+        membership: { tier, status: membershipRows[0]?.status || "preview" },
+        documents: documentRows.filter((item) => canAccess(tier, item.accessTier)),
+        kanban: kanbanRows.filter((item) => canAccess(tier, item.accessTier)),
+        reports: reportRows.filter((item) => canAccess(tier, item.accessTier)),
+      });
+    } catch (error) {
+      res.status(503).json({ error: "Platform persistence is unavailable", details: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post("/api/platform/membership", async (req, res) => {
+    try {
+      const db = requirePlatformDb();
+      const userId = String(req.header("x-artifact-user") || "preview-user");
+      const tier = membershipTier(req.body?.tier);
+      const rows = await db.insert(memberships).values({ userId, tier, status: "active" }).onConflictDoUpdate({ target: memberships.userId, set: { tier, status: "active", updatedAt: new Date() } }).returning();
+      res.json(rows[0]);
+    } catch (error) {
+      res.status(503).json({ error: "Membership persistence is unavailable", details: error instanceof Error ? error.message : String(error) });
+    }
+  });
 
   // GitHub Proxy API — uses GITHUB_TOKEN or GITHUB_PAT (fallback)
   app.get("/api/github/repo/:owner/:repo", async (req, res) => {

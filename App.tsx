@@ -18,6 +18,7 @@ import QuantumBackground from "./components/QuantumBackground";
 import CatalogDimension from "./components/CatalogDimension";
 import ContactDimension from "./components/ContactDimension";
 import { Web3Provider } from "./components/Web3Provider";
+import PlatformCommandCenter from "./components/PlatformCommandCenter";
 
 // Import dimension configs
 import { RESEARCH_CATALOG } from "./lib/research-data";
@@ -197,6 +198,10 @@ export default function App() {
   };
 
   // Route split AFTER all hooks — hook order must be identical across renders
+  if (route.startsWith("#/platform")) {
+    return <PlatformCommandCenter />;
+  }
+
   if (route.startsWith("#/investors")) {
     return (
       <>
