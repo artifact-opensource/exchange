@@ -10,9 +10,10 @@ export const fetchRepoDetails = async (fullName: string): Promise<GitHubRepo | n
     return cached.data;
   }
 
-  const [owner, repo] = fullName.split('/');
+  const [owner, repo] = fullName.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').split('/');
+  if (!owner || !repo) return null;
   try {
-    const response = await fetch(`/api/github/repo/${owner}/${repo}`);
+    const response = await fetch(`/api/github/repo/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, { headers: { 'Accept': 'application/json' } });
     if (!response.ok) {
       if (response.status === 404 || response.status === 403) {
         if (response.status === 403) console.warn(`GitHub Rate Limit hit for ${fullName}`);

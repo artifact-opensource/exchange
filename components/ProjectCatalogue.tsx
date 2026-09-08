@@ -2,123 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { GitHubRepo } from '../types';
 import { fetchRepoDetails } from '../services/githubService';
 import ProjectView from './ProjectView';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowUpRight, Database, GitBranch, Radio, RefreshCw } from 'lucide-react';
 
-interface ProjectCatalogueProps {
-  repoPaths: string[];
-  accentColor?: string;
-}
+interface ProjectCatalogueProps { repoPaths: string[]; accentColor?: string; }
 
 const ProjectCatalogue: React.FC<ProjectCatalogueProps> = ({ repoPaths, accentColor = '#ffffff' }) => {
   const [repos, setRepos] = useState<(GitHubRepo & { isFallback?: boolean })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRepo, setSelectedRepo] = useState<{ path: string, details: GitHubRepo | null } | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<{ path: string; details: GitHubRepo | null } | null>(null);
+  const [syncVersion, setSyncVersion] = useState(0);
 
-  useEffect(() => {
-    const loadRepos = async () => {
-      setLoading(true);
-      try {
-        const results = await Promise.all(repoPaths.map(async (path) => {
-          const detail = await fetchRepoDetails(path);
-          if (detail) return detail;
-          
-          const repoName = path.split('/')[1] || path;
-          return {
-            id: Math.random(),
-            name: repoName,
-            description: "CONNECTION_INTERRUPTED: Repository manifest unavailable. Node may be restricted or offline.",
-            html_url: `https://github.com/${path}`,
-            stargazers_count: 0,
-            language: "SYNC_OFFLINE",
-            isFallback: true,
-            full_name: path
-          } as any;
-        }));
-        
-        setRepos(results);
-      } catch (e) {
-        console.error("Catalogue sync failed", e);
-      }
-      setLoading(false);
-    };
-    loadRepos();
-  }, [repoPaths]);
+  const loadRepos = async () => {
+    const normalized = [...new Set(repoPaths.map((path) => path.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').split('?')[0].split('/').slice(0, 2).join('/')).filter((path) => path.includes('/')))].slice(0, 12);
+    setLoading(true);
+    const results = await Promise.all(normalized.map(async (path) => {
+      const detail = await fetchRepoDetails(path);
+      if (detail) return detail;
+      const repoName = path.split('/')[1] || path;
+      return { id: `offline-${path}`, name: repoName, description: 'Repository manifest is temporarily unavailable. Retry sync to reconnect this node.', html_url: `https://github.com/${path}`, stargazers_count: 0, language: 'SYNC_PENDING', isFallback: true, full_name: path } as any;
+    }));
+    setRepos(results); setLoading(false);
+  };
 
-  if (loading) {
-    return (
-      <div className="flex items-center gap-4 py-12 md:py-20">
-        <div className="w-8 h-[1px] bg-white/20 animate-pulse"></div>
-        <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest animate-pulse">SYNCING_NETWORK_NODES...</span>
-      </div>
-    );
-  }
+  useEffect(() => { loadRepos(); }, [repoPaths, syncVersion]);
 
-  return (
-    <div className="w-full mt-6 border-t border-white/10">
-      <AnimatePresence>
-        {selectedRepo && (
-          <ProjectView 
-            repoPath={selectedRepo.path}
-            repoDetails={selectedRepo.details}
-            accentColor={accentColor}
-            onClose={() => setSelectedRepo(null)}
-          />
-        )}
-      </AnimatePresence>
-
-      {repos.length > 0 ? repos.map((repo, idx) => (
-        <div 
-          key={repo.id || idx}
-          onClick={() => setSelectedRepo({ path: repo.full_name || repoPaths[idx], details: repo.isFallback ? null : repo })}
-          className="group block relative w-full border-b border-white/10 hover:bg-white/[0.02] transition-colors cursor-pointer"
-        >
-          <div className="flex flex-col md:flex-row md:items-center justify-between py-8 md:py-12 px-2 md:px-0 gap-6">
-            <div className="flex items-center gap-6 md:gap-16">
-              <span className="text-[10px] md:text-[11px] font-mono text-white/20 font-bold">
-                {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
-              </span>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-3 min-w-0">
-                  <h3 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none group-hover:translate-x-2 md:group-hover:translate-x-4 transition-transform duration-500 break-all">
-                    {repo.name}
-                  </h3>
-                  {repo.isFallback && (
-                    <span className="text-[7px] border border-white/20 text-white/40 px-1 py-0.5 rounded font-mono uppercase tracking-tighter shrink-0">
-                      Limited
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-4 mt-2 opacity-30 group-hover:opacity-100 transition-opacity">
-                   <span className="text-[8px] font-mono uppercase tracking-[0.2em]">{repo.language || 'ARTIFACT'}</span>
-                   <div className="w-1 h-1 rounded-full bg-white/40"></div>
-                   <span className="text-[8px] font-mono uppercase tracking-[0.2em]">{repo.stargazers_count} NODES</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="md:max-w-sm lg:max-w-md">
-              <p className="text-[10px] md:text-[11px] font-medium uppercase tracking-tight text-white/30 leading-snug group-hover:text-white/70 transition-colors">
-                {repo.description || "Technical documentation for this node is currently encrypted or pending public clearance."}
-              </p>
-            </div>
-
-            <div className="hidden lg:flex flex-col items-end gap-1 opacity-5 group-hover:opacity-100 transition-opacity">
-               <i className="fa-solid fa-arrow-right-long text-xl -rotate-45"></i>
-               <span className="text-[7px] font-mono uppercase font-bold tracking-[0.3em]">EXPLORE</span>
-            </div>
-          </div>
-          
-          <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-white/40 group-hover:w-full transition-all duration-700"></div>
-        </div>
-      )) : (
-        <div className="py-20 text-center">
-          <p className="text-[10px] font-mono text-white/20 uppercase tracking-widest italic">
-            [!] NO_ACTIVE_NODES_IN_SECTOR
-          </p>
-        </div>
-      )}
-    </div>
-  );
+  return <section className="ml-catalogue relative w-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/45 p-4 md:p-8">
+    <div className="ml-art" aria-hidden="true"><div className="ml-art-orbit orbit-one" /><div className="ml-art-orbit orbit-two" /><div className="ml-art-core" /><div className="ml-art-label">ARTIFACT / ML</div></div>
+    <div className="relative z-10 mb-8 flex flex-col justify-between gap-5 border-b border-white/10 pb-6 md:flex-row md:items-end"><div><div className="mb-3 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.32em] text-cyan-100/60"><Radio size={12} className="animate-pulse" /> live intelligence layer</div><h2 className="max-w-xl text-3xl font-semibold tracking-[-0.06em] text-white md:text-5xl">Machine intelligence, made inspectable.</h2><p className="mt-3 max-w-lg font-mono text-[10px] uppercase leading-6 tracking-[0.16em] text-white/40">A living catalogue of the research, models, and public experiments behind the Artifact network.</p></div><button onClick={() => setSyncVersion((v) => v + 1)} className="inline-flex items-center gap-2 self-start rounded-full border border-cyan-200/20 bg-cyan-100/5 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-cyan-100/75 transition hover:bg-cyan-100/15"><RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> {loading ? 'syncing' : 'refresh nodes'}</button></div>
+    <div className="relative z-10 mb-5 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/35"><Database size={13} /> {loading ? 'establishing github relay' : `${repos.length} nodes resolved`}<span className="ml-auto text-emerald-200/60">PAT relay active</span></div>
+    {loading ? <div className="flex min-h-52 items-center justify-center"><div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-cyan-100/50"><RefreshCw size={15} className="animate-spin" /> resolving repository manifests</div></div> : <div className="relative z-10 grid gap-3 md:grid-cols-2">{repos.length ? repos.map((repo, index) => <motion.button initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} key={repo.id || index} onClick={() => setSelectedRepo({ path: repo.full_name || repoPaths[index], details: repo.isFallback ? null : repo })} className="group flex min-h-44 flex-col justify-between rounded-2xl border border-white/10 bg-black/30 p-5 text-left transition duration-500 hover:-translate-y-1 hover:border-cyan-200/30 hover:bg-cyan-100/[0.06]"><div className="flex items-start justify-between gap-3"><div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-white/35"><GitBranch size={13} /> {repo.isFallback ? 'relay pending' : 'verified node'}</div><ArrowUpRight size={16} className="text-white/25 transition group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-cyan-100" /></div><div><h3 className="mt-7 break-words text-2xl font-semibold tracking-[-0.05em] text-white">{repo.name}</h3><p className="mt-2 line-clamp-2 text-xs leading-5 text-white/45">{repo.description}</p></div><div className="mt-5 flex items-center gap-3 font-mono text-[8px] uppercase tracking-[0.18em] text-white/30"><span>{repo.language || 'artifact'}</span><span className="size-1 rounded-full bg-cyan-200/60" /><span>{repo.stargazers_count || 0} signals</span></div></motion.button>) : <div className="col-span-full rounded-2xl border border-dashed border-white/10 p-10 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">No active ML nodes in this sector</div>}</div>}
+    <AnimatePresence>{selectedRepo && <ProjectView repoPath={selectedRepo.path} repoDetails={selectedRepo.details} accentColor={accentColor} onClose={() => setSelectedRepo(null)} />}</AnimatePresence>
+  </section>;
 };
-
 export default ProjectCatalogue;

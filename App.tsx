@@ -266,14 +266,14 @@ export default function App() {
       {/* Standalone Terminal Button */}
       <button
         onClick={() => setIsTerminalOpen(true)}
-        className="fixed bottom-6 right-6 z-[100] group flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 p-4 hover:border-white/40 transition-all outline-none rounded-full"
+        className="ava-launcher fixed bottom-6 right-6 z-[100] group flex size-16 items-center justify-center rounded-full border border-cyan-200/30 bg-slate-950/80 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.18)] backdrop-blur-xl transition hover:scale-105 hover:border-cyan-100/70 md:bottom-8 md:right-8"
+        aria-label="Open AVA terminal"
       >
-        <div className="flex items-center gap-3 text-white/60 group-hover:text-white">
-          <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
-            TERMINAL
-          </span>
-          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+        <div className="relative flex size-11 items-center justify-center rounded-full border border-cyan-100/20 bg-cyan-200/5">
+          <span className="absolute inset-1 rounded-full border border-cyan-200/20 animate-ping" />
+          <span className="relative font-mono text-[11px] font-bold tracking-[-0.08em]">AVA</span>
         </div>
+        <span className="absolute -top-8 right-0 whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-2 py-1 font-mono text-[8px] uppercase tracking-[0.2em] text-white/50 opacity-0 transition group-hover:opacity-100">open terminal</span>
       </button>
 
       {/* Main Horizontal Scroll Container */}
