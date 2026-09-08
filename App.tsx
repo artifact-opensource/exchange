@@ -299,7 +299,7 @@ export default function App() {
               sourceUrls={config.sourceUrls}
               isHero={config.id === SectionId.FT}
             >
-              {/* AV/RD */}
+              {/* RD */}
               {config.id === SectionId.RD && (
                 <>
                   <Library onOpenPaper={() => { setIsSidebarOpen(false); setIsInfoOpen(false); setIsHeaderVisible(false); }} />
@@ -307,10 +307,10 @@ export default function App() {
                 </>
               )}
 
-              {/* AV/FT — bottom valuation only; top content moved to AV/ST */}
+              {/* FT — bottom valuation only; top content moved to ST */}
               {config.id === SectionId.FT && <BlockchainHero />}
 
-              {/* AV/ML */}
+              {/* ML */}
               {config.id === SectionId.ML && (
                 <ProjectCatalogue
                   accentColor={config.accentColor}
@@ -326,7 +326,7 @@ export default function App() {
                 />
               )}
 
-              {/* AV/ST — Space Tech Division + Edge / Hyperspace / Repo content (moved from FT) */}
+              {/* ST — Space Tech Division + Edge / Hyperspace / Repo content (moved from FT) */}
               {config.id === SectionId.ST && (
                 <>
                   <BlockchainHero />
@@ -347,7 +347,7 @@ export default function App() {
                 </>
               )}
 
-              {/* AV/IM — Investor Relations portal node */}
+              {/* IM — Investor Relations portal node */}
               {config.id === SectionId.IM && (
                 <div className="w-full h-full flex items-center justify-center px-4">
                   <div className="max-w-xl w-full border border-white/10 bg-black/40 backdrop-blur-md p-8 md:p-12 flex flex-col gap-6">
@@ -375,10 +375,10 @@ export default function App() {
                 </div>
               )}
 
-              {/* AV/CATALOG — Business Services Dimension */}
+              {/* Catalog — Business Services Dimension */}
               {config.id === SectionId.CATALOG && <CatalogDimension />}
 
-              {/* AV/CONTACT — Contact Dimension */}
+              {/* Contact — Contact Dimension */}
               {config.id === SectionId.CONTACT && <ContactDimension />}
             </DimensionSection>
           ))}

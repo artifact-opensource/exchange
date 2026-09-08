@@ -3,7 +3,7 @@ import { SectionId, DimensionConfig } from '../types';
 
 export const mlConfig: DimensionConfig = {
   id: SectionId.ML,
-  title: "AV/ML",
+  title: "/ML",
   subtitle: "MACHINE LEARNING",
   description: "The architecture of thought, digitized. Mapping the synapses of machine intelligence through recursive learning and synthetic evolution.",
   bgGradient: "from-black via-[#080808] to-black",
