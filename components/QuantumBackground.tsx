@@ -10,32 +10,37 @@ export default function QuantumBackground() {
     if (!ctx) return;
 
     let animId: number;
-    let W = 0, H = 0;
 
     const resize = () => {
-      W = window.innerWidth;
-      H = window.innerHeight;
-      canvas.width = W;
-      canvas.height = H;
+      const w = window.innerWidth;
+      const h = Math.max(window.innerHeight, document.documentElement.clientHeight);
+      canvas.width = w;
+      canvas.height = h;
+      return { w, h };
     };
-    resize();
-    window.addEventListener('resize', resize);
 
-    // Quantum preset: grid mode, density 60, speed 1.0, scale 2.0, glow 0
+    let dims = resize();
+    window.addEventListener('resize', () => { dims = resize(); });
+    if ((window as any).visualViewport) {
+      (window as any).visualViewport.addEventListener('resize', () => { dims = resize(); });
+    }
+
     const density = 60;
     const speedVal = 1.0;
     const scaleVal = 2.0;
     const strokeVal = 2.0;
     const glowVal = 0;
-    const cols = Math.floor(density / 3) + 5;
-    const spacing = W / cols;
 
     const render = (t: number) => {
-      ctx.clearRect(0, 0, W, H);
+      const { w, h } = dims;
+      ctx.clearRect(0, 0, w, h);
       ctx.save();
       ctx.strokeStyle = 'rgba(0,0,0,0.9)';
       ctx.lineWidth = strokeVal;
       if (glowVal > 0) ctx.shadowBlur = glowVal;
+
+      const cols = Math.floor(density / 3) + 5;
+      const spacing = w / cols;
 
       for (let x = 0; x < cols; x++) {
         for (let y = 0; y < cols; y++) {
@@ -61,17 +66,19 @@ export default function QuantumBackground() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
+      if ((window as any).visualViewport) {
+        (window as any).visualViewport.removeEventListener('resize', resize);
+      }
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[0] pointer-events-none overflow-hidden" aria-hidden="true">
+    <div className="fixed inset-0 z-[0] pointer-events-none overflow-hidden" aria-hidden="true" style={{ width: '100vw', height: '100dvh' }}>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full block"
-        style={{ background: '#050505' }}
+        className="absolute block"
+        style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', background: '#050505' }}
       />
-      {/* No glow overlay — glow=0 */}
     </div>
   );
 }
