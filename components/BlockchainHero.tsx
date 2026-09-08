@@ -174,13 +174,13 @@ const BlockchainHero: React.FC = () => {
       </div>
 
       {/* Two action buttons — Treasury + Anvil */}
-      <div className="relative z-10 flex flex-wrap gap-4 md:gap-6 pt-10 md:pt-14">
+      <div className="relative z-10 flex justify-center flex-wrap gap-4 md:gap-6 pt-10 md:pt-14">
         <a href="https://arc.artifactvirtual.com/" target="_blank" rel="noreferrer" className="group flex items-center gap-3 border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 transition px-5 md:px-6 py-3 md:py-4">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70 group-hover:text-white transition-colors"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12v6"/><path d="M8 16h8"/></svg>
           <span className="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/80 group-hover:text-white font-semibold">Treasury</span>
         </a>
         <a href="https://anvil.artifactvirtual.com" target="_blank" rel="noreferrer" className="group flex items-center gap-3 border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 transition px-5 md:px-6 py-3 md:py-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70 group-hover:text-white transition-colors"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70 group-hover:text-white transition-colors"><path d="M10 2v8H6l6 8 6-8h-4V2h-4z"/></svg>
           <span className="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/80 group-hover:text-white font-semibold">Anvil · EOA Self-Custody</span>
         </a>
       </div>

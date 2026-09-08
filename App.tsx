@@ -307,8 +307,13 @@ export default function App() {
                 </>
               )}
 
-              {/* FT — bottom valuation only; top content moved to ST */}
-              {config.id === SectionId.FT && <BlockchainHero />}
+              {/* FT — ledger + treasury/anvil + repos */}
+              {config.id === SectionId.FT && (
+                <>
+                  <BlockchainHero />
+                  <RepoButtons />
+                </>
+              )}
 
               {/* ML */}
               {config.id === SectionId.ML && (
@@ -329,7 +334,6 @@ export default function App() {
               {/* ST — Space Tech Division + Edge / Hyperspace / Repo content */}
               {config.id === SectionId.ST && (
                 <>
-                  <RepoButtons />
                   <ProjectCatalogue
                     accentColor={config.accentColor}
                     repoPaths={config.sourceUrls
