@@ -91,7 +91,7 @@ export default function InvestorPortalApp() {
   const pending = member?.pendingTier ?? null;
 
   return (
-    <div className="min-h-[100dvh] bg-[#030303] text-white relative overflow-x-hidden">
+    <div className="investor-portal min-h-[100dvh] bg-[#030303] text-white relative overflow-x-hidden">
       <Atmosphere tier={member ? tier : 'free'} />
 
       {/* top bar */}

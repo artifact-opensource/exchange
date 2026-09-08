@@ -28,7 +28,7 @@ html, body, * {
 }
 @keyframes quantumPan { 0% { background-position: 0 0; } 100% { background-position: 400px 400px; } }
 
-.ava-shell { background: rgba(2, 7, 14, .48); }
+.ava-shell { background: rgba(0, 0, 0, .48); } .investor-portal { --investor-accent: #f5f5f5; } .investor-portal [style*="background"] { } .investor-portal .rounded-full { border-radius: 999px; } .investor-portal .rounded-xl, .investor-portal .rounded-lg, .investor-portal .rounded-md { border-radius: 1rem; } .investor-portal input, .investor-portal button, .investor-portal select { border-radius: .75rem; }
 .ava-backdrop { background: rgba(1, 4, 10, .7); backdrop-filter: blur(14px) saturate(.7); }
 .ava-panel { background: linear-gradient(135deg, rgba(8, 20, 34, .96), rgba(3, 7, 16, .96) 55%, rgba(13, 8, 31, .94)); box-shadow: 0 30px 120px rgba(0,0,0,.7), 0 0 80px rgba(34,211,238,.08); }
 .ava-hud { background: radial-gradient(ellipse at 22% 0%, rgba(34,211,238,.13), transparent 38%), radial-gradient(ellipse at 85% 0%, rgba(129,91,255,.15), transparent 40%); }

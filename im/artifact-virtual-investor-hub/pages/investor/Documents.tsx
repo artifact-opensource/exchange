@@ -50,20 +50,9 @@ export const Documents = () => {
              <span className="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">{activeDoc.category}</span>
          </div>
          <div className="flex-1 overflow-y-auto p-8 custom-markdown">
-            <Markdown 
-              className="prose prose-invert prose-zinc max-w-none 
-              prose-headings:text-white prose-headings:font-bold 
-              prose-h1:text-3xl prose-h1:mb-6 prose-h1:border-b prose-h1:border-zinc-800 prose-h1:pb-4
-              prose-h2:text-xl prose-h2:text-teal-400 prose-h2:mt-8
-              prose-table:border-collapse prose-table:w-full prose-table:text-sm prose-table:my-8
-              prose-th:bg-zinc-800 prose-th:p-3 prose-th:text-left prose-th:text-white
-              prose-td:border-b prose-td:border-zinc-800 prose-td:p-3 prose-td:text-zinc-300
-              prose-hr:border-zinc-800
-              prose-strong:text-white
-              "
-            >
-              {activeDoc.content}
-            </Markdown>
+            <div className="prose prose-invert prose-zinc max-w-none prose-headings:text-white prose-headings:font-bold prose-h1:text-3xl prose-h1:mb-6 prose-h1:border-b prose-h1:border-zinc-800 prose-h1:pb-4 prose-h2:text-xl prose-h2:text-white prose-h2:mt-8 prose-table:border-collapse prose-table:w-full prose-table:text-sm prose-table:my-8 prose-th:bg-zinc-800 prose-th:p-3 prose-th:text-left prose-th:text-white prose-td:border-b prose-td:border-zinc-800 prose-td:p-3 prose-td:text-zinc-300 prose-hr:border-zinc-800 prose-strong:text-white">
+              <Markdown>{activeDoc.content}</Markdown>
+            </div>
          </div>
       </div>
     </div>
