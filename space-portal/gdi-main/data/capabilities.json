@@ -1,0 +1,72 @@
+{
+  "tier": "api",
+  "hardware": {
+    "rtlsdr": false,
+    "rtlsdr_devices": 0,
+    "rtlsdr_info": [],
+    "gpu_available": true,
+    "gpu_type": "Intel iGPU",
+    "gpu_vram_mb": 0,
+    "antenna_connected": false,
+    "usb_devices": []
+  },
+  "software": {
+    "rtl_sdr": false,
+    "rtl_tcp": false,
+    "rtl_fm": false,
+    "gqrx": false,
+    "gnuradio": false,
+    "gr_satellites": false,
+    "multimon_ng": false,
+    "skyfield": true,
+    "sgp4": true,
+    "gpredict": false,
+    "torch": false,
+    "tensorflow": false,
+    "numpy": true,
+    "scipy": true,
+    "librosa": false,
+    "sox": true,
+    "ffmpeg": true,
+    "satx_project": true,
+    "satx_path": "/home/adam/workspace/enterprise/projects/satx"
+  },
+  "data": {
+    "tle_cache": true,
+    "tle_cache_age_hours": 0.1,
+    "tle_satellite_count": 15256,
+    "satnogs_cache": false,
+    "signal_recordings": 0,
+    "ml_model_available": false,
+    "celestrak_api": false,
+    "satnogs_api": false,
+    "opensky_api": false,
+    "aisstream_api": false,
+    "usgs_api": false,
+    "sentinel_api": false,
+    "websdr_available": false,
+    "newsapi": true,
+    "twitter_api": false,
+    "blockchain_rpc": true,
+    "alpha_vantage": true,
+    "binance_api": true,
+    "fred_api": true,
+    "econ_cal_api": true,
+    "marketflow_api": true
+  },
+  "detected_at": "2026-03-01T16:44:58.325513+00:00",
+  "modules_available": [
+    "GEOINT",
+    "OSINT",
+    "FININT",
+    "REPAIR"
+  ],
+  "modules_degraded": [
+    "PREDICT",
+    "MARITIME"
+  ],
+  "modules_unavailable": [
+    "SIGINT",
+    "IMAGERY"
+  ]
+}

@@ -1,0 +1,64 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+config.local.js
+*.key
+*.pem
+secrets*
+*.secret
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# Logs
+logs/
+*.log
+
+# Data caches (large, regeneratable)
+data/cache/
+data/flights/*.json
+data/seismic/*.json
+data/tle/*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+
+# Screenshots (dev artifacts)
+screenshots/
+
+# Sovereign state files
+/tmp/sovereign-state.json
+
+# Backend sensitive data
+backend/.users.json
+backend/.audit.jsonl
+backend/.db-init-done
+
+# Sovereign logs
+sovereign/logs/
+valkyrie.db*
+data/tle_cache/
+-e 
+# Dev scripts
+debug-headless.js
+record-demo*.js
+screen-record*
+-e 
+# Backup files
+*.bak

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDI — Global Defense Intelligence</title>
+
+    <!-- CesiumJS 1.138 (local sovereign bundle) -->
+    <link rel="stylesheet" href="./lib/cesium/Widgets/widgets.css">
+    <script src="./lib/cesium/Cesium.js"></script>
+
+    <!-- satellite.js for TLE propagation (local sovereign bundle) -->
+    <script src="./lib/satellite.min.js"></script>
+
+    <!-- GDI Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="satx-style.css">
+
+    <!-- Favicon: green radar blip -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+</head>
+<body>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SCANLINE OVERLAY
+         ════════════════════════════════════════════════════════════ -->
+    <div id="scanline-overlay"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         TOP BAR
+         ════════════════════════════════════════════════════════════ -->
+    <header id="top-bar">
+        <div class="top-left">
+            <div id="gdi-logo">
+                <img src="assets/gdi-logo.png" alt="GDI" class="gdi-logo-img">
+                <div class="gdi-logo-text">
+                    GDI
+                    <span class="logo-sub">GLOBAL DEFENSE INTELLIGENCE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-center">
+            <div id="search-container">
+                <input type="text" id="search-input" placeholder="SEARCH LOCATION..." autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="top-stat">
+                <span id="camera-alt" class="stat-value">ALT ---</span>
+            </div>
+        </div>
+
+        <div class="top-right">
+            <div class="clock-group">
+                <span id="clock-utc">--:--:-- UTC</span>
+                <span id="clock-local">--:--:-- LOCAL</span>
+                <span id="clock-date">----/--/--</span>
+            </div>
+            <span id="fps-counter">-- FPS</span>
+        </div>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════════
+         LEFT SIDEBAR
+         ════════════════════════════════════════════════════════════ -->
+    <nav id="sidebar">
+
+        <!-- Data Layers -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">DATA LAYERS</div>
+
+            <div class="layer-toggle active" data-layer="flights">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">FLIGHTS</span>
+                <span class="toggle-count" id="count-flights">0</span>
+            </div>
+
+            <div class="layer-toggle active" data-layer="seismic">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">SEISMIC</span>
+                <span class="toggle-count" id="count-seismic">0</span>
+            </div>
+
+            <div class="layer-toggle active" data-layer="satellites">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">SATELLITES</span>
+                <span class="toggle-count" id="count-satellites">0</span>
+            </div>
+
+            <div class="layer-toggle" data-layer="cctv">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">CCTV NODES</span>
+                <span class="toggle-count" id="count-cctv">0</span>
+            </div>
+
+            <div class="layer-toggle" data-layer="satx">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">SATx SIGINT</span>
+                <span class="toggle-count" id="count-satx">0</span>
+                <span class="satx-alert-badge" id="satx-alert-badge">0</span>
+            </div>
+
+            <div class="layer-toggle" data-layer="traffic">
+                <span class="toggle-indicator"></span>
+                <span class="toggle-label">TRAFFIC</span>
+                <span class="toggle-count" id="count-traffic">0</span>
+            </div>
+        </div>
+
+        <!-- Camera Presets -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">CAMERA VIEW</div>
+            <button class="view-btn active" data-view="GLOBE">◉ GLOBE</button>
+            <button class="view-btn" data-view="3D">◉ 3D STREET</button>
+            <button class="view-btn" data-view="OVERHEAD">◉ OVERHEAD</button>
+        </div>
+
+        <!-- Visual Filters -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">VISUAL MODE</div>
+            <button class="filter-btn active" data-filter="NORMAL">◉ NORMAL</button>
+            <button class="filter-btn" data-filter="CRT">◉ CRT MONITOR</button>
+            <button class="filter-btn" data-filter="NVG">◉ NIGHT VISION</button>
+            <button class="filter-btn" data-filter="FLIR">◉ FLIR THERMAL</button>
+        </div>
+
+        <!-- System Info -->
+        <div class="sidebar-section" style="margin-top: auto; border-bottom: none;">
+            <div class="sidebar-section-title">SYSTEM</div>
+            <div style="font-size: 9px; color: #333; line-height: 1.6;">
+                GDI v1.0.0 — VALKYRIE<br>
+                CesiumJS 1.138 • MQTT<br>
+                Backend: <span id="sys-backend" style="color:#ff004080;">OFFLINE</span><br>
+                <span style="color: #00ff4140;">■</span> ARTIFACT VIRTUAL
+            </div>
+        </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════
+         CESIUM VIEWER
+         ════════════════════════════════════════════════════════════ -->
+    <div id="cesium-container"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         HUD ELEMENTS
+         ════════════════════════════════════════════════════════════ -->
+
+    <!-- Crosshair -->
+    <div id="crosshair">
+        <div class="crosshair-gap crosshair-gap-h"></div>
+        <div class="crosshair-gap crosshair-gap-v"></div>
+    </div>
+
+    <!-- Compass Rose -->
+    <div id="compass">
+        <div class="compass-ring"></div>
+        <div class="compass-arrow"></div>
+        <span class="compass-label compass-n">N</span>
+        <span class="compass-label compass-s">S</span>
+        <span class="compass-label compass-e">E</span>
+        <span class="compass-label compass-w">W</span>
+        <span class="compass-heading">0.0°</span>
+    </div>
+
+    <!-- FLIR Label -->
+    <div id="flir-label">FLIR</div>
+
+    <!-- Info Overlay (click popup) -->
+    <div id="info-overlay"></div>
+
+    <!-- Boot Message -->
+    <div id="boot-message">INITIALIZING SYSTEMS...</div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         VALKYRIE AI PANEL
+         ════════════════════════════════════════════════════════════ -->
+    <div id="valkyrie-panel" class="valkyrie-collapsed">
+        <div id="valkyrie-header" onclick="window.gdi?.valkyrie?.toggle()">
+            <span class="valkyrie-title">⚔ VALKYRIE</span>
+            <span class="valkyrie-status" id="valkyrie-status">READY</span>
+            <span class="valkyrie-toggle">▼</span>
+        </div>
+        <div id="valkyrie-body">
+            <div id="valkyrie-messages"></div>
+            <div id="valkyrie-input-row">
+                <input type="text" id="valkyrie-input" placeholder="Query VALKYRIE..."
+                       autocomplete="off" spellcheck="false" />
+                <button id="valkyrie-send" onclick="window.gdi?.valkyrie?.send()">⏎</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         BOTTOM STATUS BAR
+         ════════════════════════════════════════════════════════════ -->
+    <footer id="bottom-bar">
+        <div class="status-indicator status-idle" id="status-flights">
+            <span class="status-label">FLIGHTS: IDLE</span>
+        </div>
+        <div class="status-indicator status-idle" id="status-seismic">
+            <span class="status-label">SEISMIC: IDLE</span>
+        </div>
+        <div class="status-indicator status-idle" id="status-satellites">
+            <span class="status-label">SATELLITES: IDLE</span>
+        </div>
+        <div class="status-indicator status-idle" id="status-cctv">
+            <span class="status-label">CCTV: IDLE</span>
+        </div>
+        <div class="status-indicator status-idle" id="status-satx">
+            <span class="status-label">SATx: IDLE</span>
+        </div>
+        <div class="status-indicator status-idle" id="status-traffic">
+            <span class="status-label">TRAFFIC: IDLE</span>
+        </div>
+
+        <div class="spacer"></div>
+
+        <span id="mouse-coords">--°--'--"N --°--'--"E ALT ---m</span>
+        <span id="camera-alt-bottom"></span>
+    </footer>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SCRIPTS (order matters: config → satellites → filters → layers → hud → app)
+         ════════════════════════════════════════════════════════════ -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="satellites.js"></script>
+    <script src="filters.js"></script>
+    <script src="layers.js"></script>
+    <script src="satx-layer.js"></script>
+    <script src="hud.js"></script>
+    <script src="valkyrie.js"></script>
+    <script src="intel-panel.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>

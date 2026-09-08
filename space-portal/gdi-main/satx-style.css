@@ -1,0 +1,310 @@
+/**
+ * GDI — SATx Layer Styles
+ * Military aesthetic: dark theme, green/amber/red accents
+ * Matches GDI's existing visual language
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   ALERT NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.satx-alert-container {
+    position: fixed;
+    top: 48px;
+    right: 100px;
+    width: 320px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    z-index: 1200;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.satx-alert {
+    background: #111111f0;
+    border: 1px solid #2a2a2a;
+    border-left: 3px solid #00b4d8;
+    border-radius: 3px;
+    padding: 8px 10px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    transition: opacity 0.3s ease-out;
+    animation: satx-alert-slide-in 0.3s ease-out;
+}
+
+.satx-alert-critical {
+    border-left-color: #ff0040;
+    animation: satx-alert-slide-in 0.3s ease-out, satx-alert-pulse-red 2s infinite;
+}
+
+.satx-alert-warning {
+    border-left-color: #ffb000;
+}
+
+.satx-alert-info {
+    border-left-color: #00b4d8;
+}
+
+.satx-alert-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.satx-alert-icon {
+    font-size: 12px;
+}
+
+.satx-alert-severity {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    flex: 1;
+}
+
+.satx-alert-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #555;
+}
+
+.satx-alert-dismiss {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0 2px;
+    font-family: 'Share Tech Mono', monospace;
+    transition: color 0.15s;
+}
+
+.satx-alert-dismiss:hover {
+    color: #ff0040;
+}
+
+.satx-alert-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: #ccc;
+    letter-spacing: 0.5px;
+}
+
+.satx-alert-message {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #888;
+    margin-top: 3px;
+    line-height: 1.4;
+}
+
+.satx-alert-detail {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #00ff41;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIDEBAR — SATx SECTION
+   ═══════════════════════════════════════════════════════════════════ */
+
+.satx-filter-group {
+    margin-top: 6px;
+    padding: 4px 0;
+}
+
+.satx-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #666;
+}
+
+.satx-filter-row label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.satx-filter-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #444;
+    border-radius: 1px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+}
+
+.satx-filter-row input[type="checkbox"]:checked {
+    background: #00ff41;
+    border-color: #00ff41;
+    box-shadow: 0 0 4px #00ff4160;
+}
+
+.satx-filter-row input[type="range"] {
+    width: 60px;
+    height: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #333;
+    border-radius: 1px;
+    outline: none;
+}
+
+.satx-filter-row input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 8px;
+    height: 8px;
+    background: #00ff41;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 4px #00ff4160;
+}
+
+.satx-filter-value {
+    color: #00ff41;
+    min-width: 28px;
+    text-align: right;
+}
+
+/* Alert badge in sidebar toggle */
+.satx-alert-badge {
+    display: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    background: #ff0040;
+    color: #fff;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 4px;
+    animation: satx-alert-pulse-red 2s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INFO OVERLAY — SATx Detection Popup
+   ═══════════════════════════════════════════════════════════════════ */
+
+.info-title.satx-detection-title {
+    color: #ff0040;
+}
+
+.satx-signal-bar {
+    margin-top: 6px;
+    padding: 4px 0;
+}
+
+.satx-signal-bar-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+}
+
+.satx-signal-bar-track {
+    height: 4px;
+    background: #1a1a1a;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.satx-signal-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff41, #ffb000, #ff0040);
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.satx-confidence-bar-fill {
+    height: 100%;
+    background: #00b4d8;
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+/* Signal class color indicators */
+.satx-class-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.satx-class-beacon          { background: #00ff41; }
+.satx-class-telemetry       { background: #00b4d8; }
+.satx-class-voice           { background: #c77dff; }
+.satx-class-data            { background: #ffb000; }
+.satx-class-cw              { background: #ffffff; }
+.satx-class-burst           { background: #ff6600; }
+.satx-class-spread_spectrum { background: #ff0040; }
+.satx-class-interference    { background: #666666; }
+.satx-class-unknown         { background: #ff0040; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes satx-alert-slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes satx-alert-pulse-red {
+    0%, 100% {
+        box-shadow: 0 0 4px rgba(255, 0, 64, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(255, 0, 64, 0.5);
+    }
+}
+
+@keyframes satx-detection-ping {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+    .satx-alert-container {
+        width: 260px;
+        right: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .satx-alert-container {
+        width: calc(100% - 24px);
+        left: 12px;
+        right: 12px;
+    }
+}

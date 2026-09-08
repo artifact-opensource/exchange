@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GDI — Global Defence Initiative</title>
+<meta name="description" content="Sovereign multi-domain intelligence platform. Real-time situational awareness across air, space, land, sea, and cyber.">
+<meta name="author" content="Artifact Virtual">
+<meta property="og:title" content="GDI — Global Defence Initiative">
+<meta property="og:description" content="Sovereign multi-domain intelligence. Real-time situational awareness.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gdi.artifactvirtual.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--bg-elevated:#0e0e10;--bg-surface:#141416;
+  --border:#1a1a1e;--border-subtle:#141418;
+  --text:#fafafa;--text-secondary:#a1a1aa;--text-muted:#63636e;
+  --accent:rgba(255,255,255,.06);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:var(--text);text-decoration:none;transition:all .3s ease}
+a:hover{opacity:.8}
+img{max-width:100%;height:auto}
+::selection{background:rgba(255,255,255,.08)}
+
+/* ─── Animations ─── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInSlow{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes breathe{0%,100%{opacity:.03}50%{opacity:.06}}
+@keyframes drift{0%{transform:translate(0,0)}25%{transform:translate(10px,-10px)}50%{transform:translate(-5px,15px)}75%{transform:translate(-15px,-5px)}100%{transform:translate(0,0)}}
+@keyframes gridPulse{0%,100%{opacity:.015}50%{opacity:.04}}
+@keyframes scanDown{0%{top:-2px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes borderGlow{0%,100%{border-color:var(--border)}50%{border-color:rgba(255,255,255,.08)}}
+
+.fade{animation:fadeIn .8s cubic-bezier(.16,1,.3,1) both}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.35s}.d5{animation-delay:.4s}
+
+/* ─── Background Effects ─── */
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:80px 80px;
+  animation:gridPulse 8s ease infinite}
+
+.bg-radial{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,255,255,.02),transparent)}
+
+.bg-orb{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(120px)}
+.bg-orb-1{width:600px;height:600px;top:-200px;right:-100px;background:rgba(255,255,255,.015);animation:drift 30s ease infinite}
+.bg-orb-2{width:400px;height:400px;bottom:10%;left:-100px;background:rgba(255,255,255,.01);animation:drift 25s ease infinite reverse}
+
+/* ─── Layout ─── */
+.container{max-width:1000px;margin:0 auto;padding:0 32px;position:relative;z-index:1}
+section{padding:100px 0;position:relative}
+
+/* ─── Nav ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;backdrop-filter:blur(20px) saturate(1.2);background:rgba(9,9,11,.7);border-bottom:1px solid var(--border-subtle);transition:all .4s ease}
+nav .container{display:flex;align-items:center;justify-content:space-between}
+.wordmark{display:flex;align-items:center;gap:10px}
+.wordmark img{height:24px;opacity:.85;transition:opacity .3s}
+.wordmark:hover img{opacity:1}
+.wordmark-text{font-size:.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--text);transition:letter-spacing .3s}
+.wordmark-text span{color:var(--text-muted);font-weight:400;letter-spacing:.06em;margin-left:8px;font-size:.7rem;text-transform:none}
+.nav-right{display:flex;align-items:center;gap:28px}
+.nav-right a{font-size:.78rem;color:var(--text-muted);font-weight:500;letter-spacing:.03em;position:relative;padding-bottom:2px}
+.nav-right a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--text);transition:width .3s ease}
+.nav-right a:hover{color:var(--text);opacity:1}
+.nav-right a:hover::after{width:100%}
+.nav-btn{background:var(--text)!important;color:var(--bg)!important;padding:7px 18px;border-radius:3px;font-weight:600!important;font-size:.75rem!important;letter-spacing:.05em!important;text-transform:uppercase;transition:all .3s ease!important}
+.nav-btn::after{display:none!important}
+.nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,255,255,.1);opacity:1!important}
+@media(hover:none){.nav-btn:hover{transform:none;box-shadow:none}}
+
+/* ─── Hero ─── */
+.hero{padding:200px 0 120px;position:relative;overflow:hidden}
+.hero-line{width:40px;height:1px;background:var(--text-muted);margin-bottom:24px;animation:slideRight .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.05s}
+.hero-label{font-size:.68rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:32px;word-spacing:.1em}
+.hero h1{font-size:clamp(2rem,4.2vw,3rem);font-weight:700;line-height:1.25;margin-bottom:28px;max-width:640px;letter-spacing:-.02em}
+.hero h1 .thin{font-weight:300;color:var(--text-secondary)}
+.hero p{font-size:1rem;color:var(--text-secondary);max-width:480px;line-height:1.75;margin-bottom:44px;font-weight:300}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 28px;border-radius:3px;font-weight:600;font-size:.82rem;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:pointer;border:none;text-decoration:none;letter-spacing:.03em;position:relative;overflow:hidden}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);transform:translateX(-100%);transition:transform .6s ease}
+.btn:hover::before{transform:translateX(100%)}
+.btn-white{background:var(--text);color:var(--bg)}
+.btn-white:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,255,255,.12);opacity:1}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.02)}
+
+/* ─── Section Styling ─── */
+.section-line{width:32px;height:1px;background:var(--text-muted);margin-bottom:20px;opacity:0;transform:scaleX(0);transform-origin:left;transition:all .6s ease}
+.visible .section-line{opacity:1;transform:scaleX(1)}
+.label{font-size:.68rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px}
+.section-title{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;margin-bottom:12px}
+.section-desc{color:var(--text-secondary);max-width:460px;font-size:.92rem;font-weight:300;line-height:1.7}
+
+/* ─── Domains ─── */
+.domains{background:transparent}
+.domains-header{margin-bottom:52px}
+.domain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-subtle);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100%}
+.domain-cell{background:var(--bg);padding:36px 28px;position:relative;transition:all .4s ease;overflow:hidden}
+.domain-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);transition:height .5s ease}
+.domain-cell:hover::before{height:100%}
+.domain-cell:hover{background:rgba(255,255,255,.01)}
+.domain-cell h3{font-size:.85rem;font-weight:600;margin-bottom:8px;letter-spacing:.02em;transition:all .3s}
+.domain-cell:hover h3{letter-spacing:.04em}
+.domain-cell p{font-size:.8rem;color:var(--text-muted);line-height:1.65}
+.tag{display:inline-block;font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);background:rgba(255,255,255,.03);padding:3px 8px;border-radius:2px;margin-bottom:14px;border:1px solid var(--border-subtle);transition:all .3s}
+.domain-cell:hover .tag{border-color:rgba(255,255,255,.08);color:var(--text-secondary)}
+
+/* ─── Capabilities ─── */
+.capabilities{background:var(--bg-elevated)}
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.cap-left .section-title{margin-bottom:16px}
+.cap-left p{margin-bottom:0}
+.cap-list{list-style:none}
+.cap-list li{padding:20px 0;border-bottom:1px solid var(--border-subtle);display:flex;gap:16px;align-items:flex-start;transition:all .3s ease;cursor:default}
+.cap-list li:hover{padding-left:8px}
+@media(hover:none){.cap-list li:hover{padding-left:0}}
+.cap-list li:last-child{border-bottom:none}
+.cap-num{font-size:.65rem;font-weight:600;color:var(--text-muted);letter-spacing:.12em;min-width:24px;padding-top:3px;transition:color .3s}
+.cap-list li:hover .cap-num{color:var(--text-secondary)}
+.cap-content h4{font-size:.86rem;font-weight:600;margin-bottom:5px;transition:all .3s}
+.cap-list li:hover .cap-content h4{letter-spacing:.01em}
+.cap-content p{font-size:.8rem;color:var(--text-muted);line-height:1.65}
+
+/* ─── Approach ─── */
+.approach{background:transparent}
+.approach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:52px}
+.approach-card{position:relative;padding-top:20px}
+.approach-card::before{content:'';position:absolute;top:0;left:0;width:24px;height:1px;background:var(--text-muted);transition:width .4s ease}
+.approach-card:hover::before{width:48px}
+.approach-card .num{font-size:.6rem;font-weight:500;letter-spacing:.18em;color:var(--text-muted);margin-bottom:18px;text-transform:uppercase}
+.approach-card h3{font-size:.95rem;font-weight:600;margin-bottom:10px;letter-spacing:-.01em}
+.approach-card p{font-size:.82rem;color:var(--text-muted);line-height:1.7}
+
+/* ─── Principles ─── */
+.principles{background:var(--bg-elevated)}
+.principles-list{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:52px;background:var(--border-subtle);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100%}
+.principle{padding:32px 28px;background:var(--bg-elevated);position:relative;transition:all .4s ease}
+.principle::after{content:'';position:absolute;bottom:0;left:28px;right:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);opacity:0;transition:opacity .4s}
+.principle:hover::after{opacity:1}
+.principle:hover{background:rgba(255,255,255,.01)}
+.principle h3{font-size:.86rem;font-weight:600;margin-bottom:7px;transition:all .3s}
+.principle:hover h3{letter-spacing:.01em}
+.principle p{font-size:.8rem;color:var(--text-muted);line-height:1.65}
+
+/* ─── CTA ─── */
+.cta{text-align:center;padding:128px 0;position:relative}
+.cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(255,255,255,.015),transparent 70%);pointer-events:none;animation:breathe 6s ease infinite}
+.cta h2{font-size:1.5rem;font-weight:700;margin-bottom:12px;letter-spacing:-.01em;line-height:1.3}
+.cta p{color:var(--text-muted);margin-bottom:40px;font-size:.92rem;font-weight:300}
+.cta .restricted{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin-top:32px;opacity:.6}
+
+/* ─── Footer ─── */
+footer{padding:36px 0;border-top:1px solid var(--border-subtle)}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;width:100%}
+.footer-left{font-size:.72rem;color:var(--text-muted);letter-spacing:.02em}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:.72rem;color:var(--text-muted);position:relative}
+.footer-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--text-muted);transition:width .3s}
+.footer-links a:hover{color:var(--text-secondary);opacity:1}
+.footer-links a:hover::after{width:100%}
+
+/* ─── Tablet ─── */
+@media(max-width:1024px){
+  .container{max-width:100%;padding:0 28px}
+  .hero h1{font-size:clamp(1.8rem,3.5vw,2.6rem)}
+  .domain-grid{grid-template-columns:repeat(2,1fr)}
+  .cap-grid{gap:40px}
+  .approach-grid{gap:24px}
+  .cta::before{width:350px;height:350px}
+}
+
+/* ─── Mobile ─── */
+@media(max-width:768px){
+  section{padding:64px 0}
+  .hero{padding:130px 0 64px}
+  .hero h1{font-size:1.6rem;max-width:100%}
+  .hero p{font-size:.9rem;max-width:100%}
+  .hero-actions{flex-direction:column;gap:10px}
+  .hero-actions .btn{width:100%;justify-content:center;text-align:center}
+  .nav-right a:not(.nav-btn){display:none}
+  .nav-btn{padding:6px 14px;font-size:.7rem!important}
+  .wordmark-text{font-size:.7rem}
+  .wordmark-text span{display:none}
+  .domain-grid{grid-template-columns:1fr}
+  .domain-cell{padding:28px 22px}
+  .cap-grid{grid-template-columns:1fr;gap:32px}
+  .cap-left .section-desc{max-width:100%}
+  .approach-grid{grid-template-columns:1fr;gap:24px}
+  .principles-list{grid-template-columns:1fr}
+  .principle{padding:24px 22px}
+  .container{padding:0 18px}
+  .bg-orb{display:none}
+  .section-title{font-size:1.25rem}
+  .section-desc{font-size:.85rem;max-width:100%}
+  .cta{padding:80px 0}
+  .cta h2{font-size:1.25rem}
+  .cta::before{width:280px;height:280px}
+  .footer-inner{flex-direction:column;text-align:center;gap:12px}
+  .footer-links{justify-content:center}
+  nav{padding:10px 0}
+}
+
+/* ─── Small Mobile ─── */
+@media(max-width:400px){
+  .hero{padding:110px 0 56px}
+  .hero h1{font-size:1.35rem}
+  .container{padding:0 14px}
+  section{padding:52px 0}
+  .domain-cell{padding:22px 18px}
+  .domain-cell h3{font-size:.8rem}
+  .domain-cell p{font-size:.75rem}
+  .cap-list li{gap:10px;padding:16px 0}
+  .cap-content h4{font-size:.8rem}
+  .cap-content p{font-size:.75rem}
+  .approach-card p{font-size:.78rem}
+  .principle p{font-size:.75rem}
+  .btn{padding:10px 22px;font-size:.78rem}
+}
+
+/* ─── Scroll Reveal ─── */
+.reveal{opacity:0;transform:translateY(20px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+</style>
+</head>
+<body>
+
+<!-- Background effects -->
+<div class="bg-grid"></div>
+<div class="bg-radial"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<!-- Nav -->
+<nav>
+<div class="container">
+  <a href="#" class="wordmark">
+    <img src="assets/gdi-emblem.png" alt="GDI">
+    <div class="wordmark-text">GDI <span>Global Defence Initiative</span></div>
+  </a>
+  <div class="nav-right">
+    <a href="#domains">Domains</a>
+    <a href="#capabilities">Capabilities</a>
+    <a href="#approach">Architecture</a>
+    <a href="mailto:ali.shakil@artifactvirtual.com" class="nav-btn">Request Access</a>
+  </div>
+</div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+<div class="container">
+  <div class="hero-line fade"></div>
+  <div class="hero-label fade d1">Sovereign Intelligence Platform</div>
+  <h1 class="fade d2">Multi-domain situational awareness.<br><span class="thin">One unified picture.</span></h1>
+  <p class="fade d3">Real-time intelligence across air, space, land, and cyber — fused into a single operational view. AI-powered analysis. Sovereign infrastructure. No external dependencies.</p>
+  <div class="hero-actions fade d4">
+    <a href="mailto:ali.shakil@artifactvirtual.com" class="btn btn-white">Request Access</a>
+    <a href="#domains" class="btn btn-outline">Learn More</a>
+  </div>
+</div>
+</section>
+
+<!-- Domains -->
+<section id="domains" class="domains">
+<div class="container">
+  <div class="domains-header reveal">
+    <div class="section-line"></div>
+    <div class="label">Intelligence Domains</div>
+    <h2 class="section-title">Six domains. Continuous coverage.</h2>
+    <p class="section-desc">Each domain operates independently. Together, they form a correlated intelligence picture that no single source can provide.</p>
+  </div>
+  <div class="domain-grid reveal reveal-delay-1">
+    <div class="domain-cell">
+      <div class="tag">Airspace</div>
+      <h3>Air Domain Awareness</h3>
+      <p>Continuous monitoring of commercial and military air traffic. Automatic classification, anomaly detection, and pattern-of-life analysis across global airspace.</p>
+    </div>
+    <div class="domain-cell">
+      <div class="tag">Space</div>
+      <h3>Orbital Surveillance</h3>
+      <p>Satellite tracking and orbital element analysis. Identify overhead windows, detect maneuvers, and monitor space-based assets in real-time.</p>
+    </div>
+    <div class="domain-cell">
+      <div class="tag">Geophysical</div>
+      <h3>Seismic &amp; Environmental</h3>
+      <p>Real-time seismic monitoring with cross-correlation to critical infrastructure. Environmental event detection at global scale with sub-minute latency.</p>
+    </div>
+    <div class="domain-cell">
+      <div class="tag">Maritime</div>
+      <h3>Maritime Awareness</h3>
+      <p>Vessel tracking, port activity monitoring, and maritime pattern analysis. Identify anomalous behavior across shipping lanes and territorial waters.</p>
+    </div>
+    <div class="domain-cell">
+      <div class="tag">Financial</div>
+      <h3>Economic Intelligence</h3>
+      <p>Market signal monitoring correlated with geopolitical events. Identify economic indicators that precede or accompany kinetic activity.</p>
+    </div>
+    <div class="domain-cell">
+      <div class="tag">OSINT</div>
+      <h3>Open Source Intelligence</h3>
+      <p>Multi-language open source collection and analysis. Structured extraction from unstructured data. Automated credibility assessment and source verification.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Capabilities -->
+<section id="capabilities" class="capabilities">
+<div class="container">
+  <div class="cap-grid">
+    <div class="cap-left reveal">
+      <div class="section-line"></div>
+      <div class="label">Capabilities</div>
+      <h2 class="section-title">What GDI delivers</h2>
+      <p class="section-desc">An intelligence analyst that processes more data in a second than a human team can in a day. Natural language in. Intelligence out.</p>
+    </div>
+    <ul class="cap-list reveal reveal-delay-1">
+      <li>
+        <span class="cap-num">01</span>
+        <div class="cap-content">
+          <h4>Natural Language Querying</h4>
+          <p>Ask the planet a question. "What military activity is occurring near the Taiwan Strait?" Receive a sourced, timestamped intelligence briefing.</p>
+        </div>
+      </li>
+      <li>
+        <span class="cap-num">02</span>
+        <div class="cap-content">
+          <h4>Cross-Domain Correlation</h4>
+          <p>Automatically correlate events across domains. Seismic events, unusual air traffic, financial spikes — connected and assessed in real-time.</p>
+        </div>
+      </li>
+      <li>
+        <span class="cap-num">03</span>
+        <div class="cap-content">
+          <h4>3D Geospatial Interface</h4>
+          <p>Full-resolution 3D globe with photorealistic terrain. Multiple operational viewing modes. Every data point in its real-world context.</p>
+        </div>
+      </li>
+      <li>
+        <span class="cap-num">04</span>
+        <div class="cap-content">
+          <h4>Anomaly Detection</h4>
+          <p>Pattern-of-life baselines across all domains. Automatic flagging of deviations — aircraft, vessels, or activity outside normal parameters.</p>
+        </div>
+      </li>
+      <li>
+        <span class="cap-num">05</span>
+        <div class="cap-content">
+          <h4>Continuous Monitoring</h4>
+          <p>15+ live intelligence feeds. Sub-minute update cycles. No polling gaps. No stale data. The picture is always current.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- Approach -->
+<section id="approach" class="approach">
+<div class="container">
+  <div class="reveal">
+    <div class="section-line"></div>
+    <div class="label">Architecture</div>
+    <h2 class="section-title">Three stages. Zero leakage.</h2>
+    <p class="section-desc">Raw data enters. Intelligence exits. Nothing leaves the perimeter.</p>
+  </div>
+  <div class="approach-grid">
+    <div class="approach-card reveal">
+      <div class="num">Stage 01 — Collect</div>
+      <h3>Multi-Source Ingestion</h3>
+      <p>Heterogeneous data feeds normalized into a unified entity schema. Every source — regardless of format, protocol, or frequency — produces the same structured output.</p>
+    </div>
+    <div class="approach-card reveal reveal-delay-1">
+      <div class="num">Stage 02 — Analyze</div>
+      <h3>AI-Powered Fusion</h3>
+      <p>Dual-tier analysis engine correlates across domains, establishes baselines, detects anomalies, and generates assessments. Natural language interface for operator queries.</p>
+    </div>
+    <div class="approach-card reveal reveal-delay-2">
+      <div class="num">Stage 03 — Present</div>
+      <h3>Operational Interface</h3>
+      <p>3D geospatial visualization with multiple operational viewing modes. Every entity, event, and assessment rendered in spatial and temporal context.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Principles -->
+<section class="principles">
+<div class="container">
+  <div class="reveal">
+    <div class="section-line"></div>
+    <div class="label">Principles</div>
+    <h2 class="section-title">Built on conviction, not convenience</h2>
+  </div>
+  <div class="principles-list reveal reveal-delay-1">
+    <div class="principle">
+      <h3>Sovereign by Design</h3>
+      <p>Runs on your infrastructure. No cloud dependencies. No data exfiltration. Air-gapped deployment supported. Your intelligence never leaves your control.</p>
+    </div>
+    <div class="principle">
+      <h3>Zero Vendor Cost</h3>
+      <p>Core intelligence feeds built on open and public data sources. No recurring API subscriptions for fundamental capabilities. Operational cost approaches zero.</p>
+    </div>
+    <div class="principle">
+      <h3>Operator-First</h3>
+      <p>Every interface decision made for the person at 3 AM who needs an answer in seconds. Information density over aesthetics. No decorative visualizations.</p>
+    </div>
+    <div class="principle">
+      <h3>Auditable Intelligence</h3>
+      <p>Every assessment traces back to source data. Every correlation is explainable. No black-box conclusions. Trust is earned through transparency.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+<div class="container">
+  <div class="reveal">
+    <h2>Restricted access.</h2>
+    <p>GDI is not a public product. Access is granted on a case-by-case basis.</p>
+    <a href="mailto:ali.shakil@artifactvirtual.com" class="btn btn-white">Request Access</a>
+    <div class="restricted">Classification: Restricted</div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<div class="container">
+  <div class="footer-inner">
+    <div class="footer-left">&copy; 2026 Artifact Virtual (SMC-Private) Limited</div>
+    <div class="footer-links">
+      <a href="https://artifactvirtual.com">Artifact Virtual</a>
+      <a href="mailto:ali@artifactvirtual.com">Contact</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+// Intersection Observer for scroll reveals
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}
+  })
+},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth'})
+  })
+});
+
+// Parallax on hero
+const hero=document.querySelector('.hero');
+let ticking=false;
+window.addEventListener('scroll',()=>{
+  if(!ticking){
+    requestAnimationFrame(()=>{
+      const y=window.scrollY;
+      if(y<800){
+        hero.style.transform=`translateY(${y*.08}px)`;
+        hero.style.opacity=1-(y/800)*.3;
+      }
+      ticking=false;
+    });
+    ticking=true;
+  }
+});
+
+// Subtle mouse-follow gradient on domain cells
+document.querySelectorAll('.domain-cell').forEach(cell=>{
+  cell.addEventListener('mousemove',e=>{
+    const r=cell.getBoundingClientRect();
+    const x=e.clientX-r.left;
+    const y=e.clientY-r.top;
+    cell.style.background=`radial-gradient(300px circle at ${x}px ${y}px,rgba(255,255,255,.015),transparent)`;
+  });
+  cell.addEventListener('mouseleave',()=>{
+    cell.style.background='var(--bg)';
+  });
+});
+
+// Same for principles
+document.querySelectorAll('.principle').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=e.clientX-r.left;
+    const y=e.clientY-r.top;
+    card.style.background=`radial-gradient(250px circle at ${x}px ${y}px,rgba(255,255,255,.012),transparent)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.background='var(--bg-elevated)';
+  });
+});
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@ import InfoOverlay from "./components/InfoOverlay";
 import BlockchainHero from "./components/BlockchainHero";
 import LandingPage from "./components/LandingPage";
 import NodeMarkdownViewer from "./components/NodeMarkdownViewer";
-import SpaceDivision from "./components/SpaceDivision";
+import SpaceCommandDeck from "./components/SpaceCommandDeck";
 import InvestorPortalApp, { PortalBoundary } from "./components/InvestorPortal";
 import QuantumBackground from "./components/QuantumBackground";
 import CatalogDimension from "./components/CatalogDimension";
@@ -351,7 +351,7 @@ export default function App() {
                         return `${parts[0]}/${parts[1]}`;
                       })}
                   />
-                  <SpaceDivision />
+                  <SpaceCommandDeck />
                 </>
               )}
 

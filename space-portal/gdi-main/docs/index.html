@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GDI — Global Defense Intelligence</title>
+<meta name="description" content="Sovereign multi-domain intelligence platform. Real-time situational awareness across air, space, maritime, ground, cyber, and environmental domains. Restricted access. Zero FISA surface area.">
+<meta name="author" content="Artifact Virtual">
+<meta property="og:title" content="GDI — Global Defense Intelligence">
+<meta property="og:description" content="The anti-Palantir. Open. Sovereign.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gdi.artifactvirtual.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;
+  --bg-elevated:#0d0d0f;
+  --bg-surface:#111113;
+  --bg-card:#0e0e10;
+  --border:#1c1c1f;
+  --border-subtle:#161618;
+  --text:#f4f4f5;
+  --text-secondary:#a1a1aa;
+  --text-muted:#52525b;
+  --accent-green:#22c55e;
+  --accent-blue:#3b82f6;
+  --accent-amber:#f59e0b;
+  --accent-red:#ef4444;
+  --accent-purple:#a855f7;
+  --accent-cyan:#06b6d4;
+  --font:"Inter",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+}
+.mi{font-family:"Material Icons";font-style:normal;font-weight:400;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto}
+::selection{background:rgba(255,255,255,.08)}
+
+/* Grid bg */
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── Layout ── */
+.container{max-width:1100px;margin:0 auto;padding:0 32px;position:relative;z-index:1}
+section{position:relative;z-index:1}
+
+/* ── Nav ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  border-bottom:1px solid var(--border-subtle);
+  background:rgba(9,9,11,.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.nav-inner{
+  max-width:1100px;margin:0 auto;padding:0 32px;
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{
+  width:26px;height:26px;border:1px solid rgba(255,255,255,.18);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text);
+}
+.nav-logo-name{font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--text-secondary)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:.8rem;color:var(--text-muted);transition:color .2s;letter-spacing:.01em}
+.nav-links a:hover{color:var(--text)}
+.nav-btn{
+  font-size:.75rem;font-weight:500;letter-spacing:.06em;
+  padding:7px 16px;border:1px solid var(--border);border-radius:4px;
+  color:var(--text-secondary);transition:all .2s;
+}
+.nav-btn:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+
+/* ── Hero ── */
+.hero{padding:160px 0 100px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.68rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:28px;
+}
+.hero-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent-green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{
+  font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:700;line-height:1.18;
+  letter-spacing:-.03em;max-width:720px;margin-bottom:24px;
+}
+.hero h1 .dim{font-weight:300;color:var(--text-secondary)}
+.hero-sub{
+  font-size:1.05rem;color:var(--text-secondary);max-width:520px;
+  line-height:1.75;margin-bottom:40px;font-weight:300;
+}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border-radius:5px;
+  font-size:.875rem;font-weight:500;letter-spacing:.01em;
+  cursor:pointer;transition:all .2s;border:1px solid transparent;
+}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.1)}
+.btn-outline{border-color:var(--border);color:var(--text-secondary)}
+.btn-outline:hover{border-color:rgba(255,255,255,.22);color:var(--text)}
+
+.hero-stats{
+  display:flex;gap:40px;flex-wrap:wrap;
+  padding-top:40px;border-top:1px solid var(--border-subtle);
+}
+.hero-stat-val{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.hero-stat-label{font-size:.72rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase}
+
+/* ── Section headers ── */
+.section-eyebrow{
+  font-size:.65rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:14px;
+}
+.section-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;letter-spacing:-.025em;margin-bottom:14px}
+.section-desc{font-size:.95rem;color:var(--text-secondary);line-height:1.7;max-width:560px;font-weight:300}
+.section-header{margin-bottom:52px}
+
+/* ── Domains ── */
+.domains{padding:100px 0}
+.domains-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+  background:var(--border);
+}
+.domain-cell{
+  background:var(--bg-card);
+  padding:28px 26px;
+  transition:background .2s;
+}
+.domain-cell:hover{background:var(--bg-surface)}
+.domain-icon{font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center}
+.domain-label{
+  font-size:.65rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:6px;
+}
+.domain-name{font-size:.95rem;font-weight:600;margin-bottom:8px}
+.domain-desc{font-size:.8rem;color:var(--text-secondary);line-height:1.6}
+.domain-sources{
+  margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;
+}
+.domain-tag{
+  font-size:.6rem;font-weight:500;letter-spacing:.06em;
+  padding:3px 8px;border-radius:3px;
+  border:1px solid var(--border);
+  color:var(--text-muted);
+  font-family:var(--mono);
+}
+
+/* ── Architecture ── */
+.architecture{padding:100px 0;background:var(--bg-elevated)}
+.arch-diagram{
+  margin-top:48px;
+  border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.arch-layer{
+  display:grid;
+  border-bottom:1px solid var(--border-subtle);
+}
+.arch-layer:last-child{border-bottom:none}
+.arch-layer-label{
+  padding:16px 20px;
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-muted);
+  background:rgba(255,255,255,.02);
+  border-right:1px solid var(--border-subtle);
+  display:flex;align-items:center;
+  min-width:120px;
+}
+.arch-layer-content{
+  padding:16px 20px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.arch-chip{
+  font-size:.7rem;font-family:var(--mono);font-weight:500;
+  padding:5px 10px;border-radius:4px;
+  border:1px solid var(--border);
+  color:var(--text-secondary);
+  background:var(--bg-card);
+  white-space:nowrap;
+}
+.arch-chip.green{border-color:rgba(34,197,94,.2);color:var(--accent-green);background:rgba(34,197,94,.06)}
+.arch-chip.blue{border-color:rgba(59,130,246,.2);color:var(--accent-blue);background:rgba(59,130,246,.06)}
+.arch-chip.amber{border-color:rgba(245,158,11,.2);color:var(--accent-amber);background:rgba(245,158,11,.06)}
+.arch-chip.purple{border-color:rgba(168,85,247,.2);color:var(--accent-purple);background:rgba(168,85,247,.06)}
+.arch-chip.cyan{border-color:rgba(6,182,212,.2);color:var(--accent-cyan);background:rgba(6,182,212,.06)}
+.arch-chip.red{border-color:rgba(239,68,68,.2);color:var(--accent-red);background:rgba(239,68,68,.06)}
+.arch-layer-row{display:flex}
+
+/* ── Capabilities ── */
+.capabilities{padding:100px 0}
+.cap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.cap-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:7px;padding:28px;
+  transition:border-color .2s;
+}
+.cap-card:hover{border-color:rgba(255,255,255,.12)}
+.cap-icon{font-size:1.2rem;margin-bottom:16px}
+.cap-title{font-size:.9rem;font-weight:600;margin-bottom:8px}
+.cap-desc{font-size:.8rem;color:var(--text-secondary);line-height:1.65}
+.cap-tags{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.cap-tag{
+  font-size:.62rem;padding:3px 8px;border-radius:3px;
+  font-family:var(--mono);font-weight:500;
+}
+.cap-tag.green{color:var(--accent-green);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15)}
+.cap-tag.blue{color:var(--accent-blue);background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)}
+.cap-tag.amber{color:var(--accent-amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)}
+.cap-tag.purple{color:var(--accent-purple);background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15)}
+.cap-tag.cyan{color:var(--accent-cyan);background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)}
+.cap-tag.red{color:var(--accent-red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15)}
+
+/* ── Sovereign section ── */
+.sovereign{padding:100px 0;background:var(--bg-elevated)}
+.sovereign-split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.sovereign-text .section-desc{max-width:100%}
+.sovereign-points{margin-top:32px;display:flex;flex-direction:column;gap:16px}
+.sovereign-point{display:flex;gap:14px;align-items:flex-start}
+.sovereign-point-icon{
+  width:28px;height:28px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;flex-shrink:0;margin-top:2px;
+}
+.sovereign-point-icon.green{background:rgba(34,197,94,.1);color:var(--accent-green)}
+.sovereign-point-icon.blue{background:rgba(59,130,246,.1);color:var(--accent-blue)}
+.sovereign-point-icon.amber{background:rgba(245,158,11,.1);color:var(--accent-amber)}
+.sovereign-point-icon.purple{background:rgba(168,85,247,.1);color:var(--accent-purple)}
+.sovereign-point-title{font-size:.85rem;font-weight:600;margin-bottom:4px}
+.sovereign-point-desc{font-size:.78rem;color:var(--text-secondary);line-height:1.6}
+
+.sovereign-comparison{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.comparison-header{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--border);
+}
+.comparison-header div{
+  padding:12px 16px;
+  font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);
+}
+.comparison-header div:not(:last-child){border-right:1px solid var(--border)}
+.comparison-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  border-bottom:1px solid var(--border-subtle);
+}
+.comparison-row:last-child{border-bottom:none}
+.comparison-row div{
+  padding:11px 16px;font-size:.78rem;
+}
+.comparison-row div:not(:last-child){border-right:1px solid var(--border-subtle)}
+.comparison-row .feature{color:var(--text-secondary)}
+.comparison-row .them{color:var(--text-muted);font-size:.75rem}
+.comparison-row .us{color:var(--accent-green);font-weight:500;font-size:.75rem}
+
+/* ── Intelligence Engine ── */
+.engine{padding:100px 0}
+.engine-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border)}
+.engine-card{background:var(--bg-card);padding:28px 24px}
+.engine-card-top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.engine-card-icon{
+  width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+}
+.engine-card-name{font-size:.85rem;font-weight:600}
+.engine-card-sub{font-size:.68rem;color:var(--text-muted);font-family:var(--mono);margin-top:2px}
+.engine-card-desc{font-size:.78rem;color:var(--text-secondary);line-height:1.65;margin-bottom:16px}
+.engine-card-feats{display:flex;flex-direction:column;gap:6px}
+.engine-feat{font-size:.72rem;color:var(--text-muted);display:flex;gap:7px;align-items:flex-start}
+.engine-feat::before{content:"›";color:var(--text-muted);flex-shrink:0}
+
+/* ── Data sources ── */
+.sources{padding:100px 0;background:var(--bg-elevated)}
+.sources-cats{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.source-cat{background:var(--bg-card);border:1px solid var(--border);border-radius:7px;padding:24px}
+.source-cat-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.source-cat-icon{font-size:1rem}
+.source-cat-name{font-size:.82rem;font-weight:600}
+.source-cat-count{
+  margin-left:auto;
+  font-size:.62rem;font-family:var(--mono);
+  padding:3px 8px;border-radius:3px;
+  color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.source-list{display:flex;flex-direction:column;gap:6px}
+.source-item{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.source-name{font-size:.75rem;color:var(--text-secondary)}
+.source-badge{
+  font-size:.58rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;white-space:nowrap;
+}
+.source-badge.live{color:var(--accent-green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.source-badge.open{color:var(--accent-cyan);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2)}
+.source-badge.soon{color:var(--accent-amber);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+
+/* ── Dark comms ── */
+.darkcomms{padding:100px 0}
+.darkcomms-intro{max-width:600px;margin-bottom:48px}
+.darkcomms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.darkcomms-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:7px;padding:22px;
+}
+.darkcomms-card-icon{font-size:1.1rem;margin-bottom:12px}
+.darkcomms-card-name{font-size:.82rem;font-weight:600;margin-bottom:6px}
+.darkcomms-card-spec{font-size:.7rem;font-family:var(--mono);color:var(--text-muted);margin-bottom:8px}
+.darkcomms-card-desc{font-size:.75rem;color:var(--text-secondary);line-height:1.6}
+
+/* ── Roadmap ── */
+.roadmap{padding:100px 0;background:var(--bg-elevated)}
+.roadmap-phases{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.roadmap-phase{
+  display:grid;grid-template-columns:180px 1fr;
+  border-bottom:1px solid var(--border-subtle);
+}
+.roadmap-phase:last-child{border-bottom:none}
+.roadmap-phase-meta{
+  padding:20px 24px;
+  background:rgba(255,255,255,.02);
+  border-right:1px solid var(--border-subtle);
+}
+.roadmap-phase-num{
+  font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:6px;font-family:var(--mono);
+}
+.roadmap-phase-name{font-size:.85rem;font-weight:600;margin-bottom:4px}
+.roadmap-phase-time{font-size:.72rem;color:var(--text-muted)}
+.roadmap-phase-status{
+  margin-top:8px;
+  font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 8px;border-radius:3px;display:inline-flex;
+}
+.status-live{color:var(--accent-green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.status-building{color:var(--accent-amber);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+.status-planned{color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.roadmap-phase-content{padding:20px 24px}
+.roadmap-items{display:flex;flex-wrap:wrap;gap:7px}
+.roadmap-item{
+  font-size:.72rem;padding:4px 10px;border-radius:4px;
+  border:1px solid var(--border);color:var(--text-secondary);
+  background:var(--bg-card);font-family:var(--mono);
+}
+.roadmap-item.done{
+  color:var(--accent-green);
+  border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.06);
+}
+.roadmap-item.active{
+  color:var(--accent-amber);
+  border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.06);
+}
+
+/* ── Principles ── */
+.principles{padding:100px 0}
+.principles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--border)}
+.principle{background:var(--bg-card);padding:28px}
+.principle-num{
+  font-size:.6rem;font-weight:700;letter-spacing:.2em;font-family:var(--mono);
+  color:var(--text-muted);margin-bottom:12px;
+}
+.principle-title{font-size:.9rem;font-weight:600;margin-bottom:8px}
+.principle-desc{font-size:.78rem;color:var(--text-secondary);line-height:1.65}
+
+/* ── CTA ── */
+.cta{padding:100px 0;background:var(--bg-elevated);text-align:center}
+.cta-inner{max-width:540px;margin:0 auto}
+.cta h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;letter-spacing:-.025em;margin-bottom:16px}
+.cta p{font-size:.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:32px;font-weight:300}
+.cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-classify{
+  margin-top:28px;
+  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-muted);opacity:.5;
+}
+
+/* ── Footer ── */
+footer{
+  padding:32px 0;
+  border-top:1px solid var(--border-subtle);
+}
+.footer-inner{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+}
+.footer-left{font-size:.72rem;color:var(--text-muted)}
+.footer-right{display:flex;gap:24px}
+.footer-right a{font-size:.72rem;color:var(--text-muted);transition:color .2s}
+.footer-right a:hover{color:var(--text-secondary)}
+
+/* ── Animations ── */
+.fade{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.fade.visible{opacity:1;transform:none}
+.d1{transition-delay:.05s}.d2{transition-delay:.12s}.d3{transition-delay:.19s}.d4{transition-delay:.26s}
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .domains-grid{grid-template-columns:repeat(2,1fr)}
+  .cap-grid{grid-template-columns:1fr}
+  .sovereign-split{grid-template-columns:1fr;gap:40px}
+  .engine-grid{grid-template-columns:1fr}
+  .sources-cats{grid-template-columns:1fr}
+  .darkcomms-grid{grid-template-columns:1fr}
+  .principles-grid{grid-template-columns:1fr}
+  .roadmap-phase{grid-template-columns:1fr}
+  .roadmap-phase-meta{border-right:none;border-bottom:1px solid var(--border-subtle)}
+  .comparison-header,.comparison-row{grid-template-columns:1fr 1fr}
+  .comparison-header div:last-child,.comparison-row div:last-child{display:none}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .container{padding:0 20px}
+  .hero{padding:120px 0 70px}
+  .domains-grid{grid-template-columns:1fr}
+  .hero-stats{gap:24px}
+}
+</style>
+<nav>
+<div class="nav-inner">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">GDI</div>
+    <span class="nav-logo-name">Global Defense Intelligence</span>
+  </div>
+  <div class="nav-links">
+    <a href="#domains">Domains</a>
+    <a href="#capabilities">Capabilities</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#sources">Data Sources</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="mailto:ali.shakil@artifactvirtual.com" class="nav-btn">Request Access</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="container">
+  <div class="hero-eyebrow fade">
+    <span class="dot"></span>
+    Sovereign Intelligence Platform &nbsp;·&nbsp; v0.2.0 Sovereign Eye
+  </div>
+  <h1 class="fade d1">Multi-domain awareness.<br><span class="dim">One sovereign picture.</span></h1>
+  <p class="hero-sub fade d2">Real-time intelligence across air, space, maritime, ground, cyber, and environmental domains — fused, correlated, and analysed on your infrastructure. No FISA exposure. No vendor lock-in. No cloud dependency.</p>
+  <div class="hero-actions fade d3">
+    <a href="mailto:ali.shakil@artifactvirtual.com" class="btn btn-primary">Request Access</a>
+    <a href="#domains" class="btn btn-outline">Explore Platform →</a>
+  </div>
+  <div class="hero-stats fade d4">
+    <div>
+      <div class="hero-stat-val">7</div>
+      <div class="hero-stat-label">Intelligence Domains</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">30+</div>
+      <div class="hero-stat-label">Live Data Sources</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">50K+</div>
+      <div class="hero-stat-label">Tracked Space Objects</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">0</div>
+      <div class="hero-stat-label">US Cloud Dependencies</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DOMAINS -->
+<section id="domains" class="domains">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Intelligence Domains</div>
+    <h2 class="section-title">Seven domains. Continuous coverage.</h2>
+    <p class="section-desc">Each domain operates independently. Together, they produce a correlated intelligence picture that no single source can provide.</p>
+  </div>
+  <div class="domains-grid">
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">flight</span></div>
+      <div class="domain-label">Air Domain</div>
+      <div class="domain-name">Aviation Intelligence</div>
+      <div class="domain-desc">Live ADS-B flight tracking with altitude colour-coding, aircraft type identification, route analysis, and restricted airspace monitoring. Anomaly detection for formation flying and transponder spoofing.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">OpenSky</span>
+        <span class="domain-tag">ADS-B Exchange</span>
+        <span class="domain-tag">SGP4 propagator</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">satellite_alt</span></div>
+      <div class="domain-label">Space Domain</div>
+      <div class="domain-name">Space Situational Awareness</div>
+      <div class="domain-desc">Full satellite catalog tracking (50,000+ objects), deep space mission telemetry via DSN Now, JPL Horizons integration for planetary bodies, asteroid close-approach data, and real-time orbital propagation.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">CelesTrak</span>
+        <span class="domain-tag">Space-Track</span>
+        <span class="domain-tag">JPL Horizons</span>
+        <span class="domain-tag">DSN Now</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">directions_boat</span></div>
+      <div class="domain-label">Maritime Domain</div>
+      <div class="domain-name">Vessel Tracking & MDA</div>
+      <div class="domain-desc">Global AIS vessel tracking covering 66,000+ vessels from 1,400+ stations. Dark vessel detection (AIS signal gap analysis), geofence alerting, flag state identification, and sovereign RTL-SDR receiver support.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">AISHub</span>
+        <span class="domain-tag">Global Fishing Watch</span>
+        <span class="domain-tag">BarentsWatch</span>
+        <span class="domain-tag">RTL-SDR</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">public</span></div>
+      <div class="domain-label">Ground Domain</div>
+      <div class="domain-name">Conflict & Event Intelligence</div>
+      <div class="domain-desc">GDELT event data updated every 15 minutes covering conflicts, protests, and diplomatic activity globally. ACLED armed conflict database with georeferenced incident mapping. Seismic monitoring for nuclear test detection.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">GDELT</span>
+        <span class="domain-tag">ACLED</span>
+        <span class="domain-tag">USGS Seismic</span>
+        <span class="domain-tag">GDACS</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">security</span></div>
+      <div class="domain-label">Cyber Domain</div>
+      <div class="domain-name">Cyber Threat Intelligence</div>
+      <div class="domain-desc">Geolocated threat actor activity from AlienVault OTX, Shodan-indexed exposed infrastructure visualised on the globe, AbuseIPDB attack source heatmaps, Tor exit node topology, and CISA Known Exploited Vulnerabilities.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">AlienVault OTX</span>
+        <span class="domain-tag">Shodan</span>
+        <span class="domain-tag">AbuseIPDB</span>
+        <span class="domain-tag">CISA KEV</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">thermostat</span></div>
+      <div class="domain-label">Environmental Domain</div>
+      <div class="domain-name">Hazard & Environmental Monitoring</div>
+      <div class="domain-desc">NASA FIRMS fire hotspots (MODIS + VIIRS, 3-hour latency), GDACS multi-hazard disaster alerts, Sentinel-2 satellite imagery change detection, volcanic activity monitoring, and ocean environmental data.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">NASA FIRMS</span>
+        <span class="domain-tag">Sentinel-2</span>
+        <span class="domain-tag">NOAA Weather</span>
+        <span class="domain-tag">Smithsonian GVP</span>
+      </div>
+    </div>
+    <div class="domain-cell reveal">
+      <div class="domain-icon"><span class="mi" style="font-size:1.5rem">sensors</span></div>
+      <div class="domain-label">SIGINT Domain</div>
+      <div class="domain-name">Signal Intelligence via SATx</div>
+      <div class="domain-desc">Integrated with SATx ground station — automated satellite pass prediction, SDR signal capture, ML-based signal classification, and protocol decoding. Sovereign operation: zero dependence on commercial SIGINT providers.</div>
+      <div class="domain-sources">
+        <span class="domain-tag">SATx SDR</span>
+        <span class="domain-tag">SatNOGS</span>
+        <span class="domain-tag">RTL-SDR v4</span>
+        <span class="domain-tag">GNU Radio</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CAPABILITIES -->
+<section id="capabilities" class="capabilities">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Platform Capabilities</div>
+    <h2 class="section-title">What GDI delivers</h2>
+    <p class="section-desc">Not just a display layer. An active intelligence system that correlates, detects, and explains.</p>
+  </div>
+  <div class="cap-grid">
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">hub</span></div>
+      <div class="cap-title">Cross-Domain Correlation Engine</div>
+      <div class="cap-desc">HEKTOR-powered correlation across all seven domains simultaneously. Automatically connects aircraft movements to seismic events, vessel dark periods to conflict zones, and financial anomalies to geopolitical events — within configurable time and distance windows.</div>
+      <div class="cap-tags">
+        <span class="cap-tag green">HEKTOR</span>
+        <span class="cap-tag blue">BM25 + Vector</span>
+        <span class="cap-tag amber">Real-time</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">my_location</span></div>
+      <div class="cap-title">Geofence & Alerting System</div>
+      <div class="cap-desc">Draw geofence regions directly on the globe. Configure alerts per domain with threshold rules — aircraft entering restricted airspace, vessels going dark near ports, seismic events above magnitude 4.0. Alerts push via WebSocket, Discord, and email.</div>
+      <div class="cap-tags">
+        <span class="cap-tag red">Alerting</span>
+        <span class="cap-tag blue">WebSocket Push</span>
+        <span class="cap-tag purple">Discord</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">psychology</span></div>
+      <div class="cap-title">Valkyrie AI — Natural Language Intelligence</div>
+      <div class="cap-desc">Query the entire intelligence picture in plain language. "Show military aircraft near the Indian border in the last 6 hours." "What vessels were in Gwadar during last week's seismic event?" Powered by local Ollama — no cloud, no data exfiltration.</div>
+      <div class="cap-tags">
+        <span class="cap-tag green">Local LLM</span>
+        <span class="cap-tag amber">GLADIUS</span>
+        <span class="cap-tag blue">Zero Cloud</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">visibility</span></div>
+      <div class="cap-title">GLSL Visual Intelligence Modes</div>
+      <div class="cap-desc">Four post-processing shader modes: Standard, CRT (scanlines + chromatic aberration), Night Vision Green (phosphor glow + grain + aperture vignette), and FLIR Thermal (7-stop palette + Sobel edge enhancement). Analyst-grade visual tools built into the globe.</div>
+      <div class="cap-tags">
+        <span class="cap-tag cyan">GLSL Shaders</span>
+        <span class="cap-tag blue">NVG</span>
+        <span class="cap-tag red">FLIR</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">lock</span></div>
+      <div class="cap-title">Auth, RBAC & Audit Trail</div>
+      <div class="cap-desc">JWT-based authentication with role hierarchy: Viewer → Analyst → Commander → Admin. Every action logged to an immutable audit trail. Session management with token rotation. MFA support (TOTP). API key management for programmatic access. SIEM-ready log format.</div>
+      <div class="cap-tags">
+        <span class="cap-tag green">JWT</span>
+        <span class="cap-tag amber">RBAC</span>
+        <span class="cap-tag blue">Audit</span>
+        <span class="cap-tag purple">TOTP</span>
+      </div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon"><span class="mi" style="font-size:1.3rem">cell_tower</span></div>
+      <div class="cap-title">Dark Comms — Offline Operation</div>
+      <div class="cap-desc">When the internet dies, GDI doesn't. Foundry Courier protocol encodes intelligence frames for transport over LoRa mesh (Meshtastic), HF radio (JS8Call), Bluetooth mesh, or audio modem. HMAC-SHA256 authenticated. Blockchain-anchored for tamper-proof audit.</div>
+      <div class="cap-tags">
+        <span class="cap-tag amber">LoRa Mesh</span>
+        <span class="cap-tag green">HMAC-SHA256</span>
+        <span class="cap-tag purple">Foundry Courier</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" class="architecture">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Sovereign Stack</div>
+    <h2 class="section-title">Built to survive adversarial conditions</h2>
+    <p class="section-desc">Every layer is replaceable. Every dependency is auditable. The stack runs air-gapped if required.</p>
+  </div>
+  <div class="arch-diagram reveal">
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Frontend</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip green">CesiumJS Globe</span>
+        <span class="arch-chip green">Military HUD</span>
+        <span class="arch-chip green">GLSL Shaders</span>
+        <span class="arch-chip green">Valkyrie AI Panel</span>
+        <span class="arch-chip green">Analyst Workspace</span>
+        <span class="arch-chip green">Alert Dashboard</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">API Gateway</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip blue">FastAPI</span>
+        <span class="arch-chip blue">JWT Auth / RBAC</span>
+        <span class="arch-chip blue">WebSocket Hub</span>
+        <span class="arch-chip blue">Rate Limiting</span>
+        <span class="arch-chip blue">Audit Logging</span>
+        <span class="arch-chip blue">CORS</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Intelligence</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip purple">HEKTOR Correlation</span>
+        <span class="arch-chip purple">Anomaly Detection</span>
+        <span class="arch-chip purple">Geofence Engine</span>
+        <span class="arch-chip purple">Alerting Rules</span>
+        <span class="arch-chip amber">GLADIUS / Ollama LLM</span>
+        <span class="arch-chip amber">NL Query Interface</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Data Workers</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip">ADS-B Ingest</span>
+        <span class="arch-chip">AIS Vessel</span>
+        <span class="arch-chip">Satellite TLE</span>
+        <span class="arch-chip">GDELT Events</span>
+        <span class="arch-chip">FIRMS Fire</span>
+        <span class="arch-chip">Seismic</span>
+        <span class="arch-chip">Cyber Feeds</span>
+        <span class="arch-chip">SATx SIGINT</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Storage</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip cyan">PostgreSQL + PostGIS</span>
+        <span class="arch-chip cyan">SurrealDB</span>
+        <span class="arch-chip cyan">Redis</span>
+        <span class="arch-chip cyan">COMB Memory</span>
+        <span class="arch-chip cyan">HEKTOR Index</span>
+        <span class="arch-chip cyan">MQTT Bus</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Comms</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip red">Cloudflare Tunnel</span>
+        <span class="arch-chip red">WebSocket</span>
+        <span class="arch-chip red">Meshtastic LoRa</span>
+        <span class="arch-chip red">HF Radio</span>
+        <span class="arch-chip red">Foundry Courier</span>
+        <span class="arch-chip red">Discord Alerts</span>
+      </div>
+    </div>
+    <div class="arch-layer-row arch-layer">
+      <div class="arch-layer-label">Security</div>
+      <div class="arch-layer-content">
+        <span class="arch-chip">Ghost Mode</span>
+        <span class="arch-chip">Stealth Firewall</span>
+        <span class="arch-chip">Secure Delete</span>
+        <span class="arch-chip">TLS Enforcement</span>
+        <span class="arch-chip">Immutable Audit</span>
+        <span class="arch-chip">Air-Gap Mode</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- SOVEREIGN -->
+<section class="sovereign">
+<div class="container">
+  <div class="sovereign-split">
+    <div class="sovereign-text reveal">
+      <div class="section-eyebrow">Data Sovereignty</div>
+      <h2 class="section-title">The anti-Palantir.</h2>
+      <p class="section-desc">FISA Section 702 gives the US government legal authority to access any data processed by US companies. Every intelligence platform sold by a US company is structurally compromised for non-US nations. GDI dissolves this dependency entirely.</p>
+      <div class="sovereign-points">
+        <div class="sovereign-point">
+          <div class="sovereign-point-icon green"><span class="mi" style="font-size:.9rem">check</span></div>
+          <div>
+            <div class="sovereign-point-title">Your hardware. Your laws.</div>
+            <div class="sovereign-point-desc">Deploys on-premises or on any sovereign cloud. No data ever leaves your perimeter. Air-gap mode available for classified environments.</div>
+          </div>
+        </div>
+        <div class="sovereign-point">
+          <div class="sovereign-point-icon blue"><span class="mi" style="font-size:.9rem">code</span></div>
+          <div>
+            <div class="sovereign-point-title">Full code transparency for authorised deployments.</div>
+            <div class="sovereign-point-desc">Authorised operators receive full source access. No black boxes. No hidden telemetry. Every line is auditable by the organisations that depend on it.</div>
+          </div>
+        </div>
+        <div class="sovereign-point">
+          <div class="sovereign-point-icon amber"><span class="mi" style="font-size:.9rem">block</span></div>
+          <div>
+            <div class="sovereign-point-title">Zero US corporate dependencies.</div>
+            <div class="sovereign-point-desc">No AWS. No Azure. No Google Cloud. No Palantir. No Recorded Future. Local AI inference via Ollama + GLADIUS. Sovereign data pipeline end to end.</div>
+          </div>
+        </div>
+        <div class="sovereign-point">
+          <div class="sovereign-point-icon purple"><span class="mi" style="font-size:.9rem">wifi_off</span></div>
+          <div>
+            <div class="sovereign-point-title">Operates without internet.</div>
+            <div class="sovereign-point-desc">RTL-SDR for sovereign AIS and ADS-B reception. Meshtastic mesh for inter-node comms. Local LLM for analysis. Cached globe tiles for display. True air-gap capability.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sovereign-comparison reveal">
+      <div class="comparison-header">
+        <div>Capability</div>
+        <div>Palantir Gotham</div>
+        <div>GDI</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Deployment</div>
+        <div class="them">US cloud infrastructure</div>
+        <div class="us">Your hardware</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Data sovereignty</div>
+        <div class="them">FISA-exposed</div>
+        <div class="us">Fully sovereign</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Source code</div>
+        <div class="them">Proprietary black box</div>
+        <div class="us">Auditable — authorised access</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">AI inference</div>
+        <div class="them">Cloud LLM</div>
+        <div class="us">Local GLADIUS/Ollama</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">SIGINT integration</div>
+        <div class="them">MetaConstellation ($$$)</div>
+        <div class="us">Built-in via SATx</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Offline operation</div>
+        <div class="them">No</div>
+        <div class="us">Full air-gap support</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Annual cost</div>
+        <div class="them">$50M+</div>
+        <div class="us">Infrastructure only</div>
+      </div>
+      <div class="comparison-row">
+        <div class="feature">Vendor location</div>
+        <div class="them">USA (FISA jurisdiction)</div>
+        <div class="us">Artifact Virtual — sovereign</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- INTELLIGENCE ENGINE -->
+<section id="engine" class="engine">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Intelligence Engine</div>
+    <h2 class="section-title">The brain behind the picture</h2>
+    <p class="section-desc">Three integrated systems turn raw data streams into actionable intelligence.</p>
+  </div>
+  <div class="engine-grid">
+    <div class="engine-card reveal">
+      <div class="engine-card-top">
+        <div class="engine-card-icon" style="background:rgba(168,85,247,.1);color:var(--accent-purple)">⬡</div>
+        <div>
+          <div class="engine-card-name">HEKTOR</div>
+          <div class="engine-card-sub">Hybrid Search &amp; Correlation</div>
+        </div>
+      </div>
+      <div class="engine-card-desc">BM25 + vector hybrid search engine indexes every data point across all domains in real-time. Cross-domain correlation engine automatically surfaces relationships that human analysts would miss.</div>
+      <div class="engine-card-feats">
+        <div class="engine-feat">Temporal correlation — events across domains within configurable time windows</div>
+        <div class="engine-feat">Spatial correlation — entities from different layers within geographic proximity</div>
+        <div class="engine-feat">Pattern matching — "this activity resembles a historical event"</div>
+        <div class="engine-feat">Anomaly scoring — continuous baseline deviation detection</div>
+        <div class="engine-feat">Natural language search across the entire intelligence corpus</div>
+      </div>
+    </div>
+    <div class="engine-card reveal">
+      <div class="engine-card-top">
+        <div class="engine-card-icon" style="background:rgba(245,158,11,.1);color:var(--accent-amber)">◈</div>
+        <div>
+          <div class="engine-card-name">GLADIUS</div>
+          <div class="engine-card-sub">Local AI Inference Engine</div>
+        </div>
+      </div>
+      <div class="engine-card-desc">Artifact Virtual's own AI kernel running local inference. No cloud. No OpenAI. No data exfiltration. Processes intelligence queries, generates situation reports, and drives the Valkyrie analyst interface.</div>
+      <div class="engine-card-feats">
+        <div class="engine-feat">Natural language queries → structured intelligence output</div>
+        <div class="engine-feat">Automated intelligence brief generation</div>
+        <div class="engine-feat">Anomaly explanation in plain language</div>
+        <div class="engine-feat">Cross-source verification and confidence scoring</div>
+        <div class="engine-feat">Fallback chain: GLADIUS → Ollama → sanitised cloud</div>
+      </div>
+    </div>
+    <div class="engine-card reveal">
+      <div class="engine-card-top">
+        <div class="engine-card-icon" style="background:rgba(59,130,246,.1);color:var(--accent-blue)">⟁</div>
+        <div>
+          <div class="engine-card-name">Virtual GPU Core</div>
+          <div class="engine-card-sub">Parallel Analysis Engine</div>
+        </div>
+      </div>
+      <div class="engine-card-desc">Software-defined parallel computation kernel providing GPU-class analytical throughput without physical GPU. Runs continuous pattern detection, trajectory prediction, and anomaly pipelines across all data streams simultaneously.</div>
+      <div class="engine-card-feats">
+        <div class="engine-feat">10K–100K virtual threads for pattern detection</div>
+        <div class="engine-feat">Continuous anomaly scoring pipelines</div>
+        <div class="engine-feat">Trajectory prediction — flight paths, vessel routes, orbital mechanics</div>
+        <div class="engine-feat">Real-time fusion across all seven domains</div>
+        <div class="engine-feat">SIMD-style parallelism without physical GPU requirement</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DATA SOURCES -->
+<section id="sources" class="sources">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Data Sources</div>
+    <h2 class="section-title">30+ feeds. Open access. Fully sovereign.</h2>
+    <p class="section-desc">Every data source is free-tier or open access. No proprietary feed lock-in. No $50M data contracts.</p>
+  </div>
+  <div class="sources-cats">
+    <div class="source-cat reveal">
+      <div class="source-cat-header">
+        <div class="source-cat-icon"><span class="mi" style="font-size:1.1rem">flight</span></div>
+        <div class="source-cat-name">Aviation &amp; Space</div>
+        <div class="source-cat-count">8 sources</div>
+      </div>
+      <div class="source-list">
+        <div class="source-item"><span class="source-name">OpenSky Network (ADS-B)</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">ADS-B Exchange</span><span class="source-badge soon">Integrating</span></div>
+        <div class="source-item"><span class="source-name">CelesTrak (50K+ TLEs)</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">Space-Track.org (USSTRATCOM)</span><span class="source-badge soon">Integrating</span></div>
+        <div class="source-item"><span class="source-name">JPL Horizons (Deep Space)</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">NASA DSN Now</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">JPL CNEOS (Asteroids)</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">NOAA SWPC (Space Weather)</span><span class="source-badge open">Open</span></div>
+      </div>
+    </div>
+    <div class="source-cat reveal">
+      <div class="source-cat-header">
+        <div class="source-cat-icon"><span class="mi" style="font-size:1.1rem">directions_boat</span></div>
+        <div class="source-cat-name">Maritime</div>
+        <div class="source-cat-count">5 sources</div>
+      </div>
+      <div class="source-list">
+        <div class="source-item"><span class="source-name">AISHub (66K+ vessels)</span><span class="source-badge soon">Integrating</span></div>
+        <div class="source-item"><span class="source-name">Global Fishing Watch</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">BarentsWatch (Arctic)</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">Danish Maritime Authority</span><span class="source-badge open">Open</span></div>
+        <div class="source-item"><span class="source-name">RTL-SDR AIS Receiver</span><span class="source-badge live">Sovereign</span></div>
+      </div>
+    </div>
+    <div class="source-cat reveal">
+      <div class="source-cat-header">
+        <div class="source-cat-icon"><span class="mi" style="font-size:1.1rem">public</span></div>
+        <div class="source-cat-name">Ground &amp; Events</div>
+        <div class="source-cat-count">6 sources</div>
+      </div>
+      <div class="source-list">
+        <div class="source-item"><span class="source-name">GDELT Project (15-min events)</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">ACLED Armed Conflict</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">USGS Earthquake API</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">GDACS Disaster Alerts</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">NASA FIRMS Fire Hotspots</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">Smithsonian GVP (Volcanic)</span><span class="source-badge open">Open</span></div>
+      </div>
+    </div>
+    <div class="source-cat reveal">
+      <div class="source-cat-header">
+        <div class="source-cat-icon"><span class="mi" style="font-size:1.1rem">security</span></div>
+        <div class="source-cat-name">Cyber &amp; FININT</div>
+        <div class="source-cat-count">7 sources</div>
+      </div>
+      <div class="source-list">
+        <div class="source-item"><span class="source-name">AlienVault OTX</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">AbuseIPDB</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">CISA KEV</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">GreyNoise</span><span class="source-badge soon">Integrating</span></div>
+        <div class="source-item"><span class="source-name">Tor Exit Nodes</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">FRED Macroeconomic</span><span class="source-badge live">Live</span></div>
+        <div class="source-item"><span class="source-name">Binance Crypto Markets</span><span class="source-badge live">Live</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DARK COMMS -->
+<section class="darkcomms">
+<div class="container">
+  <div class="reveal darkcomms-intro">
+    <div class="section-eyebrow">Dark Comms</div>
+    <h2 class="section-title">When the internet dies, GDI doesn't.</h2>
+    <p class="section-desc">Foundry Courier protocol encodes authenticated intelligence frames for transport over any available medium. HMAC-SHA256 signed. CRC32 + XOR error correction. When all connectivity fails, GDI nodes form an autonomous mesh.</p>
+  </div>
+  <div class="darkcomms-grid">
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">router</span></div>
+      <div class="darkcomms-card-name">LoRa / Meshtastic</div>
+      <div class="darkcomms-card-spec">10–80 km per hop · AES-256 · $20 node</div>
+      <div class="darkcomms-card-desc">TTGO T-Beam nodes form an encrypted mesh. GPS-positioned on the globe. Solar-powered for persistent coverage. Primary dark comms transport.</div>
+    </div>
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">sensors</span></div>
+      <div class="darkcomms-card-name">HF Radio (JS8Call)</div>
+      <div class="darkcomms-card-spec">Continental range · Weak-signal · Skywave</div>
+      <div class="darkcomms-card-desc">JS8Call weak-signal HF mode for continental-range intelligence sharing. Works when LoRa range is insufficient. No infrastructure dependency.</div>
+    </div>
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">inventory_2</span></div>
+      <div class="darkcomms-card-name">Foundry Courier Protocol</div>
+      <div class="darkcomms-card-spec">HMAC-SHA256 · CRC32 · XOR ECC</div>
+      <div class="darkcomms-card-desc">Frame encoding layer that sits above any transport. Authenticated, error-corrected intelligence packets. Blockchain-anchored for tamper-proof audit trail.</div>
+    </div>
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">graphic_eq</span></div>
+      <div class="darkcomms-card-name">Audio Modem (minimodem)</div>
+      <div class="darkcomms-card-spec">Speaker range · 300 baud · Ultimate fallback</div>
+      <div class="darkcomms-card-desc">When everything else fails — speaker to microphone. Encodes Courier frames as audio tones. Requires zero hardware beyond the device itself.</div>
+    </div>
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">satellite_alt</span></div>
+      <div class="darkcomms-card-name">Blockstream Satellite</div>
+      <div class="darkcomms-card-spec">Global · One-way receive · 64 kbps</div>
+      <div class="darkcomms-card-desc">One-way Bitcoin blockchain broadcast via satellite. $100 receiver. No internet required to receive. Global coverage. Immutable intelligence anchoring.</div>
+    </div>
+    <div class="darkcomms-card reveal">
+      <div class="darkcomms-card-icon"><span class="mi" style="font-size:1.2rem">device_hub</span></div>
+      <div class="darkcomms-card-name">Bluetooth &amp; WiFi Direct</div>
+      <div class="darkcomms-card-spec">100m–200m · Short-range mesh · Zero infra</div>
+      <div class="darkcomms-card-desc">Local mesh for node-to-node intelligence sharing within a base or compound. No router, no AP, no internet. Pure P2P fabric.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap" class="roadmap">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Development Roadmap</div>
+    <h2 class="section-title">From foundation to government-grade.</h2>
+    <p class="section-desc">Five months to demo-ready. Every phase ships usable capability.</p>
+  </div>
+  <div class="roadmap-phases reveal">
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-meta">
+        <div class="roadmap-phase-num">Phase 01</div>
+        <div class="roadmap-phase-name">Sovereign Eye</div>
+        <div class="roadmap-phase-time">Weeks 1–2</div>
+        <div class="roadmap-phase-status status-live">Live</div>
+      </div>
+      <div class="roadmap-phase-content">
+        <div class="roadmap-items">
+          <span class="roadmap-item done">FastAPI Backend</span>
+          <span class="roadmap-item done">JWT Auth + RBAC</span>
+          <span class="roadmap-item done">WebSocket Hub</span>
+          <span class="roadmap-item done">PostgreSQL + PostGIS</span>
+          <span class="roadmap-item done">HEKTOR Integration</span>
+          <span class="roadmap-item done">Correlation Engine</span>
+          <span class="roadmap-item done">Alerting System</span>
+          <span class="roadmap-item done">GDELT Worker</span>
+          <span class="roadmap-item done">FIRMS Fire Feed</span>
+          <span class="roadmap-item done">Valkyrie AI Panel</span>
+          <span class="roadmap-item done">Audit Logging</span>
+          <span class="roadmap-item done">Geofence Engine</span>
+        </div>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-meta">
+        <div class="roadmap-phase-num">Phase 02</div>
+        <div class="roadmap-phase-name">Data Flood</div>
+        <div class="roadmap-phase-time">Weeks 3–4</div>
+        <div class="roadmap-phase-status status-building">Building</div>
+      </div>
+      <div class="roadmap-phase-content">
+        <div class="roadmap-items">
+          <span class="roadmap-item active">AISHub Vessel Layer</span>
+          <span class="roadmap-item active">CelesTrak Full Catalog</span>
+          <span class="roadmap-item active">ADS-B Exchange</span>
+          <span class="roadmap-item">JPL Close Approach</span>
+          <span class="roadmap-item">ACLED Conflict</span>
+          <span class="roadmap-item">Space Weather Overlay</span>
+          <span class="roadmap-item">Sentinel-2 Imagery</span>
+          <span class="roadmap-item">Cyber Feed Integration</span>
+        </div>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-meta">
+        <div class="roadmap-phase-num">Phase 03</div>
+        <div class="roadmap-phase-name">Space &amp; SIGINT</div>
+        <div class="roadmap-phase-time">Weeks 5–6</div>
+        <div class="roadmap-phase-status status-planned">Planned</div>
+      </div>
+      <div class="roadmap-phase-content">
+        <div class="roadmap-items">
+          <span class="roadmap-item">Deep Space Missions (DSN)</span>
+          <span class="roadmap-item">Lunar Globe (LROC)</span>
+          <span class="roadmap-item">Asteroid Visualisation</span>
+          <span class="roadmap-item">SATx → GDI Pipeline</span>
+          <span class="roadmap-item">Signal Classification</span>
+          <span class="roadmap-item">SIGINT Globe Overlay</span>
+          <span class="roadmap-item">Space-Track API</span>
+        </div>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-meta">
+        <div class="roadmap-phase-num">Phase 04</div>
+        <div class="roadmap-phase-name">Dark Comms</div>
+        <div class="roadmap-phase-time">Weeks 7–8</div>
+        <div class="roadmap-phase-status status-planned">Planned</div>
+      </div>
+      <div class="roadmap-phase-content">
+        <div class="roadmap-items">
+          <span class="roadmap-item">Meshtastic Integration</span>
+          <span class="roadmap-item">Foundry Courier Transport</span>
+          <span class="roadmap-item">Mesh Globe Visualisation</span>
+          <span class="roadmap-item">Offline Intel Packages</span>
+          <span class="roadmap-item">Blockchain Audit Trail</span>
+          <span class="roadmap-item">HF Radio Bridge</span>
+        </div>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-meta">
+        <div class="roadmap-phase-num">Phase 05</div>
+        <div class="roadmap-phase-name">Hardening</div>
+        <div class="roadmap-phase-time">Weeks 9–10</div>
+        <div class="roadmap-phase-status status-planned">Planned</div>
+      </div>
+      <div class="roadmap-phase-content">
+        <div class="roadmap-items">
+          <span class="roadmap-item">MFA / TOTP</span>
+          <span class="roadmap-item">CAC/PIV Smart Card</span>
+          <span class="roadmap-item">Data Classification Marking</span>
+          <span class="roadmap-item">Air-Gap Deployment</span>
+          <span class="roadmap-item">Self Pen-Test (Kali)</span>
+          <span class="roadmap-item">SIEM Integration</span>
+          <span class="roadmap-item">Open Source Launch</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PRINCIPLES -->
+<section class="principles">
+<div class="container">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Principles</div>
+    <h2 class="section-title">Why we built this</h2>
+  </div>
+  <div class="principles-grid">
+    <div class="principle reveal">
+      <div class="principle-num">01 / SOVEREIGN</div>
+      <div class="principle-title">Intelligence must not cross foreign borders</div>
+      <div class="principle-desc">The moment your intelligence data touches a US company's infrastructure, it is accessible under FISA Section 702. For any non-US nation, this is not a theoretical risk — it is a structural compromise. GDI was built to eliminate this surface entirely.</div>
+    </div>
+    <div class="principle reveal">
+      <div class="principle-num">02 / OPEN</div>
+      <div class="principle-title">Black boxes have no place in national security</div>
+      <div class="principle-desc">Proprietary intelligence platforms are a trust problem disguised as a product. You cannot audit what you cannot read. GDI is deployed with full source access for authorised operators — every line auditable by the organisations that depend on it.</div>
+    </div>
+    <div class="principle reveal">
+      <div class="principle-num">03 / RESILIENT</div>
+      <div class="principle-title">Designed for adversarial conditions</div>
+      <div class="principle-desc">Internet connectivity is a privilege, not a guarantee. GDI was designed from the ground up to degrade gracefully: from full connectivity to partial to dark comms to fully air-gapped — capability at every level.</div>
+    </div>
+    <div class="principle reveal">
+      <div class="principle-num">04 / CORRELATED</div>
+      <div class="principle-title">Data without correlation is just noise</div>
+      <div class="principle-desc">Palantir sells dashboards. GDI sells understanding. The correlation engine — HEKTOR — finds the patterns human analysts miss because it processes all domains simultaneously, continuously, without fatigue.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+<div class="container">
+  <div class="cta-inner reveal">
+    <h2>Access is restricted.</h2>
+    <p>GDI is not a public product. Deployment is granted to defence organisations, intelligence agencies, and research institutions on a case-by-case basis.</p>
+    <div class="cta-actions">
+      <a href="mailto:ali.shakil@artifactvirtual.com" class="btn btn-primary">Request Access</a>
+      <a href="https://artifactvirtual.com" class="btn btn-outline" target="_blank">Artifact Virtual</a>
+    </div>
+    <div class="cta-classify">Classification: Restricted &nbsp;·&nbsp; Not for public distribution</div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="container">
+  <div class="footer-inner">
+    <div class="footer-left">&copy; 2026 Artifact Virtual (SMC-Private) Limited &nbsp;·&nbsp; Open. Sovereign.</div>
+    <div class="footer-right">
+      <a href="https://artifactvirtual.com">Artifact Virtual</a>
+      <a href="mailto:ali.shakil@artifactvirtual.com">Contact</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+// Intersection Observer for scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade, .reveal').forEach(el => observer.observe(el));
+
+// Smooth anchor scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// Nav scroll style
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  nav.style.borderBottomColor = window.scrollY > 20 ? 'var(--border)' : 'var(--border-subtle)';
+}, { passive: true });
+</script>
+</body>
+</html>

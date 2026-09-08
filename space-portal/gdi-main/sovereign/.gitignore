@@ -1,0 +1,18 @@
+# Sovereign — GDI Resilience Core
+
+# Environment (secrets live here)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime
+logs/
+*.log
+
+# State files (ephemeral)
+*.lock

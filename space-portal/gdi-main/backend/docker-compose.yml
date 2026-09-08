@@ -1,0 +1,93 @@
+# ═══════════════════════════════════════════════════════════════════
+#  GDI SATx — Docker Compose
+#  PostgreSQL + PostGIS + FastAPI Backend + Ingest Daemon
+# ═══════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── PostgreSQL + PostGIS ─────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: gdi-satx-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gdi_satx
+      POSTGRES_USER: gdi
+      POSTGRES_PASSWORD: gdi_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - gdi_pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gdi -d gdi_satx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gdi-net
+
+  # ── FastAPI Backend ──────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gdi-satx-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GDI_DB_HOST: db
+      GDI_DB_PORT: 5432
+      GDI_DB_NAME: gdi_satx
+      GDI_DB_USER: gdi
+      GDI_DB_PASSWORD: gdi_secret
+      GDI_API_HOST: 0.0.0.0
+      GDI_API_PORT: 8600
+      GDI_DEBUG: "false"
+      GDI_STATION_NAME: GDI-PRIMARY
+      GDI_STATION_LAT: "33.6844"
+      GDI_STATION_LON: "73.0479"
+      GDI_STATION_ELEV: "508.0"
+    ports:
+      - "8600:8600"
+    volumes:
+      - satx_data:/opt/satx/data
+    networks:
+      - gdi-net
+
+  # ── Ingest Daemon ────────────────────────────────────────────────
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gdi-satx-ingest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GDI_DB_HOST: db
+      GDI_DB_PORT: 5432
+      GDI_DB_NAME: gdi_satx
+      GDI_DB_USER: gdi
+      GDI_DB_PASSWORD: gdi_secret
+      SATX_DATA_DIR: /opt/satx/data
+      SATX_WATCH: "true"
+      SATX_WATCH_INTERVAL: 5
+    command: ["python", "ingest.py", "--init-station", "--watch"]
+    volumes:
+      - satx_data:/opt/satx/data
+    networks:
+      - gdi-net
+
+volumes:
+  gdi_pgdata:
+    driver: local
+  satx_data:
+    driver: local
+
+networks:
+  gdi-net:
+    driver: bridge
