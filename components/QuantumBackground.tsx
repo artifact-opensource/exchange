@@ -33,7 +33,7 @@ export default function QuantumBackground() {
     const render = (t: number) => {
       ctx.clearRect(0, 0, W, H);
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.9)';
       ctx.lineWidth = strokeVal;
       if (glowVal > 0) ctx.shadowBlur = glowVal;
 
